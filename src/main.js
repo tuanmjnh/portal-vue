@@ -7,7 +7,7 @@ import $ from 'jquery';
 window.jQuery = $;
 window.$ = $;
 // 
-import mixins from './mixins'
+import mixins from './plugins/mixins'
 // Store
 import store from './store'
 // Router
