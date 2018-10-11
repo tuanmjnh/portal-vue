@@ -1,0 +1,6 @@
+// git
+https://github.com/tuanmjnh/tm-shop-vue.git
+// fix git unmerged
+git add .
+git commit -am tm
+git push

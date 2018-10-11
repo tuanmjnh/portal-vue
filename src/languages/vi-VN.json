@@ -1,0 +1,49 @@
+{
+  "global": [{
+      "key": "search",
+      "value": "Tìm kiếm"
+    },
+    {
+      "key": "btn-tool-add",
+      "value": "Thêm mới"
+    },
+    {
+      "key": "btn-tool-list",
+      "value": "Danh sách sử dụng"
+    },
+    {
+      "key": "btn-tool-delete",
+      "value": "Danh sách xóa"
+    },
+    {
+      "key": "btn-edit",
+      "value": "Sửa"
+    },
+    {
+      "key": "btn-delete",
+      "value": "Xóa"
+    },
+    {
+      "key": "btn-recover",
+      "value": "Khôi phục"
+    }
+  ],
+  "languages": [{
+      "key": "",
+      "value": ""
+    },
+    {
+      "key": "",
+      "value": ""
+    }
+  ],
+  "users": [{
+      "key": "",
+      "value": ""
+    },
+    {
+      "key": "",
+      "value": ""
+    }
+  ]
+}
