@@ -153,6 +153,15 @@ export default {
     items: [
       { icon: 'home', title: 'Dashboard', push: 'dashboard' },
       {
+        icon: 'description',
+        title: 'Hợp đồng',
+        push: 'ContractCustomer',
+        children: [
+          { icon: 'contacts', title: 'Khách hàng', push: 'contract-customer' },
+          { icon: 'supervisor_account', title: 'DV CNTT', push: 'contract-enterprise' },
+        ]
+      },
+      {
         icon: 'developer_board',
         title: 'Manager',
         push: 'users',

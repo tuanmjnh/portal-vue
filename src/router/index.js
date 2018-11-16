@@ -1,5 +1,5 @@
 import Vue from 'vue'
-import store from '@/store'
+// import store from '@/store'
 import VueRouter from 'vue-router'
 // Routes
 const routes = [
@@ -19,6 +19,22 @@ const routes = [
     meta: { description: 'Overview of environment', requiresAuth: true },
     component: () =>
       import ('../pages/dashboard/index')
+  },
+  {
+    path: '/contract-customer',
+    name: 'contract-customer',
+    alias: '',
+    meta: { description: 'Overview of environment', requiresAuth: true },
+    component: () =>
+      import ('../pages/contract-customer/index')
+  },
+  {
+    path: '/contract-enterprise',
+    name: 'contract-enterprise',
+    alias: '',
+    meta: { description: 'Overview of environment', requiresAuth: true },
+    component: () =>
+      import ('../pages/contract-enterprise/index')
   },
   {
     path: '/users',

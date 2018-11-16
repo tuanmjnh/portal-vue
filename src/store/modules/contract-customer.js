@@ -1,33 +1,32 @@
 import { SET_CATCH, SET_ITEMS, PUSH_ITEMS, UPDATE_ITEMS, REMOVE_ITEMS, SET_ITEM, SET_MESSAGE } from '../mutation-type'
 import { vnptbkn } from '@/plugins/axios-config'
-const collection = 'contract-enterprise'
+const collection = 'contract-customer'
 export default {
   namespaced: true,
   state: {
     items: [],
     item: {},
     default: {
-      contract_enterprise_id: '',
+      contract_customer_id: '',
       app_key: '',
       local_id: 0,
-      group_id: 0,
       contract_code: '',
       customer_name: '',
       customer_address: '',
-      tax_code: '',
-      start_at: new Date(),
-      end_at: new Date(),
-      quantity: 1,
-      price: '',
-      details: '',
-      contents: '',
+      customer_phone: '',
+      accounts: '',
       attachs: '',
+      details: '',
       created_by: '',
       created_at: new Date(),
       updated_by: '',
       updated_at: null,
       deleted_by: '',
       deleted_at: null,
+      cfm_notes: '',
+      cfm_by: '',
+      cfm_at: new Date(),
+      account_number: 1,
       flag: 1,
       type_id: 1
     }
