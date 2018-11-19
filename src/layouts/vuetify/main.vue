@@ -10,7 +10,7 @@
               <v-icon>store</v-icon>
             </v-list-tile-action>
             <v-list-tile-content class="title">
-              <v-list-tile-title>TM Store</v-list-tile-title>
+              <v-list-tile-title>Portal</v-list-tile-title>
             </v-list-tile-content>
             <!-- <v-list-tile-title class="title">
               TM Store
