@@ -61,6 +61,7 @@ Vue.use(Vuetify, {
     secondary: '#424242',
     accent: '#82B1FF',
     error: '#dc3545',
+    danger: '#cc2032',
     info: '#2196F3',
     success: '#28a745',
     warning: '#FFC107'

@@ -29,6 +29,7 @@ export default {
       // if (_auth.GetRemember()) 
       this.$store.dispatch('auth/setIsAuth', _auth.isAuth())
       var x = this.$store.state.auth.isAuth
+      // console.log(this.$store.state._message)
       return x
     }
   },

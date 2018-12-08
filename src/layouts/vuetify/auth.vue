@@ -5,28 +5,28 @@
         <!-- <v-img src="https://cdn.vuetifyjs.com/images/cards/desert.jpg" aspect-ratio="2.75"></v-img> -->
         <v-card-title primary-title>
           <div>
-            <h3 class="headline mb-0">Login Application</h3>
+            <h3 class="headline mb-0">Đăng nhập hệ thống Portal VNPT BKN</h3>
           </div>
         </v-card-title>
         <v-card-text>
           <v-container grid-list-md>
             <v-layout wrap>
               <v-flex xs12 sm12 md12>
-                <v-text-field v-model="item.username" label="username"></v-text-field>
+                <v-text-field v-model="item.username" label="Tài khoản"></v-text-field>
               </v-flex>
               <v-flex xs12 sm12 md12>
-                <v-text-field type="password" v-model="item.password" label="password"></v-text-field>
+                <v-text-field type="password" v-model="item.password" label="Mật khẩu"></v-text-field>
               </v-flex>
               <v-flex xs12 sm12 md12>
                 <div class="spacer"></div>
-                <v-checkbox v-model="item.remember" label="Remember"></v-checkbox>
+                <v-checkbox v-model="item.remember" label="Ghi nhớ"></v-checkbox>
               </v-flex>
             </v-layout>
           </v-container>
         </v-card-text>
         <v-card-actions>
           <div class="spacer"></div>
-          <v-btn flat color="primary" @click="login">Login</v-btn>
+          <v-btn flat color="primary" @click="login">Đăng nhập</v-btn>
         </v-card-actions>
       </v-card>
     </v-flex>

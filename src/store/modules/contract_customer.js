@@ -9,12 +9,11 @@ export default {
     default: {
       contract_customer_id: '',
       app_key: '',
-      local_id: 0,
-      contract_code: '',
-      customer_name: '',
-      customer_address: '',
-      customer_phone: '',
-      accounts: '',
+      donvi_id: 0,
+      ma_gd: '',
+      ten_kh: '',
+      so_dt: '',
+      ma_tb: '',
       attachs: '',
       details: '',
       created_by: '',
@@ -28,7 +27,38 @@ export default {
       cfm_at: new Date(),
       account_number: 1,
       flag: 1,
-      type_id: 1
+      type_id: 1,
+      thuebao_id: 1,
+      so_gt: '',
+      mst: '',
+      stk: '',
+      diachi_kh: '',
+      diachi_tb: '',
+      diachi_ld: '',
+    },
+    contract: {
+      ma_gd: '',
+      thuebao_id: 0,
+      ma_tb: '',
+      loaitb_id: 0,
+      dichvuvt_id: 0,
+      donvi_id: 0,
+      ten_kh: '',
+      diachi_kh: '',
+      diachi_tb: '',
+      diachi_ld: '',
+      so_dt: '',
+      so_gt: '',
+      mst: '',
+      stk: '',
+      nguoi_cn: '',
+      ngay_cn: null,
+      ngay_tt: null,
+      ngay_ht: null,
+      kieuld_id: '',
+      ten_kieuld: '',
+      tthd_id: '',
+      trangthai_hd: '',
     }
   },
   getters: {
@@ -75,7 +105,26 @@ export default {
     [REMOVE_ITEMS](state, item) {
       const index = state.items.findIndex(x => x.id === item.id)
       if (index >= 0) state.items.splice(index, 1)
-    }
+    },
+    SET_CONTRACT(state, contract) {
+      // state.contract = Object.assign({}, contract)
+      state.item.ma_gd = contract[0].ma_gd
+      state.item.donvi_id = contract[0].donvi_id
+      state.item.ten_kh = contract[0].ten_kh
+      state.item.so_dt = contract[0].so_dt
+      state.item.so_gt = contract[0].local_id
+      state.item.ma_tb = contract[0].ma_tb
+      state.item.thuebao_id = contract[0].thuebao_id
+      state.item.mst = contract[0].local_id
+      state.item.stk = contract[0].local_id
+      state.item.diachi_kh = contract[0].diachi_kh
+      state.item.diachi_tb = contract[0].diachi_tb
+      state.item.diachi_ld = contract[0].diachi_ld
+      state.item.ma_tb = ','
+      contract.forEach(i => {
+        state.item.ma_tb += i.ma_tb + ','
+      });
+    },
   },
   actions: {
     async select({ commit, state }) {
@@ -140,6 +189,16 @@ export default {
     item({ commit, state }, item) {
       if (item) commit(SET_ITEM, item)
       else commit(SET_ITEM, state.default)
-    }
+    },
+    async getContract({ commit, state }) {
+      await vnptbkn
+        .get(collection + '/getContract?str=' + state.item.ma_gd)
+        .then(function(res) {
+          if (res.status == 200) {
+            if (res.data.data && res.data.data.length > 0) commit('SET_CONTRACT', res.data.data)
+          } else commit(SET_CATCH, null, { root: true })
+        })
+        .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
+    },
   }
 }

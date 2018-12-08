@@ -3,26 +3,51 @@
     <!-- <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn> -->
     <v-card>
       <v-card-title>
-        <span class="headline">{{ formTitle }}</span>
+        <span class="headline">{{
+          this.$store.state.contract_customer.item.contract_customer_id ?
+          'Chi tiết hợp đồng lưu trữ' :
+          'Thêm mới hợp đồng lưu trữ' }}</span>
       </v-card-title>
       <v-card-text>
         <v-container grid-list-md>
           <v-layout wrap>
-            <v-flex xs12 sm12 md12>
-              <v-text-field v-model="item.name" label="Name"></v-text-field>
+            <v-flex xs12 sm12 md4>
+              <v-text-field v-model.trim="item.ma_gd" label="Mã hợp đồng"
+                v-on:keyup.enter="getContract"></v-text-field>
             </v-flex>
-            <v-flex xs12 sm6 md4>
-              <v-text-field v-model="item.icon" label="Icon"></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm6 md4>
-              <v-text-field v-model="item.orders" label="Orders"></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm6 md4>
-              <v-switch color="primary" :label="item.flag===1?'Show':'Hide'" :true-value="1" :false-value="0"
-                v-model.number="item.flag"></v-switch>
+            <v-flex xs12 sm12 md8>
+              <v-text-field v-model="item.ten_kh" label="Tên khách hàng"></v-text-field>
             </v-flex>
             <v-flex xs12 sm12 md12>
-              <quill-editor v-model="item.desc" ref="descriptions">
+              <v-text-field v-model="item.diachi_kh" label="Địa chỉ khách hàng"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm12 md12>
+              <v-text-field v-model="item.diachi_tb" label="Địa chỉ thuê bao"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm12 md12>
+              <v-text-field v-model="item.diachi_ld" label="Địa chỉ lắp đặt"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md6>
+              <v-text-field v-model="item.so_dt" label="Điện thoại liên hệ"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md6>
+              <v-text-field v-model="item.so_gt" label="Số giấy tờ"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md6>
+              <v-text-field v-model="item.mst" label="Mã số thuế"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md6>
+              <v-text-field v-model="item.stk" label="Số tài khoản"></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm6 md6>
+              <v-text-field v-model="item.ma_tb" label="Mã thuê bao"></v-text-field>
+            </v-flex>
+            <!-- <v-flex xs12 sm6 md4>
+              <v-switch color="primary" :label="item.flag===1?'Show':'Hide'" :true-value="1"
+                :false-value="0" v-model.number="item.flag"></v-switch>
+            </v-flex> -->
+            <v-flex xs12 sm12 md12>
+              <quill-editor v-model="item.details" ref="Ghi chú">
               </quill-editor>
               <!-- <tinymce id="desc" v-model="item.desc"></tinymce> -->
             </v-flex>
@@ -59,14 +84,11 @@ export default {
     editedIndex: -1
   }),
   mounted() {
-    this.$store.dispatch('users/item')
+    this.$store.dispatch('contract_customer/item')
   },
   computed: {
-    formTitle() {
-      return this.$store.state.users.item.id ? 'Edit Item' : 'New Item'
-    },
     item() {
-      var item = this.$store.state.users.item
+      var item = this.$store.state.contract_customer.item
       return item
     }
   },
@@ -74,13 +96,17 @@ export default {
     dialog(val) { this.localDialog = val },
     localDialog(val) {
       this.$emit('handleDialog', val)
-      if (!val) this.$store.dispatch('users/item')
+      if (!val) this.$store.dispatch('contract_customer/item')
     }
   },
   methods: {
     handleSave() {
-      if (this.item.id) this.$store.dispatch('users/update')
-      else this.$store.dispatch('users/insert')
+      if (this.item.id) this.$store.dispatch('contract_customer/update')
+      else this.$store.dispatch('contract_customer/insert')
+    },
+    getContract() {
+      if (this.item.ma_gd.length > 0)
+        this.$store.dispatch('contract_customer/getContract').then(console.log(this.item))
     }
   }
 }

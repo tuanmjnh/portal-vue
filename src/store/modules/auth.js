@@ -1,5 +1,5 @@
 import { SET_CATCH, SET_MESSAGE } from '../mutation-type'
-import { vnptbkn } from '@/plugins/axios-config'
+import { vnptbkn, setHeaderAuth } from '@/plugins/axios-config'
 import * as _auth from '@/plugins/storage-auth'
 const collection = 'auth'
 export default {
@@ -39,7 +39,26 @@ export default {
           }
           // commit('SET_AUTH', { token: res.data.token, user: data.username, remember: data.remember })
           // commit message
+          if (res.data.message == 'danger') {
+            res.color = 'danger'
+            res.text = 'Lỗi kết nối đến cơ sở dữ liệu!'
+          } else if (res.data.message == 'locked') {
+            res.color = 'danger'
+            res.text = 'Tài khoản đã bị khóa, vui lòng liên hệ Admin!'
+          }
+          // else if (res.data.message == 'null') {
+          //   res.color = 'danger'
+          //   res.text = 'Tài khoản không tồn tại!'
+          // }
+          else if (res.data.message == 'success') {
+            res.color = 'success'
+            res.text = 'Đăng nhập hệ thống thành công!'
+          } else {
+            res.color = 'danger'
+            res.text = 'Tài khoản hoặc mật khẩu không đúng!'
+          }
           commit(SET_MESSAGE, res, { root: true })
+          setHeaderAuth()
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) }) // commit catch
     },
@@ -48,7 +67,7 @@ export default {
       commit('SET_ISAUTH')
       // commit('REMOVE_AUTH', {}, { root: true })
       var res = {
-        data: { message: { type: 'danger', text: 'Đăng xuất thành công' } },
+        data: { message: { type: 'danger', text: 'Đăng xuất thành công!' } },
         status: 200,
         statusText: 'OK'
       }

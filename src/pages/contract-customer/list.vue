@@ -2,50 +2,52 @@
   <div>
     <v-card>
       <v-card-title>
-        <v-text-field v-model="query.search" append-icon="search" label="Search" single-line hide-details></v-text-field>
+        <v-text-field v-model="query.search" append-icon="search" label="Tìm kiếm hợp đồng" single-line hide-details></v-text-field>
         <v-spacer></v-spacer>
         <v-tooltip bottom>
           <v-btn slot="activator" color="primary" small fab flat @click="localDialog=!localDialog">
             <i class="material-icons">add</i>
           </v-btn>
-          <span>Add</span>
+          <span>Nhập mới hợp đồng</span>
         </v-tooltip>
         <v-btn-toggle v-model="toggle_one" mandatory>
           <v-tooltip bottom>
             <v-btn slot="activator" flat @click="query.flag=1">
               <i class="material-icons">view_list</i>
             </v-btn>
-            <span>List use</span>
+            <span>Danh sách hợp đồng</span>
           </v-tooltip>
           <v-tooltip bottom>
             <v-btn slot="activator" flat @click="query.flag=0">
               <i class="material-icons">delete</i>
             </v-btn>
-            <span>List delete</span>
+            <span>Danh sách hợp đồng đã cập nhật</span>
           </v-tooltip>
         </v-btn-toggle>
       </v-card-title>
-      <v-data-table class="elevation-1" v-model="selected" select-all item-key="user_id" :headers="headers"
+      <v-data-table class="elevation-1" v-model="selected" item-key="user_id" :headers="headers"
         :items="items" :rows-per-page-items="rowPerPage" :loading="loading">
-        <!--:loading="loading" :pagination.sync="pagination" :total-items="totalItems" -->
+        <!-- select-all :loading="loading" :pagination.sync="pagination" :total-items="totalItems" -->
         <template slot="items" slot-scope="props">
           <tr>
-            <td>
+            <!-- <td>
               <v-checkbox v-model="props.selected" primary hide-details></v-checkbox>
-            </td>
+            </td> -->
             <!-- <td>{{ props.item.id }}</td> -->
-            <td>{{ props.item.username }}</td>
-            <td>{{ props.item.full_name }}</td>
-            <td>{{ props.item.mobile }}</td>
-            <td>{{ props.item.email }}</td>
+            <td>{{ props.item.contract_code }}</td>
+            <td>{{ props.item.customer_name }}</td>
+            <td>{{ props.item.customer_phone }}</td>
+            <td>{{ props.item.created_by }}</td>
+            <td>{{ props.item.created_at|formatDate('DD/MM/YYYY') }}</td>
             <td class="justify-center layout px-0">
+              <a class="mx-0 v-btn v-btn--icon theme--info" :href="props.item.attachs" target="_blank"><i class="material-icons">attachment</i></a>
               <v-btn icon class="mx-0" @click="onEdit(props.item)">
-                <i class="material-icons teal--text">edit</i>
+                <i class="material-icons teal--text">assignment</i>
               </v-btn>
-              <v-btn icon class="mx-0" @click="onDelete(props.item)">
+              <!-- <v-btn icon class="mx-0" @click="onDelete(props.item)">
                 <i v-if="query.flag===1" class="material-icons error--text">delete</i>
                 <i v-else class="material-icons info--text">refresh</i>
-              </v-btn>
+              </v-btn> -->
             </td>
           </tr>
         </template>
@@ -70,17 +72,19 @@ export default {
       query: { search: '', flag: 1 },
       rowPerPage: [5, 10, 25, 50, 100, { text: "All", value: -1 }],
       headers: [
-        { text: 'Tài khoản', value: 'username' },
-        { text: 'Họ tên', value: 'full_name' },
-        { text: 'Điện thoại', value: 'mobile' },
-        { text: 'Email', value: 'email' },
+        { text: 'Mã hợp đồng', value: 'contract_code' },
+        { text: 'Tên khách hàng', value: 'customer_name' },
+        { text: 'Điện thoại', value: 'customer_phone' },
+        { text: 'Người tạo', value: 'created_by' },
+        { text: 'Ngày tạo', value: 'created_at' },
+        // { text: '#', value: 'attachs' },
         { text: '#', value: '#', sortable: false }
       ]
     }
   },
   computed: {
     items() {
-      var rs = this.$store.getters['users/getFilter'](this.query)
+      var rs = this.$store.getters['contract_customer/getFilter'](this.query)
       return rs
     }
   },
@@ -88,23 +92,23 @@ export default {
     dialog(val) { this.localDialog = val },
     localDialog(val) {
       this.$emit('handleDialog', val)
-      if (!val) this.$store.dispatch('users/item')
+      if (!val) this.$store.dispatch('contract_customer/item')
     }
   },
   created() {
-    this.$store.dispatch('users/select').then(this.loading = false)
+    this.$store.dispatch('contract_customer/select').then(this.loading = false)
   },
   methods: {
     onEdit(item) {
-      this.$store.dispatch('users/item', item)
+      this.$store.dispatch('contract_customer/item', item)
       this.localDialog = true
     },
     onDelete(item) {
       this.confirmDialog = !this.confirmDialog
-      this.$store.dispatch('users/item', item)
+      this.$store.dispatch('contract_customer/item', item)
     },
     onConfirm() {
-      this.$store.dispatch('users/delete')
+      this.$store.dispatch('contract_customer/delete')
     }
   }
 }

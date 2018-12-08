@@ -15,7 +15,11 @@ const vnptbkn = axios.create({
     Remember: _auth.GetRemember()
   }
 })
-
+const setHeaderAuth = function() {
+  vnptbkn.defaults.headers.Author = _auth.GetUser() || ''
+  vnptbkn.defaults.headers.Authorization = _auth.GetToken() || ''
+  vnptbkn.defaults.headers.Remember = _auth.GetRemember()
+}
 // another api service
 // const amazonApi = axios.create({
 //   baseURL: 'https://amazon-domain.com/api/',
@@ -25,4 +29,4 @@ const vnptbkn = axios.create({
 //   }
 // });
 
-export { vnptbkn }
+export { vnptbkn, setHeaderAuth }

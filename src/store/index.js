@@ -11,13 +11,17 @@ import auth from './modules/auth'
 import users from './modules/users'
 import languages from './modules/languages'
 import languages_items from './modules/languages_items'
+import contract_customer from './modules/contract_customer'
+import contract_enterprise from './modules/contract_enterprise'
 Vue.use(Vuex)
 export default new Vuex.Store({
   modules: {
-    auth,
-    users,
-    languages,
-    languages_items
+    'auth': auth,
+    'users': users,
+    'languages': languages,
+    'languages_items': languages_items,
+    'contract_customer': contract_customer,
+    'contract_enterprise': contract_enterprise
   },
   state: {
     _noimage: `Uploads/noimage.jpg`,
@@ -35,7 +39,7 @@ export default new Vuex.Store({
         x: 'right',
         y: 'top',
         show: res.text ? true : false,
-        timeout: 6000,
+        timeout: 60000,
         color: res.color || '',
         text: res.text || '',
         status: res.status || 0,
@@ -43,18 +47,36 @@ export default new Vuex.Store({
       }
     },
     [SET_CATCH](state, error) {
-      // if (error.response.status === 401) this.dispatch('auth/logout')
-      state._message = {
-        mode: '',
-        x: 'right',
-        y: 'top',
-        show: true,
-        timeout: 6000,
-        color: 'danger',
-        text: 'Không thể kết nối đến máy chủ, vui lòng thực hiện lại!', // error.response ? error.response.statusText : error,
-        status: error.response ? error.response.status : 0,
-        statusText: error.response ? error.response.statusText : error
+      console.log(error)
+
+      if (error.response.status === 401) {
+        this.dispatch('auth/logout')
+        state._message = {
+          mode: '',
+          x: 'right',
+          y: 'top',
+          timeout: 6000,
+          show: true,
+          color: 'danger',
+          text: 'Vui lòng đăng nhập lại!', // error.response ? error.response.statusText : error,
+          status: error.response ? error.response.status : 0,
+          statusText: error.response ? error.response.statusText : error
+        }
+      } else {
+        state._message = {
+          mode: '',
+          x: 'right',
+          y: 'top',
+          timeout: 6000,
+          show: true,
+          color: 'danger',
+          text: 'Không thể kết nối đến máy chủ, vui lòng thực hiện lại!', // error.response ? error.response.statusText : error,
+          status: error.response ? error.response.status : 0,
+          statusText: error.response ? error.response.statusText : error
+        }
       }
+      // state._message.show = true
+      // console.log(state._message)
     }
   } // Mutations
 })
