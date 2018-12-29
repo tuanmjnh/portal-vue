@@ -21,7 +21,7 @@ export default {
       price: '',
       details: '',
       contents: '',
-      attachs: '',
+      attach: '',
       created_by: '',
       created_at: new Date(),
       updated_by: '',

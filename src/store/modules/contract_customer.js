@@ -14,7 +14,7 @@ export default {
       ten_kh: '',
       so_dt: '',
       ma_tb: '',
-      attachs: '',
+      attach: '',
       details: '',
       created_by: '',
       created_at: new Date(),

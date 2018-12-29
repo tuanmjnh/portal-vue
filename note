@@ -1,5 +1,6 @@
 // git
-https://github.com/tuanmjnh/tm-shop-vue.git
+git config --global user.name "John Doe"
+git config --global user.email johndoe@example.com
 // fix git unmerged
 git rm -r --cached .
 git add .

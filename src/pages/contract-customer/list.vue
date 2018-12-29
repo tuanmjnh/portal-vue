@@ -34,13 +34,13 @@
               <v-checkbox v-model="props.selected" primary hide-details></v-checkbox>
             </td> -->
             <!-- <td>{{ props.item.id }}</td> -->
-            <td>{{ props.item.contract_code }}</td>
-            <td>{{ props.item.customer_name }}</td>
-            <td>{{ props.item.customer_phone }}</td>
+            <td>{{ props.item.ma_gd }}</td>
+            <td>{{ props.item.ten_kh }}</td>
+            <td>{{ props.item.so_dt }}</td>
             <td>{{ props.item.created_by }}</td>
             <td>{{ props.item.created_at|formatDate('DD/MM/YYYY') }}</td>
             <td class="justify-center layout px-0">
-              <a class="mx-0 v-btn v-btn--icon theme--info" :href="props.item.attachs" target="_blank"><i class="material-icons">attachment</i></a>
+              <a class="mx-0 v-btn v-btn--icon theme--info" :href="host+props.item.attach" target="_blank"><i class="material-icons">attachment</i></a>
               <v-btn icon class="mx-0" @click="onEdit(props.item)">
                 <i class="material-icons teal--text">assignment</i>
               </v-btn>
@@ -59,6 +59,7 @@
 
 <script>
 import confirm from '@/components/confirm'
+import { vnptbkn } from '@/plugins/axios-config'
 export default {
   components: { 'tpl-confirm': confirm },
   props: { dialog: { type: Boolean, default: false } },
@@ -71,6 +72,7 @@ export default {
       confirmDialog: false,
       query: { search: '', flag: 1 },
       rowPerPage: [5, 10, 25, 50, 100, { text: "All", value: -1 }],
+      host: vnptbkn.defaults.host,
       headers: [
         { text: 'Mã hợp đồng', value: 'contract_code' },
         { text: 'Tên khách hàng', value: 'customer_name' },

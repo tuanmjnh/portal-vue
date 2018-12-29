@@ -58,11 +58,11 @@
         <v-spacer></v-spacer>
         <v-btn color="primary" flat @click.native="handleSave">
           <!-- <i class="material-icons">check</i> -->
-          Update
+          {{this.$store.state.contract_customer.item.contract_customer_id ? 'Cập nhật' : 'Thêm mới' }}
         </v-btn>
         <v-btn color="secondary" flat @click.native="localDialog=false">
           <!-- <i class="material-icons">close</i>  -->
-          Cancel
+          Hủy bỏ
         </v-btn>
       </v-card-actions>
     </v-card>
