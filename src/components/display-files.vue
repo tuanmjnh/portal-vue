@@ -1,15 +1,15 @@
 <template>
   <div class="display-file">
-    <div *ngFor="let item of files" class="list-file">
+    <div :key="index" v-for="(item, index) in files" class="list-file">
       <div class="file-item">
         <div class="file-item-content">
           <div class="w-50 file-item-view">
-            <img *ngIf="getExtension(item.extension)==='image'" [src]="this.config.baseUrl.replace('api/', '')+item.full_name"
+            <!-- <img *ngIf="getExtension(item.extension)==='image'" [src]="this.config.baseUrl.replace('api/', '')+item.full_name"
               [title]="item.name">
             <i *ngIf="getExtension(item.extension)==='audio'" class="material-icons">audiotrack</i>
             <i *ngIf="getExtension(item.extension)==='video'" class="material-icons">camera_roll</i>
             <i *ngIf="getExtension(item.extension)==='pdf'" class="material-icons">picture_as_pdf</i>
-            <i *ngIf="getExtension(item.extension)==='file'" class="material-icons">insert_drive_file</i>
+            <i *ngIf="getExtension(item.extension)==='file'" class="material-icons">insert_drive_file</i> -->
           </div>
         </div>
         <div class="file-item-title">{{item.name}}</div>

@@ -124,13 +124,14 @@ export function isVideo(str) {
   return /\.(3g2|3gp|3gp2|3gpp|3gpp2|amv|flv|gom|mp4|mov|mpe|mpeg|mpg||kmv|mkv|wvm|wmv)$/i.test(str.toLowerCase())
 }
 export function isPdf(str) {
-    if (!str) return false;
-    return /\.(pdf)$/i.test(str.toLowerCase());
-  }
-export function getExtension(str, dot) {
+  if (!str) return false;
+  return /\.(pdf)$/i.test(str.toLowerCase());
+}
+export function getExtension(str, dot = true) {
   if (!str) return ''
   var re = /(?:\.([^.]+))?$/;
-  return (dot ? '.' : '') + re.exec(str)[1];
+  var rs = re.exec(str)
+  return rs ? (dot ? rs[0] : rs[1]) : '';
 }
 export function GetImage(file) {
   return new Promise((resolve, reject) => {
@@ -196,4 +197,16 @@ export function ObjectToFormData(obj, formData) {
     formData.append(key, obj[key])
   })
   return formData
+}
+export function ObjectToFillSource(source, destination) {
+  if (!source || !destination) return source
+  Object.keys(source).forEach(function(key, index) {
+    if (typeof source[key] === 'object') {
+      // if (source[key].name) rs += `${obj[key].name}=${obj[key].value}&`
+    } else {
+      source[key] = destination[key]
+      // if (source[key].toString().length > 0) rs += `${key}=${obj[key]}&`
+    }
+  })
+  return source
 }

@@ -1,5 +1,6 @@
 import { SET_CATCH, SET_ITEMS, PUSH_ITEMS, UPDATE_ITEMS, REMOVE_ITEMS, SET_ITEM, SET_MESSAGE } from '../mutation-type'
 import { vnptbkn } from '@/plugins/axios-config'
+import { ObjectToFillSource } from '@/plugins/helpers'
 const collection = 'contract-customer'
 export default {
   namespaced: true,
@@ -9,13 +10,20 @@ export default {
     default: {
       contract_customer_id: '',
       app_key: '',
+      hdkh_id: 0,
+      khachhang_id: 0,
       donvi_id: 0,
       ma_gd: '',
       ten_kh: '',
+      diachi_kh: '',
       so_dt: '',
-      ma_tb: '',
+      so_gt: '',
+      mst: '',
+      stk: '',
       attach: '',
       details: '',
+      nguoi_cn: '',
+      ngay_cn: null,
       created_by: '',
       created_at: new Date(),
       updated_by: '',
@@ -25,16 +33,27 @@ export default {
       cfm_notes: '',
       cfm_by: '',
       cfm_at: new Date(),
-      account_number: 1,
       flag: 1,
-      type_id: 1,
-      thuebao_id: 1,
-      so_gt: '',
-      mst: '',
-      stk: '',
-      diachi_kh: '',
+      loaihd_id: 0,
+      kieuhd_id: 0
+    },
+    thuebao: {
+      hdtb_id: 0,
+      hdtb_cha_id: 0,
+      thuebao_id: 0,
+      thuebao_cha_id: 0,
+      hdkh_id: 0,
+      hdtt_id: 0,
+      ma_tb: '',
+      ten_tb: '',
       diachi_tb: '',
       diachi_ld: '',
+      kieuld_id: 0,
+      tthd_id: 0,
+      loaitb_id: 0,
+      doituong_id: 0,
+      dichvuvt_id: 0,
+      donvi_id: 0
     },
     contract: {
       ma_gd: '',
@@ -93,7 +112,8 @@ export default {
       state.items = items
     },
     [SET_ITEM](state, item) {
-      state.item = Object.assign({}, item)
+      state.item = { ...item } // Object.assign({}, item)
+      console.log(state.item)
     },
     [PUSH_ITEMS](state, item) {
       state.items.push(item)
@@ -138,8 +158,8 @@ export default {
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
     },
     async insert({ commit, state }) {
-      var item = Object.assign({}, state.item)
-      item.created_by = 'Admin'
+      var item = { ...state.item } // Object.assign({}, state.item)
+      item.created_by = vnptbkn.defaults.headers.Author
       item.created_at = new Date()
       // return FBStore.collection(collection)
       //   .add(state.item)
@@ -152,8 +172,8 @@ export default {
       //   .catch(error => { commit(SET_CATCH, error, { root: true }) })
     },
     update({ commit, state }) {
-      var item = Object.assign({}, state.item)
-      item.updated_by = 'Admin'
+      var item = { ...state.item } // Object.assign({}, state.item)
+      item.updated_by = vnptbkn.defaults.headers.Author
       item.updated_at = new Date()
       // FBStore.collection(collection).doc(item.id).set(item)
       //   .then(docRef => {
@@ -163,8 +183,8 @@ export default {
       //   .catch(error => { commit(SET_CATCH, error, { root: true }) })
     },
     delete({ commit, state }) {
-      var item = Object.assign({}, state.item)
-      item.deleted_by = 'Admin'
+      var item = { ...state.item } // Object.assign({}, state.item)
+      item.deleted_by = vnptbkn.defaults.headers.Author
       item.deleted_at = new Date()
       // FBStore.collection(collection).doc(item.id)
       //   .update({ flag: item.flag === 1 ? 0 : 1 })
@@ -177,7 +197,7 @@ export default {
       //   .catch(error => { commit(SET_CATCH, error, { root: true }) })
     },
     remove({ commit, state }) {
-      var item = Object.assign({}, state.item)
+      var item = { ...state.item } // Object.assign({}, state.item)
       // FBStore.collection(collection).doc(item.id).delete()
       //   .then(docRef => {
       //     commit(REMOVE_ITEMS, item)
@@ -195,7 +215,9 @@ export default {
         .get(collection + '/getContract?str=' + state.item.ma_gd)
         .then(function(res) {
           if (res.status == 200) {
-            if (res.data.data && res.data.data.length > 0) commit('SET_CONTRACT', res.data.data)
+            if (res.data.data.khachhang && res.data.data.thuebao && res.data.data.thuebao.length > 0)
+              commit(SET_ITEM, ObjectToFillSource({ ...state.default }, res.data.data.khachhang))
+
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })

@@ -1,73 +1,81 @@
 <template>
-  <div class="file-upload">
-    <div v-if="button" class="file-upload-content">
+  <div class="file-upload" v-if="uploadReady">
+    <div class="btn-upload" v-if="buttonUse">
       <input type="file" id="file-upload" :multiple="multiple===true?true:false" @change="onChange($event)" />
-      <p>
-        Drag your file(s) here to begin<br> or click to browse
-      </p>
+      <label for="file-upload" class="v-btn v-btn--icon theme--info primary--text"><i
+          class="material-icons">cloud_upload</i></label>
     </div>
-    <div v-else>
-      <div class="btn-upload">
-        <input type="file" id="file-upload" :multiple="multiple===true?true:false"
-          @change="onChange($event)" />
-        <label for="file-upload" class="mat-icon-button mat-primary"><i class="material-icons">cloud_upload</i></label>
-      </div>
+    <div v-else class="file-upload-content">
+      <input type="file" id="file-upload" :multiple="multiple===true?true:false" @change="onChange($event)" />
+      <p v-html="buttonText"></p>
     </div>
   </div>
-
 </template>
 
 <script>
-import { NewGuid, CheckExtension, GetExtension } from '@/plugins/helpers';
+import axios from 'axios'
+import { NewGuid, CheckExtension, getExtension } from '@/plugins/helpers';
 export default {
   props: {
     multiple: { type: Boolean, default: false },
     fieldName: { type: String, default: 'file-upload' },
-    renameFile: { type: Boolean, default: false },
-    files: { type: Array, default: null },
-    baseUrl: { type: String, default: 'http://localhost:8080' },
-    controller: { type: String, default: 'upload' },
+    fileName: { type: String, default: null },
+    autoName: { type: Boolean, default: false },
+    http: null,
     httpOptions: { type: Object, default: null },
-    button: { type: String, default: 'upload' }
+    baseUrl: { type: String, default: 'http://localhost:8080' },
+    controller: { type: String, default: 'fileManager' },
+    buttonUse: { type: Boolean, default: false },
+    buttonText: { type: String, default: 'Drag your file(s) here to begin<br> or click to browse' }
   },
+  data: () => ({
+    uploadReady: true,
+    files: [],
+  }),
   methods: {
     onChange(event) {
-      const files = event.target.files;
-      const formData = new FormData();
-      Array.from(Array(files.length).keys()).map(x => {
-        var tmp;
+      // event.target.name
+      // event.target.files
+      // event.target.files.length
+      const formData = new FormData()
+      Array.from(Array(event.target.files.length).keys()).map(x => {
+        var tmp
         if (this.multiple) {
           tmp = {
             fieldName: this.fieldName,
             fileName:
-              this.renameFile === true
-                ? NewGuid() + GetExtension(files[x].name)
-                : files[x].name,
-            file: files[x]
-          };
+              this.autoName === true ? NewGuid() + getExtension(event.target.files[x].name) : event.target.files[x].name,
+            file: event.target.files[x]
+          }
         } else {
           tmp = {
             fieldName: this.fieldName,
-            fileName: this.renameFile
-              ? this.renameFile + GetExtension(files[x].name)
-              : files[x].name,
-            file: files[x]
-          };
+            fileName: this.autoName ? NewGuid() + getExtension(event.target.files[x].name) : (this.fileName ? this.fileName + getExtension(event.target.files[x].name) : event.target.files[x].name),
+            file: event.target.files[x]
+          }
         }
-        formData.append(tmp.fieldName, tmp.file, tmp.fileName);
-        this.files.push(tmp);
-      });
-      this.http
-        .post(
-          this.baseUrl + this.controller,
-          formData,
-          this.httpOptions
-        )
-        .subscribe((res) => {
-          this.files = res.files;
-          this.fileUploadInput.nativeElement.value = '';
-          console.log(res);
+        formData.append(tmp.fieldName, tmp.file, tmp.fileName)
+        this.files.push(tmp)
+        // console.log(this.files)
+      })
+      if (this.http)
+        this.http.post(this.http.defaults.baseURL + this.controller, formData).then((rs) => {
+          this.$emit('handleUpload', rs.data)
+          this.clear();
+        })
+      else
+        axios.post(this.baseUrl + this.controller, formData, { headers: this.httpOptions }).then((rs) => {
+          // console.log(rs.data);
+          this.$emit('handleUpload', rs.data)
+          this.clear();
         });
+
+      // console.log(this.http)
+    },
+    clear() {
+      this.uploadReady = false
+      this.$nextTick(() => { this.uploadReady = true })
+      this.files = []
     }
   }
 }
@@ -91,7 +99,7 @@ export default {
   color: #8d8d8d;
 }
 
-.file-upload [type='file'] {
+.file-upload [type="file"] {
   opacity: 0;
   /* invisible but it's there! */
   cursor: pointer;
@@ -121,7 +129,7 @@ export default {
 .btn-upload {
 }
 
-.btn-upload [type='file'] {
+.btn-upload [type="file"] {
   display: none;
 }
 </style>
