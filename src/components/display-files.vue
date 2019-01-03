@@ -3,13 +3,13 @@
     <div :key="index" v-for="(item, index) in files" class="list-file">
       <div class="file-item">
         <div class="file-item-content">
-          <div class="w-50 file-item-view">
-            <!-- <img *ngIf="getExtension(item.extension)==='image'" [src]="this.config.baseUrl.replace('api/', '')+item.full_name"
-              [title]="item.name">
-            <i *ngIf="getExtension(item.extension)==='audio'" class="material-icons">audiotrack</i>
-            <i *ngIf="getExtension(item.extension)==='video'" class="material-icons">camera_roll</i>
-            <i *ngIf="getExtension(item.extension)==='pdf'" class="material-icons">picture_as_pdf</i>
-            <i *ngIf="getExtension(item.extension)==='file'" class="material-icons">insert_drive_file</i> -->
+          <div :class="[classes,'file-item-view']">
+            <img v-if="getExtension(item.extension)==='image'" :src="baseUrl+item.full_name"
+              :title="item.name">
+            <i v-if="getExtension(item.extension)==='audio'" class="material-icons">audiotrack</i>
+            <i v-if="getExtension(item.extension)==='video'" class="material-icons">camera_roll</i>
+            <i v-if="getExtension(item.extension)==='pdf'" class="material-icons">picture_as_pdf</i>
+            <i v-if="getExtension(item.extension)==='file'" class="material-icons">insert_drive_file</i>
           </div>
         </div>
         <div class="file-item-title">{{item.name}}</div>
@@ -22,7 +22,9 @@
 import { isImage, isAudio, isVideo, isPdf } from '@/plugins/helpers';
 export default {
   props: {
-    files: { type: Array, default: null }
+    files: { type: Array, default: null },
+    baseUrl: { type: String, default: '' },
+    classes: { type: String, default: 'w-50' }
   },
   methods: {
     getExtension(extension) {
@@ -37,17 +39,57 @@ export default {
 </script>
 
 <style lang="scss">
+.list-file {
+  float: left;
+}
 .file-item-view {
   border: 1px solid #ccc;
-}
-
-.w-50 {
-  width: 50px;
   text-align: center;
   vertical-align: middle;
-
   img {
-    width: 50px;
+    text-align: center;
+    vertical-align: middle;
+  }
+}
+.w-25 {
+  width: 25px;
+  img {
+    width: 23px;
+    padding: 3px;
+  }
+}
+.w-50 {
+  width: 50px;
+  img {
+    width: 46px;
+    padding: 3px;
+  }
+}
+.w-100 {
+  width: 100px;
+  img {
+    width: 98px;
+    padding: 3px;
+  }
+}
+.w-150 {
+  width: 150px;
+  img {
+    width: 146px;
+    padding: 3px;
+  }
+}
+.w-200 {
+  width: 200px;
+  img {
+    width: 195px;
+    padding: 3px;
+  }
+}
+.w-300 {
+  width: 300px;
+  img {
+    width: 290px;
     padding: 3px;
   }
 }

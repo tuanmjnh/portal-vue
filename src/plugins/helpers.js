@@ -200,7 +200,6 @@ export function ObjectToFormData(obj, formData) {
 }
 export function ObjectToLowerKey(obj) {
   if (!obj) return obj
-  console.log(Array.isArray(obj))
   if (Array.isArray(obj)) {
     var _arr = new Array()
     obj.forEach(e => {

@@ -40,7 +40,7 @@
             <td>{{ props.item.created_by }}</td>
             <td>{{ props.item.created_at|formatDate('DD/MM/YYYY') }}</td>
             <td class="justify-center layout px-0">
-              <a class="mx-0 v-btn v-btn--icon theme--info" :href="host+props.item.attach" target="_blank"><i class="material-icons">attachment</i></a>
+              <a class="mx-0 v-btn v-btn--icon theme--info" :href="vnptbkn.defaults.host+props.item.attach" target="_blank"><i class="material-icons">attachment</i></a>
               <v-btn icon class="mx-0" @click="onEdit(props.item)">
                 <i class="material-icons teal--text">assignment</i>
               </v-btn>
@@ -72,7 +72,7 @@ export default {
       confirmDialog: false,
       query: { search: '', flag: 1 },
       rowPerPage: [5, 10, 25, 50, 100, { text: "All", value: -1 }],
-      host: vnptbkn.defaults.host,
+      vnptbkn: vnptbkn,
       headers: [
         { text: 'Mã hợp đồng', value: 'contract_code' },
         { text: 'Tên khách hàng', value: 'customer_name' },

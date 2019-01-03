@@ -3,14 +3,12 @@
     <!-- <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn> -->
     <v-card>
       <v-card-title>
-        <span class="headline">{{
-          this.$store.state.contract_customer.khachhang.contract_customer_id ?
-          'Chi tiết hợp đồng lưu trữ' :
-          'Thêm mới hợp đồng lưu trữ' }}</span>
+        <span class="headline">{{ khachhang.contract_customer_id ?
+          'Chi tiết hợp đồng lưu trữ' : 'Thêm mới hợp đồng lưu trữ' }}</span>
       </v-card-title>
       <v-card-text>
         <v-container grid-list-md>
-          <v-tabs v-model="tabActive" color="transparent">
+          <v-tabs v-model="tabActive" color="secondary" dark>
             <v-tab>Thông tin khách hàng</v-tab>
             <v-tab>Thông tin thuê bao</v-tab>
             <v-tab>Ghi chú</v-tab>
@@ -18,8 +16,8 @@
             <v-tab-item>
               <v-layout wrap class="pt-2">
                 <v-flex xs12 sm12 md4>
-                  <v-text-field v-model.trim="khachhang.ma_gd" label="Mã hợp đồng"
-                    v-on:keyup.enter="getContract"></v-text-field>
+                  <v-text-field v-model.trim="khachhang.ma_gd" label="Mã hợp đồng" class="text-color-initial"
+                    v-on:keyup.enter="getContract" :disabled="khachhang.contract_customer_id?true:false"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm12 md8>
                   <v-text-field v-model="khachhang.ten_kh" label="Tên khách hàng"
@@ -51,20 +49,20 @@
                   <v-text-field v-model="khachhang.stk" label="Số tài khoản" :disabled="true"
                     class="text-color-initial"></v-text-field>
                 </v-flex>
-                <v-flex xs12 sm6 md6>
-                  <v-text-field :value="khachhang.donvi_id" label="Đơn vị quản lý"
-                    :disabled="true" class="text-color-initial"></v-text-field>
+                <v-flex xs12 sm12 md12 v-if="khachhang.contract_customer_id">
+                  Hợp đồng: <a class="mx-0 v-btn v-btn--icon theme--info" :href="vnptbkn.defaults.host+khachhang.attach"
+                    target="_blank"><i class="material-icons">attachment</i></a>
                 </v-flex>
-                <v-flex xs12 sm12 md12>
-                  Dang sach: <display-files></display-files>
-                </v-flex>
-                <v-flex xs12 sm12 md12 v-if="khachhang.ma_gd">
-                  <display-files></display-files>
-                  <div class="spacer"></div>
-                  <upload-files @handleUpload="uploadFiles=$event" :buttonUse="true"
-                    :multiple="false" :autoName="true" :http="vnptbkn"></upload-files>
-                  <!-- :fileName="khachhang.ma_gd.replace(/\//g,'_')" -->
-                </v-flex>
+                <template v-if="!khachhang.contract_customer_id">
+                  <v-flex xs12 sm6 md6 v-if="khachhang.ma_gd">
+                    <upload-files @handleUpload="uploadFiles=$event" :buttonUse="false"
+                      :multiple="false" :autoName="true" :http="vnptbkn" buttonText="Ấn vào đây để chọn hợp đồng"></upload-files>
+                    <!-- :fileName="khachhang.ma_gd.replace(/\//g,'_')" -->
+                  </v-flex>
+                  <v-flex xs12 sm6 md6 v-if="khachhang.ma_gd">
+                    <display-files :files="uploadFiles.files" :baseUrl="vnptbkn.defaults.host"></display-files>
+                  </v-flex>
+                </template>
                 <!-- <v-flex xs12 sm6 md4>
               <v-switch color="primary" :label="khachhang.flag===1?'Show':'Hide'" :true-value="1"
                 :false-value="0" v-model.number="khachhang.flag"></v-switch>
@@ -72,14 +70,15 @@
               </v-layout>
             </v-tab-item>
             <v-tab-item>
-              <v-data-table :headers="headers" :items="thuebao" class="elevation-1" hide-actions>
+              <v-data-table :headers="headers" :items="thuebao" class="elevation-1"
+                hide-actions>
                 <template slot="items" slot-scope="props">
                   <td>{{ props.item.ma_tb }}</td>
                   <td>{{ props.item.ten_tb }}</td>
                   <td>{{ props.item.diachi_tb }}</td>
                   <td>{{ props.item.diachi_ld }}</td>
                   <td>{{ props.item.loaihinh_tb }}</td>
-                  <td>{{ props.item.ten_dvql }}</td>
+                  <td>{{ props.item.ten_dv }}</td>
                 </template>
               </v-data-table>
             </v-tab-item>
@@ -95,11 +94,11 @@
             <v-tab-item>
               <v-layout wrap class="pt-2">
                 <v-flex xs12 sm6 md6>
-                  <v-text-field :value="khachhang.loaihd_id" label="Loại hợp đồng"
-                    :disabled="true" class="text-color-initial"></v-text-field>
+                  <v-text-field :value="khachhang.ten_dv" label="Đơn vị" :disabled="true"
+                    class="text-color-initial"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md6>
-                  <v-text-field :value="khachhang.kieuhd_id" label="Kiểu hợp đồng"
+                  <v-text-field :value="khachhang.ten_loaihd" label="Loại hợp đồng"
                     :disabled="true" class="text-color-initial"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md6>
@@ -117,10 +116,12 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" flat @click.native="handleSave" v-if="uploadFiles.files.length>0">
-          <!-- <i class="material-icons">check</i> -->
-          {{this.$store.state.contract_customer.khachhang.contract_customer_id ? 'Cập nhật':'Thêm mới' }}
-        </v-btn>
+        <template v-if="!khachhang.contract_customer_id">
+          <v-btn color="primary" flat @click.native="handleSave" v-if="uploadFiles.files.length>0">
+            <!-- <i class="material-icons">check</i> -->
+            {{khachhang.contract_customer_id ? 'Cập nhật':'Thêm mới' }}
+          </v-btn>
+        </template>
         <v-btn color="secondary" flat @click.native="localDialog=false">
           <!-- <i class="material-icons">close</i>  -->
           Hủy bỏ
@@ -186,13 +187,15 @@ export default {
     },
     uploadFiles: {
       handler(val) {
-        console.log(val)
+        if (val.files && val.files.length > 0)
+          this.khachhang.attach = val.files[0].full_name
       },
       deep: true
     }
   },
   methods: {
     handleSave() {
+      this.khachhang
       if (this.khachhang.id) this.$store.dispatch('contract_customer/update')
       else this.$store.dispatch('contract_customer/insert')
     },
