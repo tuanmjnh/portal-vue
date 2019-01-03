@@ -1,18 +1,19 @@
 import { SET_CATCH, SET_ITEMS, PUSH_ITEMS, UPDATE_ITEMS, REMOVE_ITEMS, SET_ITEM, SET_MESSAGE } from '../mutation-type'
 import { vnptbkn } from '@/plugins/axios-config'
-import { ObjectToFillSource } from '@/plugins/helpers'
+import { ObjectToFillSource, ObjectToLowerKey } from '@/plugins/helpers'
 const collection = 'contract-customer'
 export default {
   namespaced: true,
   state: {
     items: [],
-    item: {},
-    default: {
-      contract_customer_id: '',
+    khachhang: {},
+    thuebao: [],
+    df_khachhang: {
+      contract_customer_id: 0,
       app_key: '',
-      hdkh_id: 0,
-      khachhang_id: 0,
-      donvi_id: 0,
+      hdkh_id: '',
+      khachhang_id: '',
+      donvi_id: '',
       ma_gd: '',
       ten_kh: '',
       diachi_kh: '',
@@ -23,21 +24,21 @@ export default {
       attach: '',
       details: '',
       nguoi_cn: '',
-      ngay_cn: null,
+      ngay_cn: '',
       created_by: '',
       created_at: new Date(),
       updated_by: '',
-      updated_at: null,
+      updated_at: '',
       deleted_by: '',
-      deleted_at: null,
+      deleted_at: '',
       cfm_notes: '',
       cfm_by: '',
       cfm_at: new Date(),
       flag: 1,
-      loaihd_id: 0,
-      kieuhd_id: 0
+      loaihd_id: '',
+      kieuhd_id: ''
     },
-    thuebao: {
+    df_thuebao: {
       hdtb_id: 0,
       hdtb_cha_id: 0,
       thuebao_id: 0,
@@ -54,30 +55,6 @@ export default {
       doituong_id: 0,
       dichvuvt_id: 0,
       donvi_id: 0
-    },
-    contract: {
-      ma_gd: '',
-      thuebao_id: 0,
-      ma_tb: '',
-      loaitb_id: 0,
-      dichvuvt_id: 0,
-      donvi_id: 0,
-      ten_kh: '',
-      diachi_kh: '',
-      diachi_tb: '',
-      diachi_ld: '',
-      so_dt: '',
-      so_gt: '',
-      mst: '',
-      stk: '',
-      nguoi_cn: '',
-      ngay_cn: null,
-      ngay_tt: null,
-      ngay_ht: null,
-      kieuld_id: '',
-      ten_kieuld: '',
-      tthd_id: '',
-      trangthai_hd: '',
     }
   },
   getters: {
@@ -111,39 +88,22 @@ export default {
     [SET_ITEMS](state, items) {
       state.items = items
     },
-    [SET_ITEM](state, item) {
-      state.item = { ...item } // Object.assign({}, item)
-      console.log(state.item)
+    SET_KHACHHANG(state, khachhang) {
+      state.khachhang = { ...khachhang } // Object.assign({}, item)
     },
-    [PUSH_ITEMS](state, item) {
-      state.items.push(item)
+    SET_THUEBAO(state, thuebao) {
+      state.thuebao = thuebao // Object.assign({}, item)
     },
-    [UPDATE_ITEMS](state, item) {
-      const index = state.items.findIndex(x => x.id === item.id)
-      state.items.splice(index, 1, item)
+    [PUSH_ITEMS](state, khachhang) {
+      state.items.push(khachhang)
     },
-    [REMOVE_ITEMS](state, item) {
-      const index = state.items.findIndex(x => x.id === item.id)
+    [UPDATE_ITEMS](state, khachhang) {
+      const index = state.items.findIndex(x => x.id === khachhang.id)
+      state.items.splice(index, 1, khachhang)
+    },
+    [REMOVE_ITEMS](state, khachhang) {
+      const index = state.items.findIndex(x => x.id === khachhang.id)
       if (index >= 0) state.items.splice(index, 1)
-    },
-    SET_CONTRACT(state, contract) {
-      // state.contract = Object.assign({}, contract)
-      state.item.ma_gd = contract[0].ma_gd
-      state.item.donvi_id = contract[0].donvi_id
-      state.item.ten_kh = contract[0].ten_kh
-      state.item.so_dt = contract[0].so_dt
-      state.item.so_gt = contract[0].local_id
-      state.item.ma_tb = contract[0].ma_tb
-      state.item.thuebao_id = contract[0].thuebao_id
-      state.item.mst = contract[0].local_id
-      state.item.stk = contract[0].local_id
-      state.item.diachi_kh = contract[0].diachi_kh
-      state.item.diachi_tb = contract[0].diachi_tb
-      state.item.diachi_ld = contract[0].diachi_ld
-      state.item.ma_tb = ','
-      contract.forEach(i => {
-        state.item.ma_tb += i.ma_tb + ','
-      });
     },
   },
   actions: {
@@ -158,7 +118,7 @@ export default {
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
     },
     async insert({ commit, state }) {
-      var item = { ...state.item } // Object.assign({}, state.item)
+      var item = { ...state.khachhang } // Object.assign({}, state.khachhang)
       item.created_by = vnptbkn.defaults.headers.Author
       item.created_at = new Date()
       // return FBStore.collection(collection)
@@ -168,11 +128,11 @@ export default {
       //     commit(PUSH_ITEMS, item)
       //     commit(SET_MESSAGE, { text: 'Cập nhật thành công', color: 'success' }, { root: true })
       //   })
-      //   .then(() => { commit(SET_ITEM, state.default) })
+      //   .then(() => { commit(SET_KHACHHANG, state.default) })
       //   .catch(error => { commit(SET_CATCH, error, { root: true }) })
     },
     update({ commit, state }) {
-      var item = { ...state.item } // Object.assign({}, state.item)
+      var item = { ...state.khachhang } // Object.assign({}, state.khachhang)
       item.updated_by = vnptbkn.defaults.headers.Author
       item.updated_at = new Date()
       // FBStore.collection(collection).doc(item.id).set(item)
@@ -183,7 +143,7 @@ export default {
       //   .catch(error => { commit(SET_CATCH, error, { root: true }) })
     },
     delete({ commit, state }) {
-      var item = { ...state.item } // Object.assign({}, state.item)
+      var item = { ...state.khachhang } // Object.assign({}, state.khachhang)
       item.deleted_by = vnptbkn.defaults.headers.Author
       item.deleted_at = new Date()
       // FBStore.collection(collection).doc(item.id)
@@ -193,31 +153,42 @@ export default {
       //     commit(UPDATE_ITEMS, item)
       //     commit(SET_MESSAGE, { text: 'Xóa bản ghi thành công!', color: 'success' }, { root: true })
       //   })
-      //   .then(() => { commit(SET_ITEM, state.default) })
+      //   .then(() => { commit(SET_KHACHHANG, state.default) })
       //   .catch(error => { commit(SET_CATCH, error, { root: true }) })
     },
     remove({ commit, state }) {
-      var item = { ...state.item } // Object.assign({}, state.item)
+      var item = { ...state.khachhang } // Object.assign({}, state.khachhang)
       // FBStore.collection(collection).doc(item.id).delete()
       //   .then(docRef => {
       //     commit(REMOVE_ITEMS, item)
       //     commit(SET_MESSAGE, { text: 'Xóa hoàn toàn bản ghi thành công!', color: 'success' }, { root: true })
       //   })
-      //   .then(() => { commit(SET_ITEM, state.default) })
+      //   .then(() => { commit(SET_KHACHHANG, state.default) })
       //   .catch(error => { commit(SET_CATCH, error, { root: true }) })
     },
-    item({ commit, state }, item) {
-      if (item) commit(SET_ITEM, item)
-      else commit(SET_ITEM, state.default)
+    khachhang({ commit, state }, khachhang) {
+      if (khachhang) commit('SET_KHACHHANG', khachhang)
+      else commit('SET_KHACHHANG', state.df_khachhang)
+    },
+    thuebao({ commit, state }, thuebao) {
+      if (thuebao) commit('SET_THUEBAO', thuebao)
+      else commit('SET_THUEBAO', [])
     },
     async getContract({ commit, state }) {
       await vnptbkn
-        .get(collection + '/getContract?str=' + state.item.ma_gd)
+        .get(collection + '/getContract?str=' + state.khachhang.ma_gd)
         .then(function(res) {
           if (res.status == 200) {
-            if (res.data.data.khachhang && res.data.data.thuebao && res.data.data.thuebao.length > 0)
-              commit(SET_ITEM, ObjectToFillSource({ ...state.default }, res.data.data.khachhang))
-
+            if (res.data.message === 'exist') {
+              commit(SET_MESSAGE, { text: 'Không tìm thấy hợp đồng!', color: 'warning' }, { root: true })
+              return
+            }
+            if (res.data.data.khachhang && res.data.data.thuebao && res.data.data.thuebao.length > 0) {
+              // SET_KHACHHANG
+              commit('SET_KHACHHANG', ObjectToFillSource({ ...state.df_khachhang }, res.data.data.khachhang))
+              // SET_THUEBAO
+              commit('SET_THUEBAO', ObjectToLowerKey(res.data.data.thuebao))
+            }
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })

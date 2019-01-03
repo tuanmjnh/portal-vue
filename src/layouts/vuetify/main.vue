@@ -1,8 +1,8 @@
 <template>
   <div>
     <!--temporary-->
-    <v-navigation-drawer :mini-variant="miniVariant" :clipped="clipped" v-model="drawer" enable-resize-watcher
-      fixed app>
+    <v-navigation-drawer :mini-variant="miniVariant" :clipped="clipped" v-model="drawer"
+      enable-resize-watcher fixed app>
       <v-toolbar flat>
         <v-list>
           <v-list-tile>
@@ -33,12 +33,14 @@
             <v-list-tile slot="activator">
               <v-list-tile-title v-text="item.title"></v-list-tile-title>
             </v-list-tile>
-            <v-list-tile v-if="item.children" v-for="(children, ii) in item.children" :key="ii" @click="MenuAction(children)">
-              <v-list-tile-title v-text="children.title"></v-list-tile-title>
-              <v-list-tile-action>
-                <v-icon v-text="children.icon"></v-icon>
-              </v-list-tile-action>
-            </v-list-tile>
+            <template v-if="item.children">
+              <v-list-tile v-for="(children, ii) in item.children" :key="ii" @click="MenuAction(children)">
+                <v-list-tile-title v-text="children.title"></v-list-tile-title>
+                <v-list-tile-action>
+                  <v-icon v-text="children.icon"></v-icon>
+                </v-list-tile-action>
+              </v-list-tile>
+            </template>
           </v-list-group>
         </template>
       </v-list>
@@ -111,9 +113,10 @@
     <v-content>
       <!-- <HelloWorld/> -->
       <div class="container page">
-        <v-snackbar v-model="snackbar.show" :color="snackbar.color" :right="snackbar.x==='right'" :left="snackbar.x==='left'"
-          :bottom="snackbar.y==='bottom'" :top="snackbar.y==='top'" :timeout="snackbar.timeout"
-          :multi-line="snackbar.mode==='multi-line'" :vertical="snackbar.mode==='vertical'">
+        <v-snackbar v-model="snackbar.show" :color="snackbar.color" :right="snackbar.x==='right'"
+          :left="snackbar.x==='left'" :bottom="snackbar.y==='bottom'" :top="snackbar.y==='top'"
+          :timeout="snackbar.timeout" :multi-line="snackbar.mode==='multi-line'"
+          :vertical="snackbar.mode==='vertical'">
           {{ snackbar.text }}
           <v-btn color="" flat @click="snackbar.show=false">
             <i class="material-icons">close</i>
@@ -216,5 +219,6 @@ export default {
 }
 </script>
 <style lang="scss">
-@import '@/assets/scss/vuetify.scss';
+@import "@/assets/scss/vuetify.scss";
+@import "@/assets/scss/quill.scss";
 </style>

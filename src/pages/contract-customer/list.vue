@@ -94,7 +94,7 @@ export default {
     dialog(val) { this.localDialog = val },
     localDialog(val) {
       this.$emit('handleDialog', val)
-      if (!val) this.$store.dispatch('contract_customer/item')
+      if (!val) this.$store.dispatch('contract_customer/khachhang')
     }
   },
   created() {
@@ -102,12 +102,12 @@ export default {
   },
   methods: {
     onEdit(item) {
-      this.$store.dispatch('contract_customer/item', item)
+      this.$store.dispatch('contract_customer/khachhang', item)
       this.localDialog = true
     },
     onDelete(item) {
       this.confirmDialog = !this.confirmDialog
-      this.$store.dispatch('contract_customer/item', item)
+      this.$store.dispatch('contract_customer/khachhang', item)
     },
     onConfirm() {
       this.$store.dispatch('contract_customer/delete')

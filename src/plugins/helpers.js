@@ -198,13 +198,38 @@ export function ObjectToFormData(obj, formData) {
   })
   return formData
 }
+export function ObjectToLowerKey(obj) {
+  if (!obj) return obj
+  console.log(Array.isArray(obj))
+  if (Array.isArray(obj)) {
+    var _arr = new Array()
+    obj.forEach(e => {
+      var _obj = new Object()
+      Object.keys(e).forEach(function(key, index) {
+        var _key = key.toLowerCase()
+        _obj[_key] = e[key]
+      })
+      _arr.push(_obj)
+    });
+    return _arr
+  } else {
+    var _obj = new Object()
+    Object.keys(obj).forEach(function(key, index) {
+      var _key = key.toLowerCase()
+      _obj[_key] = obj[key]
+    })
+    return _obj
+  }
+}
 export function ObjectToFillSource(source, destination) {
   if (!source || !destination) return source
+  destination = ObjectToLowerKey(destination)
   Object.keys(source).forEach(function(key, index) {
-    if (typeof source[key] === 'object') {
+    var _key = key.toLowerCase()
+    if (typeof source[_key] === 'object') {
       // if (source[key].name) rs += `${obj[key].name}=${obj[key].value}&`
     } else {
-      source[key] = destination[key]
+      source[_key] = destination[_key]
       // if (source[key].toString().length > 0) rs += `${key}=${obj[key]}&`
     }
   })
