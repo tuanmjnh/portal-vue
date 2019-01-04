@@ -6,10 +6,10 @@ import {
   REMOVE_ITEMS,
   SET_ITEM,
   SET_MESSAGE
-} from '../mutation-type';
-import { vnptbkn } from '@/plugins/axios-config';
-import { ObjectToFillSource, ObjectToLowerKey } from '@/plugins/helpers';
-const collection = 'contract-customer';
+} from '../mutation-type'
+import { vnptbkn } from '@/plugins/axios-config'
+import { ObjectToFillSource, ObjectToLowerKey } from '@/plugins/helpers'
+const collection = 'contract-customer'
 export default {
   namespaced: true,
   state: {
@@ -17,11 +17,10 @@ export default {
     khachhang: {},
     thuebao: [],
     df_khachhang: {
-      contract_customer_id: 0,
-      app_key: '',
+      cc_id: '',
       hdkh_id: '',
       khachhang_id: '',
-      donvi_id: '',
+      app_key: '',
       ma_gd: '',
       ten_kh: '',
       diachi_kh: '',
@@ -33,17 +32,15 @@ export default {
       details: '',
       nguoi_cn: '',
       ngay_cn: '',
+      donvi_id: '',
+      loaihd_id: '',
       created_by: '',
-      created_at: new Date(),
+      created_at: '',
       updated_by: '',
       updated_at: '',
       deleted_by: '',
       deleted_at: '',
-      cfm_notes: '',
-      cfm_by: '',
-      cfm_at: new Date(),
       flag: 1,
-      loaihd_id: ''
     },
     df_thuebao: {
       hdtb_id: 0,
@@ -66,55 +63,51 @@ export default {
   },
   getters: {
     getAll(state) {
-      return state.items;
+      return state.items
     },
     getById: state => id => {
-      return state.items.find(x => x.id === id);
+      return state.items.find(x => x.id === id)
     },
     getByFlag: state => flag => {
-      return state.items.filter(x => x.flag === flag);
+      return state.items.filter(x => x.flag === flag)
     },
     getFilter: state => query => {
-      let items = state.items;
+      let items = state.items
       if (query.flag >= 0) {
         items = items.filter(function(row) {
-          return row['flag'] == query.flag;
-        });
+          return row['flag'] == query.flag
+        })
       }
       if (query.search) {
         items = items.filter(function(row) {
           return Object.keys(row).some(function(key) {
-            return (
-              String(row[key])
-                .toLowerCase()
-                .indexOf(query.search) > -1
-            );
-          });
-        });
+            return (String(row[key]).toLowerCase().indexOf(query.search) > -1)
+          })
+        })
       }
-      return items;
+      return items
     }
   },
   mutations: {
     [SET_ITEMS](state, items) {
-      state.items = items;
+      state.items = items
     },
     SET_KHACHHANG(state, khachhang) {
-      state.khachhang = { ...khachhang }; // Object.assign({}, item)
+      state.khachhang = { ...khachhang } // Object.assign({}, item)
     },
     SET_THUEBAO(state, thuebao) {
-      state.thuebao = thuebao; // Object.assign({}, item)
+      state.thuebao = thuebao // Object.assign({}, item)
     },
     [PUSH_ITEMS](state, khachhang) {
-      state.items.push(khachhang);
+      state.items.push(khachhang)
     },
     [UPDATE_ITEMS](state, khachhang) {
-      const index = state.items.findIndex(x => x.id === khachhang.id);
-      state.items.splice(index, 1, khachhang);
+      const index = state.items.findIndex(x => x.id === khachhang.id)
+      state.items.splice(index, 1, khachhang)
     },
     [REMOVE_ITEMS](state, khachhang) {
-      const index = state.items.findIndex(x => x.id === khachhang.id);
-      if (index >= 0) state.items.splice(index, 1);
+      const index = state.items.findIndex(x => x.id === khachhang.id)
+      if (index >= 0) state.items.splice(index, 1)
     }
   },
   actions: {
@@ -122,47 +115,56 @@ export default {
       await vnptbkn
         .get(collection)
         .then(function(res) {
-          if (res.status == 200) {
-            if (res.data.data) commit(SET_ITEMS, res.data.data);
-          } else commit(SET_CATCH, null, { root: true });
+          if (res.status === 200) {
+            if (res.data.data) commit(SET_ITEMS, res.data.data)
+          } else commit(SET_CATCH, null, { root: true })
         })
-        .catch(function(error) {
-          commit(SET_CATCH, error, { root: true });
-        });
+        .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
+    },
+    async getThuebao({ commit, state }) {
+      console.log(state.khachhang.hdkh_id)
+      await vnptbkn
+        .get(collection + '/getThuebao/' + state.khachhang.hdkh_id)
+        .then(function(res) {
+          if (res.status === 200) {
+            if (res.data.data) commit('SET_THUEBAO', res.data.data)
+          } else commit(SET_CATCH, null, { root: true })
+        })
+        .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
     },
     async insert({ commit, state }) {
       // const khachhang = { ...state.khachhang } // Object.assign({}, state.khachhang)
-      state.khachhang.created_by = vnptbkn.defaults.headers.Author;
-      state.khachhang.created_at = new Date();
+      // state.khachhang.created_by = vnptbkn.defaults.headers.Author
+      // state.khachhang.created_at = new Date()
       // const thuebao = [...state.thuebao]
       const data = {
         khachhang: { ...state.khachhang },
         thuebao: [...state.thuebao]
-      };
-      console.log(data);
-      await vnptbkn.post(collection, data)
+      }
+      await vnptbkn
+        .post(collection, data)
         .then(function(res) {
           if (res.status == 200) {
-            if (res.data.message === 'exist') {
-              commit(SET_MESSAGE, { text: 'Không tìm thấy hợp đồng!', color: 'warning' }, { root: true })
+            if (res.data.msg === 'exist') {
+              commit(SET_MESSAGE, { text: 'Hợp đồng đã tồn tại!', color: 'warning' }, { root: true })
               return
             }
-            if (res.data.message === 'danger') {
-              commit(SET_MESSAGE, { text: 'Lỗi dữ liệu, vui lòng thử lại!', color: 'danger' }, { root: true })
+            if (res.data.msg === 'danger') {
+              commit(SET_MESSAGE, { text: 'Lỗi dữ liệu, vui lòng thử lại!', color: res.data.msg }, { root: true })
               return
             }
-            if (res.data.data.khachhang && res.data.data.thuebao && res.data.data.thuebao.length > 0) {
-              commit(SET_MESSAGE, { text: 'Thêm mới hợp đồng thành công!', color: 'success' }, { root: true })
-              commit('SET_KHACHHANG', state.default)
+            if (res.data.data.khachhang) {
+              commit(PUSH_ITEMS, res.data.data.khachhang)
             }
+            commit(SET_MESSAGE, { text: 'Thêm mới hợp đồng thành công!', color: res.data.msg }, { root: true })
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
     },
     async update({ commit, state }) {
-      const item = { ...state.khachhang }; // Object.assign({}, state.khachhang)
-      item.updated_by = vnptbkn.defaults.headers.Author;
-      item.updated_at = new Date();
+      const item = { ...state.khachhang } // Object.assign({}, state.khachhang)
+      item.updated_by = vnptbkn.defaults.headers.Author
+      item.updated_at = new Date()
       // FBStore.collection(collection).doc(item.id).set(item)
       //   .then(docRef => {
       //     commit(UPDATE_ITEMS, item)
@@ -171,9 +173,9 @@ export default {
       //   .catch(error => { commit(SET_CATCH, error, { root: true }) })
     },
     async delete({ commit, state }) {
-      const item = { ...state.khachhang }; // Object.assign({}, state.khachhang)
-      item.deleted_by = vnptbkn.defaults.headers.Author;
-      item.deleted_at = new Date();
+      const item = { ...state.khachhang } // Object.assign({}, state.khachhang)
+      item.deleted_by = vnptbkn.defaults.headers.Author
+      item.deleted_at = new Date()
       // FBStore.collection(collection).doc(item.id)
       //   .update({ flag: item.flag === 1 ? 0 : 1 })
       //   .then(docRef => {
@@ -185,7 +187,7 @@ export default {
       //   .catch(error => { commit(SET_CATCH, error, { root: true }) })
     },
     async remove({ commit, state }) {
-      const item = { ...state.khachhang }; // Object.assign({}, state.khachhang)
+      const item = { ...state.khachhang } // Object.assign({}, state.khachhang)
       // FBStore.collection(collection).doc(item.id).delete()
       //   .then(docRef => {
       //     commit(REMOVE_ITEMS, item)
@@ -195,53 +197,40 @@ export default {
       //   .catch(error => { commit(SET_CATCH, error, { root: true }) })
     },
     async khachhang({ commit, state }, khachhang) {
-      if (khachhang) commit('SET_KHACHHANG', khachhang);
-      else commit('SET_KHACHHANG', state.df_khachhang);
+      if (khachhang) commit('SET_KHACHHANG', khachhang)
+      else commit('SET_KHACHHANG', state.df_khachhang)
     },
     async thuebao({ commit, state }, thuebao) {
-      if (thuebao) commit('SET_THUEBAO', thuebao);
-      else commit('SET_THUEBAO', []);
+      if (thuebao) commit('SET_THUEBAO', thuebao)
+      else commit('SET_THUEBAO', [])
     },
     async getContract({ commit, state }) {
       await vnptbkn
-        .get(collection + '/getContract?str=' + state.khachhang.ma_gd)
+        .get(collection + '/getContract?key=' + state.khachhang.ma_gd)
         .then(function(res) {
           if (res.status == 200) {
-            if (res.data.message === 'exist') {
-              commit(
-                SET_MESSAGE,
-                { text: 'Không tìm thấy hợp đồng!', color: 'warning' },
-                { root: true }
-              );
-              return;
+            if (res.data.msg === 'notexist') {
+              commit(SET_MESSAGE, { text: 'Không tìm thấy hợp đồng!', color: 'warning' }, { root: true })
+              return
             }
-            if (res.data.message === 'danger') {
-              commit(
-                SET_MESSAGE,
-                { text: 'Lỗi dữ liệu, vui lòng thử lại!', color: 'danger' },
-                { root: true }
-              );
-              return;
+            if (res.data.msg === 'exist') {
+              commit(SET_MESSAGE, { text: 'Hợp đồng đã tồn tại!', color: 'warning' }, { root: true })
+              return
             }
-            if (
-              res.data.data.khachhang &&
-              res.data.data.thuebao &&
-              res.data.data.thuebao.length > 0
-            ) {
+            if (res.data.msg === 'danger') {
+              commit(SET_MESSAGE, { text: 'Lỗi dữ liệu, vui lòng thử lại!', color: res.data.msg }, { root: true })
+              return
+            }
+            if (res.data.data.khachhang && res.data.data.thuebao && res.data.data.thuebao.length > 0) {
               // SET_KHACHHANG
               // commit('SET_KHACHHANG', ObjectToFillSource({ ...state.df_khachhang }, res.data.data.khachhang))
-              commit(
-                'SET_KHACHHANG',
-                ObjectToLowerKey(res.data.data.khachhang)
-              );
+              commit('SET_KHACHHANG', ObjectToLowerKey(res.data.data.khachhang))
               // SET_THUEBAO
-              commit('SET_THUEBAO', ObjectToLowerKey(res.data.data.thuebao));
+              commit('SET_THUEBAO', ObjectToLowerKey(res.data.data.thuebao))
             }
-          } else commit(SET_CATCH, null, { root: true });
+          } else commit(SET_CATCH, null, { root: true })
         })
-        .catch(function(error) {
-          commit(SET_CATCH, error, { root: true });
-        });
+        .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
     }
   }
-};
+}

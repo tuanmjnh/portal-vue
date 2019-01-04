@@ -6,13 +6,21 @@
           <div :class="[classes,'file-item-view']">
             <img v-if="getExtension(item.extension)==='image'" :src="baseUrl+item.full_name"
               :title="item.name">
-            <i v-if="getExtension(item.extension)==='audio'" class="material-icons">audiotrack</i>
-            <i v-if="getExtension(item.extension)==='video'" class="material-icons">camera_roll</i>
-            <i v-if="getExtension(item.extension)==='pdf'" class="material-icons">picture_as_pdf</i>
-            <i v-if="getExtension(item.extension)==='file'" class="material-icons">insert_drive_file</i>
+            <a :href="baseUrl+item.full_name" target="_blank" v-if="getExtension(item.extension)==='audio'">
+              <i class="material-icons">audiotrack</i>
+            </a>
+            <a :href="baseUrl+item.full_name" target="_blank" v-if="getExtension(item.extension)==='video'">
+              <i class="material-icons">camera_roll</i>
+            </a>
+            <a :href="baseUrl+item.full_name" target="_blank" v-if="getExtension(item.extension)==='pdf'">
+              <i class="material-icons">picture_as_pdf</i>
+            </a>
+            <a :href="baseUrl+item.full_name" target="_blank" v-if="getExtension(item.extension)==='file'">
+              <i class="material-icons">insert_drive_file</i>
+            </a>
           </div>
         </div>
-        <div class="file-item-title">{{item.name}}</div>
+        <div class="file-item-title" v-if="isShowName">{{item.name}}</div>
       </div>
     </div>
   </div>
@@ -24,7 +32,8 @@ export default {
   props: {
     files: { type: Array, default: null },
     baseUrl: { type: String, default: '' },
-    classes: { type: String, default: 'w-50' }
+    classes: { type: String, default: 'w-50' },
+    isShowName: { type: Boolean, default: true },
   },
   methods: {
     getExtension(extension) {
@@ -46,9 +55,23 @@ export default {
   border: 1px solid #ccc;
   text-align: center;
   vertical-align: middle;
-  img {
+  img,
+  i {
     text-align: center;
     vertical-align: middle;
+  }
+  i {
+    color: #0a74dd;
+  }
+  a {
+    display: block;
+  }
+}
+.file-item-view:hover {
+  cursor: pointer;
+  i {
+    color: #2196f3;
+    cursor: pointer;
   }
 }
 .w-25 {

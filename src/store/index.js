@@ -47,8 +47,8 @@ export default new Vuex.Store({
         x: 'right',
         y: 'top',
         show: res.text ? true : false,
-        timeout: 60000,
-        color: res.color || '',
+        timeout: 6000,
+        color: res.color || 'success',
         text: res.text || '',
         status: res.status || 0,
         statusText: res.statusText || 'Error'

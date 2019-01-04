@@ -1,12 +1,14 @@
 <template>
   <div class="file-upload" v-if="uploadReady">
     <div class="btn-upload" v-if="buttonUse">
-      <input type="file" id="file-upload" :multiple="multiple===true?true:false" @change="onChange($event)" />
+      <input type="file" id="file-upload" :multiple="multiple===true?true:false" @change="onChange($event)"
+        :accept="extension" />
       <label for="file-upload" class="v-btn v-btn--icon theme--info primary--text"><i
           class="material-icons">cloud_upload</i></label>
     </div>
     <div v-else class="file-upload-content">
-      <input type="file" id="file-upload" :multiple="multiple===true?true:false" @change="onChange($event)" />
+      <input type="file" id="file-upload" :multiple="multiple===true?true:false" @change="onChange($event)"
+        :accept="extension" />
       <p v-html="buttonText"></p>
     </div>
   </div>
@@ -17,16 +19,17 @@ import axios from 'axios'
 import { NewGuid, CheckExtension, getExtension } from '@/plugins/helpers';
 export default {
   props: {
+    http: null,
     multiple: { type: Boolean, default: false },
     fieldName: { type: String, default: 'file-upload' },
     fileName: { type: String, default: null },
     autoName: { type: Boolean, default: false },
-    http: null,
     httpOptions: { type: Object, default: null },
     baseUrl: { type: String, default: 'http://localhost:8080' },
     controller: { type: String, default: 'fileManager' },
     buttonUse: { type: Boolean, default: false },
-    buttonText: { type: String, default: 'Drag your file(s) here to begin<br> or click to browse' }
+    buttonText: { type: String, default: 'Drag your file(s) here to begin<br> or click to browse' },
+    extension: { type: String, default: null },
   },
   data: () => ({
     uploadReady: true,
@@ -79,6 +82,18 @@ export default {
     }
   }
 }
+
+// file_extension	A file extension starting with the STOP character, e.g: .gif, .jpg, .png, .doc
+// audio: audio/*	All sound files are accepted
+// video: video/*	All video files are accepted
+// image: image/*	All image files are accepted
+// pdf: application/pdf
+// csv: .csv
+// xls: application/vnd.ms-excel
+// xlsx: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet
+// txt: text/plain
+// html: text/html
+
 </script>
 
 <style lang="scss">

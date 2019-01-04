@@ -2,7 +2,8 @@
   <div>
     <v-card>
       <v-card-title>
-        <v-text-field v-model="query.search" append-icon="search" label="Tìm kiếm hợp đồng" single-line hide-details></v-text-field>
+        <v-text-field v-model="query.search" append-icon="search" label="Tìm kiếm hợp đồng"
+          single-line hide-details></v-text-field>
         <v-spacer></v-spacer>
         <v-tooltip bottom>
           <v-btn slot="activator" color="primary" small fab flat @click="localDialog=!localDialog">
@@ -40,7 +41,8 @@
             <td>{{ props.item.created_by }}</td>
             <td>{{ props.item.created_at|formatDate('DD/MM/YYYY') }}</td>
             <td class="justify-center layout px-0">
-              <a class="mx-0 v-btn v-btn--icon theme--info" :href="vnptbkn.defaults.host+props.item.attach" target="_blank"><i class="material-icons">attachment</i></a>
+              <a class="mx-0 v-btn v-btn--icon theme--info" :href="vnptbkn.defaults.host+props.item.attach"
+                target="_blank"><i class="material-icons">attachment</i></a>
               <v-btn icon class="mx-0" @click="onEdit(props.item)">
                 <i class="material-icons teal--text">assignment</i>
               </v-btn>
@@ -79,7 +81,6 @@ export default {
         { text: 'Điện thoại', value: 'customer_phone' },
         { text: 'Người tạo', value: 'created_by' },
         { text: 'Ngày tạo', value: 'created_at' },
-        // { text: '#', value: 'attachs' },
         { text: '#', value: '#', sortable: false }
       ]
     }
@@ -103,6 +104,7 @@ export default {
   methods: {
     onEdit(item) {
       this.$store.dispatch('contract_customer/khachhang', item)
+      this.$store.dispatch('contract_customer/getThuebao')
       this.localDialog = true
     },
     onDelete(item) {

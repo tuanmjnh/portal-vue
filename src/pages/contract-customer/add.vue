@@ -3,7 +3,7 @@
     <!-- <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn> -->
     <v-card>
       <v-card-title>
-        <span class="headline">{{ khachhang.contract_customer_id ?
+        <span class="headline">{{ khachhang.cc_id ?
           'Chi tiết hợp đồng lưu trữ' : 'Thêm mới hợp đồng lưu trữ' }}</span>
       </v-card-title>
       <v-card-text>
@@ -17,7 +17,7 @@
               <v-layout wrap class="pt-2">
                 <v-flex xs12 sm12 md4>
                   <v-text-field v-model.trim="khachhang.ma_gd" label="Mã hợp đồng" class="text-color-initial"
-                    v-on:keyup.enter="getContract" :disabled="khachhang.contract_customer_id?true:false"></v-text-field>
+                    v-on:keyup.enter="getContract" :disabled="khachhang.cc_id?true:false"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm12 md8>
                   <v-text-field v-model="khachhang.ten_kh" label="Tên khách hàng"
@@ -49,18 +49,20 @@
                   <v-text-field v-model="khachhang.stk" label="Số tài khoản" :disabled="true"
                     class="text-color-initial"></v-text-field>
                 </v-flex>
-                <v-flex xs12 sm12 md12 v-if="khachhang.contract_customer_id">
+                <v-flex xs12 sm12 md12 v-if="khachhang.cc_id">
                   Hợp đồng: <a class="mx-0 v-btn v-btn--icon theme--info" :href="vnptbkn.defaults.host+khachhang.attach"
                     target="_blank"><i class="material-icons">attachment</i></a>
                 </v-flex>
-                <template v-if="!khachhang.contract_customer_id">
+                <template v-if="!khachhang.cc_id">
                   <v-flex xs12 sm6 md6 v-if="khachhang.ma_gd">
                     <upload-files @handleUpload="uploadFiles=$event" :buttonUse="false"
-                      :multiple="false" :autoName="true" :http="vnptbkn" buttonText="Ấn vào đây để chọn hợp đồng"></upload-files>
+                      :multiple="false" :autoName="true" :http="vnptbkn" extension="application/pdf"
+                      buttonText="Ấn vào đây để chọn hợp đồng"></upload-files>
                     <!-- :fileName="khachhang.ma_gd.replace(/\//g,'_')" -->
                   </v-flex>
                   <v-flex xs12 sm6 md6 v-if="khachhang.ma_gd">
-                    <display-files :files="uploadFiles.files" :baseUrl="vnptbkn.defaults.host"></display-files>
+                    <display-files :files="uploadFiles.files" :baseUrl="vnptbkn.defaults.host"
+                      :isShowName="false" classes="w-x"></display-files>
                   </v-flex>
                 </template>
                 <!-- <v-flex xs12 sm6 md4>
@@ -102,6 +104,12 @@
                     :disabled="true" class="text-color-initial"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md6>
+                  <v-text-field v-model="khachhang.ten_loaikh" label="Loại khách hàng"
+                    :disabled="true" class="text-color-initial"></v-text-field>
+                </v-flex>
+                <v-flex xs12 sm6 md6>
+                </v-flex>
+                <v-flex xs12 sm6 md6>
                   <v-text-field v-model="khachhang.nguoi_cn" label="Người cập nhật"
                     :disabled="true" class="text-color-initial"></v-text-field>
                 </v-flex>
@@ -116,10 +124,10 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <template v-if="!khachhang.contract_customer_id">
+        <template v-if="!khachhang.cc_id">
           <v-btn color="primary" flat @click.native="handleSave" v-if="uploadFiles.files.length>0">
             <!-- <i class="material-icons">check</i> -->
-            {{khachhang.contract_customer_id ? 'Cập nhật':'Thêm mới' }}
+            {{khachhang.cc_id ? 'Cập nhật':'Thêm mới' }}
           </v-btn>
         </template>
         <v-btn color="secondary" flat @click.native="localDialog=false">
@@ -183,6 +191,7 @@ export default {
       if (!val) {
         this.$store.dispatch('contract_customer/khachhang')
         this.$store.dispatch('contract_customer/thuebao')
+        this.uploadFiles.files = []
       }
     },
     uploadFiles: {
@@ -195,9 +204,14 @@ export default {
   },
   methods: {
     handleSave() {
-      this.khachhang
-      if (this.khachhang.id) this.$store.dispatch('contract_customer/update')
-      else this.$store.dispatch('contract_customer/insert')
+      // if (this.khachhang.id) this.$store.dispatch('contract_customer/update')
+      // else this.$store.dispatch('contract_customer/insert')
+      if (!this.khachhang.cc_id)
+        this.$store.dispatch('contract_customer/insert').then(() => {
+          this.$store.dispatch('contract_customer/khachhang')
+          this.$store.dispatch('contract_customer/thuebao')
+          this.uploadFiles.files = []
+        })
     },
     getContract() {
       if (this.khachhang.ma_gd.length > 0)
@@ -211,4 +225,7 @@ export default {
 </script>
 
 <style>
+.file-item-view a {
+  padding: 10px;
+}
 </style>
