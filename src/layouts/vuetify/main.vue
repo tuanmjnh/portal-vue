@@ -58,9 +58,9 @@
       </v-btn> -->
       <!-- <v-toolbar-title v-text="title"></v-toolbar-title> -->
       <v-spacer></v-spacer>
-      <v-btn icon @click.stop="ShowSnackbar">
+      <!-- <v-btn icon @click.stop="ShowSnackbar">
         <v-icon>notifications</v-icon>
-      </v-btn>
+      </v-btn> -->
       <v-btn icon @click.stop="rightDrawer = !rightDrawer">
         <v-icon>notifications</v-icon>
       </v-btn>
@@ -68,9 +68,8 @@
         <v-icon>apps</v-icon>
       </v-btn>
       <v-menu bottom :min-width="166">
-        <v-btn slot="activator" flat>
-          Admin
-          <v-icon>arrow_drop_down</v-icon>
+        <v-btn slot="activator" flat class="text-transform-initial">
+          {{getAuth('full_name')}} <v-icon>arrow_drop_down</v-icon>
         </v-btn>
         <!-- <v-list>
           <v-list-tile v-for="(item, i) in menuUser" :key="i" @click="MenuAction(item)">
@@ -88,7 +87,7 @@
               <i class="material-icons">ballot</i>
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title>Profile</v-list-tile-title>
+              <v-list-tile-title>Hồ sơ</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
           <v-list-tile @click="$router.push('/setting')">
@@ -96,7 +95,7 @@
               <i class="material-icons">settings_applications</i>
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title>Setting</v-list-tile-title>
+              <v-list-tile-title>Cài đặt</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
           <v-list-tile @click="Logout">
@@ -104,7 +103,7 @@
               <i class="material-icons">exit_to_app</i>
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title>Logout</v-list-tile-title>
+              <v-list-tile-title>Đăng xuất</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
@@ -142,6 +141,7 @@
 </template>
 
 <script>
+import * as _auth from '@/plugins/storage-auth'
 export default {
   // name: 'vuetify',
   components: {
@@ -154,35 +154,36 @@ export default {
     miniVariant: false,
     rightDrawer: false,
     items: [
-      { icon: 'home', title: 'Dashboard', push: 'dashboard' },
+      { icon: 'home', title: 'Trang chủ', push: 'dashboard' },
       {
         icon: 'description',
         title: 'Hợp đồng',
         push: 'ContractCustomer',
         children: [
           { icon: 'contacts', title: 'Khách hàng', push: 'contract-customer' },
-          { icon: 'supervisor_account', title: 'DV CNTT', push: 'contract-enterprise' },
+          // { icon: 'supervisor_account', title: 'DV CNTT', push: 'contract-enterprise' },
         ]
       },
-      {
-        icon: 'developer_board',
-        title: 'Manager',
-        push: 'users',
-        children: [
-          { icon: 'account_circle', title: 'Users', push: 'users' },
-          { icon: 'vpn_key', title: 'Roles', push: 'roles' },
-          { icon: 'apps', title: 'Modules', push: 'modules' },
-        ]
-      },
-      {
-        icon: 'vertical_split',
-        title: 'Common',
-        push: 'languages',
-        children: [
-          { icon: 'outlined_flag', title: 'languages', push: 'languages' },
-          { icon: 'local_library', title: 'Informations', push: 'informations' }
-        ]
-      }],
+      // {
+      //   icon: 'developer_board',
+      //   title: 'Manager',
+      //   push: 'users',
+      //   children: [
+      //     { icon: 'account_circle', title: 'Users', push: 'users' },
+      //     { icon: 'vpn_key', title: 'Roles', push: 'roles' },
+      //     { icon: 'apps', title: 'Modules', push: 'modules' },
+      //   ]
+      // },
+      // {
+      //   icon: 'vertical_split',
+      //   title: 'Common',
+      //   push: 'languages',
+      //   children: [
+      //     { icon: 'outlined_flag', title: 'languages', push: 'languages' },
+      //     { icon: 'local_library', title: 'Informations', push: 'informations' }
+      //   ]
+      // }
+    ],
     menuUser: [
       { icon: "ballot", title: "Profile", push: "profile" },
       { icon: "settings_applications", title: "Setting", push: "setting" },
@@ -198,6 +199,10 @@ export default {
     clipped() {
       var mobile = !this.$vuetify.breakpoint.lgAndUp
       return mobile
+    },
+    authUser() {
+      var rs = this.$store.state.auth.user
+      return rs
     }
   },
   methods: {
@@ -211,9 +216,13 @@ export default {
     },
     Logout() {
       this.$store.dispatch('auth/logout').then(() => { this.$router.push('/auth') })
+    },
+    getAuth(key) {
+      return _auth.GetStorage(key)
     }
   },
   created() {
+    // console.log(this.authUser)
     // this.$store.dispatch('languages_items/init')
   }
 }

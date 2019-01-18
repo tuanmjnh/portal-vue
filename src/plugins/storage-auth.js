@@ -8,6 +8,7 @@ const SetAuth = function(model, extras = null) {
   Storage.Set(header.user, model.username, model.remember);
   Storage.Set(header.remember, model.remember, model.remember);
   Storage.Set(header.token, `Bearer ${ model.token}`, model.remember);
+  Storage.Set('full_name', model.full_name, model.remember);
   if (extras)
     Object.keys(extras).forEach(function(key, index) {
       Storage.Set(key, extras[key], model.remember);

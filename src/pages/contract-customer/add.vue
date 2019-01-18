@@ -20,11 +20,11 @@
                     v-on:keyup.enter="getContract" :disabled="khachhang.cc_id?true:false"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm12 md8>
-                  <v-text-field v-model="khachhang.ten_kh" label="Tên khách hàng"
+                  <v-text-field v-model.trim="khachhang.ten_kh" label="Tên khách hàng"
                     :disabled="true" class="text-color-initial"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm12 md12>
-                  <v-text-field v-model="khachhang.diachi_kh" label="Địa chỉ khách hàng"
+                  <v-text-field v-model.trim="khachhang.diachi_kh" label="Địa chỉ khách hàng"
                     :disabled="true" class="text-color-initial"></v-text-field>
                 </v-flex>
                 <!-- <v-flex xs12 sm12 md12>
@@ -34,19 +34,19 @@
               <v-text-field v-model="khachhang.diachi_ld" label="Địa chỉ lắp đặt"></v-text-field>
             </v-flex> -->
                 <v-flex xs12 sm6 md6>
-                  <v-text-field v-model="khachhang.so_dt" label="Điện thoại liên hệ"
+                  <v-text-field v-model.trim="khachhang.so_dt" label="Điện thoại liên hệ"
                     :disabled="true" class="text-color-initial"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md6>
-                  <v-text-field v-model="khachhang.so_gt" label="Số giấy tờ" :disabled="true"
+                  <v-text-field v-model.trim="khachhang.so_gt" label="Số giấy tờ" :disabled="true"
                     class="text-color-initial"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md6>
-                  <v-text-field v-model="khachhang.mst" label="Mã số thuế" :disabled="true"
+                  <v-text-field v-model.trim="khachhang.mst" label="Mã số thuế" :disabled="true"
                     class="text-color-initial"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md6>
-                  <v-text-field v-model="khachhang.stk" label="Số tài khoản" :disabled="true"
+                  <v-text-field v-model.trim="khachhang.stk" label="Số tài khoản" :disabled="true"
                     class="text-color-initial"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm12 md12 v-if="khachhang.cc_id">
@@ -87,7 +87,7 @@
             <v-tab-item>
               <v-layout wrap class="pt-2">
                 <v-flex xs12 sm12 md12>
-                  <vue-quill-editor v-model="khachhang.details" ref="Ghi chú">
+                  <vue-quill-editor v-model.trim="khachhang.details" ref="Ghi chú">
                   </vue-quill-editor>
                   <!-- <tinymce id="desc" v-model="khachhang.desc"></tinymce> -->
                 </v-flex>

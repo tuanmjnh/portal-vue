@@ -23,11 +23,21 @@ export default {
   mounted() {
   },
   created() {
+    // window.addEventListener('beforeunload', () => {
+    //   //I CAN ACCESS TO this VARIABLE
+    //   console.log('abc');
+    // }, false)
   },
   computed: {
     isAuth() {
       // if (_auth.GetRemember()) 
       this.$store.dispatch('auth/setIsAuth', _auth.isAuth())
+      this.$store.dispatch('auth/item', {
+        username: _auth.GetUser(),
+        password: '',
+        token: _auth.GetToken(),
+        remember: _auth.GetRemember()
+      })
       var x = this.$store.state.auth.isAuth
       // console.log(this.$store.state._message)
       return x

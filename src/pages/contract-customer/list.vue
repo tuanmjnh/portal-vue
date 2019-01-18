@@ -27,7 +27,8 @@
         </v-btn-toggle>
       </v-card-title>
       <v-data-table class="elevation-1" v-model="selected" item-key="user_id" :headers="headers"
-        :items="items" :rows-per-page-items="rowPerPage" :loading="loading">
+        :items="items" :rows-per-page-items="rowPerPage" :loading="loading"
+        :pagination.sync="pagination">
         <!-- select-all :loading="loading" :pagination.sync="pagination" :total-items="totalItems" -->
         <template slot="items" slot-scope="props">
           <tr>
@@ -41,8 +42,11 @@
             <td>{{ props.item.created_by }}</td>
             <td>{{ props.item.created_at|formatDate('DD/MM/YYYY') }}</td>
             <td class="justify-center layout px-0">
-              <a class="mx-0 v-btn v-btn--icon theme--info" :href="vnptbkn.defaults.host+props.item.attach"
-                target="_blank"><i class="material-icons">attachment</i></a>
+              <v-tooltip bottom>
+                <a slot="activator" class="mx-0 v-btn v-btn--icon theme--info" :href="vnptbkn.defaults.host+props.item.attach"
+                  target="_blank"><i class="material-icons">attachment</i></a>
+                <span>Hợp đồng {}</span>
+              </v-tooltip>
               <v-btn icon class="mx-0" @click="onEdit(props.item)">
                 <i class="material-icons teal--text">assignment</i>
               </v-btn>
@@ -73,8 +77,12 @@ export default {
       localDialog: false,
       confirmDialog: false,
       query: { search: '', flag: 1 },
-      rowPerPage: [5, 10, 25, 50, 100, { text: "All", value: -1 }],
+      rowPerPage: [10, 25, 50, 100, 200, 500], //  { text: "All", value: -1 }
       vnptbkn: vnptbkn,
+      pagination: {
+        sortBy: 'created_at',
+        descending: true
+      },
       headers: [
         { text: 'Mã hợp đồng', value: 'contract_code' },
         { text: 'Tên khách hàng', value: 'customer_name' },

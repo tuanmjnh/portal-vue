@@ -6,6 +6,7 @@ export default {
   namespaced: true,
   state: {
     item: {},
+    user: {},
     isAuth: false,
     default: {
       username: '',
@@ -17,10 +18,10 @@ export default {
   getters: {},
   mutations: {
     'SET_ITEM'(state, item) {
-      state.item = Object.assign({}, item)
+      state.item = { ...item }
     },
     'SET_DEFAULT'(state) {
-      state.item = Object.assign({}, state.default)
+      state.item = { ...state.default }
     },
     'SET_ISAUTH'(state, val) {
       state.isAuth = val || false
@@ -33,7 +34,9 @@ export default {
         .then(function(res) {
           // commit auth
           if (res.data.data && res.data.token) {
+            state.user = { ...res.data.data }
             state.item.token = res.data.token
+            state.item.full_name = res.data.data.full_name
             _auth.SetAuth(state.item)
             commit('SET_ISAUTH', true)
           }
