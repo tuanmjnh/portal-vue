@@ -161,28 +161,28 @@ export default {
         push: 'ContractCustomer',
         children: [
           { icon: 'contacts', title: 'Khách hàng', push: 'contract-customer' },
-          // { icon: 'supervisor_account', title: 'DV CNTT', push: 'contract-enterprise' },
+          { icon: 'supervisor_account', title: 'DV CNTT', push: 'contract-enterprise' },
         ]
       },
-      // {
-      //   icon: 'developer_board',
-      //   title: 'Manager',
-      //   push: 'users',
-      //   children: [
-      //     { icon: 'account_circle', title: 'Users', push: 'users' },
-      //     { icon: 'vpn_key', title: 'Roles', push: 'roles' },
-      //     { icon: 'apps', title: 'Modules', push: 'modules' },
-      //   ]
-      // },
-      // {
-      //   icon: 'vertical_split',
-      //   title: 'Common',
-      //   push: 'languages',
-      //   children: [
-      //     { icon: 'outlined_flag', title: 'languages', push: 'languages' },
-      //     { icon: 'local_library', title: 'Informations', push: 'informations' }
-      //   ]
-      // }
+      {
+        icon: 'developer_board',
+        title: 'Manager',
+        push: 'users',
+        children: [
+          { icon: 'account_circle', title: 'Users', push: 'users' },
+          { icon: 'vpn_key', title: 'Roles', push: 'roles' },
+          { icon: 'apps', title: 'Modules', push: 'modules' },
+        ]
+      },
+      {
+        icon: 'vertical_split',
+        title: 'Common',
+        push: 'languages',
+        children: [
+          { icon: 'outlined_flag', title: 'languages', push: 'languages' },
+          { icon: 'local_library', title: 'Informations', push: 'informations' }
+        ]
+      }
     ],
     menuUser: [
       { icon: "ballot", title: "Profile", push: "profile" },
