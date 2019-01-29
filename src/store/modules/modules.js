@@ -1,7 +1,7 @@
 import { SET_CATCH, SET_ITEMS, PUSH_ITEMS, UPDATE_ITEMS, REMOVE_ITEMS, SET_ITEM, SET_MESSAGE } from '../mutation-type'
 import { FilterValue, SearchValue, SortByKey } from '@/plugins/helpers'
 import { vnptbkn } from '@/plugins/axios-config'
-const collection = 'languages'
+const collection = 'modules'
 export default {
   namespaced: true,
   state: {
@@ -11,10 +11,13 @@ export default {
       id: '',
       code: '',
       title: '',
-      icon: '<i class="material-icons">outlined_flag</i>',
-      attach: '',
+      icon: '<i class="material-icons">view_module</i>',
+      image: '',
+      urls: '',
+      permissions: '',
       orders: 1,
       descs: '',
+      contents: '',
       created_by: '',
       created_at: new Date(),
       updated_by: '',
@@ -35,19 +38,6 @@ export default {
       return state.items.filter(x => x.flag === flag)
     },
     getFilter: state => pagination => {
-      // let items = state.items
-      // if (pagination.flag >= 0) {
-      //   items = items.filter(function(row) {
-      //     return row['flag'] == pagination.flag
-      //   })
-      // }
-      // if (pagination.search) {
-      //   items = items.filter(function(row) {
-      //     return Object.keys(row).some(function(key) {
-      //       return (String(row[key]).toLowerCase().indexOf(pagination.search) > -1)
-      //     })
-      //   })
-      // }
       let items = [...state.items]
       items = FilterValue(items, pagination.find)
       items = SearchValue(items, pagination.search)
@@ -75,54 +65,6 @@ export default {
     }
   },
   actions: {
-    pagination({ commit, state }, { search, pagination }) {
-      var items = []
-      var obj = {
-        search: [],
-        orderBy: [],
-        limit: 5
-      }
-      if (search) {
-        obj.search.push('name', '>=', search)
-        obj.search.push('name', '<=', search)
-        // cll = cll.where('name', '==', 'lang 0')
-      }
-      if (pagination.sortBy) {
-        obj.orderBy.push('name', pagination.descending ? 'desc' : 'asc')
-        // cll = cll.orderBy('name', pagination.descending ? 'desc' : 'asc')
-      }
-      if (pagination.rowsPerPage) {
-        obj.limit = 5
-        // cll = cll.limit(5)
-      }
-      console.log(obj)
-      if (obj.search.length > 0)
-        state.cll
-        .where(obj.search[0], obj.search[1], obj.search[2])
-        .orderBy(obj.orderBy[0], obj.orderBy[1])
-        .limit(obj.limit)
-        .get().then(query => {
-          query.forEach(function(doc) {
-            var item = state.default
-            item = doc.data()
-            item.id = doc.id
-            items.push(item)
-          })
-        })
-      else
-        state.cll
-        .orderBy(obj.orderBy[0], obj.orderBy[1])
-        .limit(obj.limit)
-        .get().then(query => {
-          query.forEach(function(doc) {
-            var item = state.default
-            item = doc.data()
-            item.id = doc.id
-            items.push(item)
-          })
-        })
-      commit(SET_ITEMS, items)
-    },
     async select({ commit, state }) {
       await vnptbkn.get(collection).then(function(res) {
           if (res.status === 200) {
@@ -201,8 +143,8 @@ export default {
       if (item) commit(SET_ITEM, item)
       else commit(SET_ITEM, state.default)
     },
-    existCode({ commit }, val) {
-      return vnptbkn.get(collection + '/ExistCode/' + val, { timeout: 1000 }).then(function(res) { //, { timeout: 3000 }
+    existCode({ commit, state }) {
+      return vnptbkn.get(collection + '/ExistCode/' + state.item.code, { timeout: 1000 }).then(function(res) { //, { timeout: 3000 }
           if (res.status === 200) {
             if (res.data.msg === 'exist') return false
             else return true

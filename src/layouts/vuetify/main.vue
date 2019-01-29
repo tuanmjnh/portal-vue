@@ -172,6 +172,7 @@ export default {
           { icon: 'account_circle', title: 'Users', push: 'users' },
           { icon: 'vpn_key', title: 'Roles', push: 'roles' },
           { icon: 'apps', title: 'Modules', push: 'modules' },
+          { icon: 'low_priority', title: 'Permissions', push: 'permissions' },
         ]
       },
       {
@@ -179,7 +180,8 @@ export default {
         title: 'Common',
         push: 'languages',
         children: [
-          { icon: 'outlined_flag', title: 'languages', push: 'languages' },
+          { icon: 'outlined_flag', title: 'Languages', push: 'languages' },
+          { icon: 'scatter_plot', title: 'Language items', push: 'language-items' },
           { icon: 'local_library', title: 'Informations', push: 'informations' }
         ]
       }

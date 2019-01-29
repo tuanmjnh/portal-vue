@@ -1,4 +1,5 @@
 import { SET_CATCH, SET_ITEMS, PUSH_ITEMS, UPDATE_ITEMS, REMOVE_ITEMS, SET_ITEM, SET_MESSAGE } from '../mutation-type'
+import { FilterValue, SearchValue, SortByKey } from '@/plugins/helpers'
 import { vnptbkn } from '@/plugins/axios-config'
 const collection = 'users'
 export default {
@@ -20,7 +21,6 @@ export default {
       details: '',
       images: '',
       orders: 1,
-      roles: '',
       created_by: '',
       created_at: new Date(),
       updated_by: '',
@@ -42,20 +42,11 @@ export default {
     getByFlag: state => flag => {
       return state.items.filter(x => x.flag === flag)
     },
-    getFilter: state => query => {
-      var items = state.items
-      if (query.flag >= 0) {
-        items = items.filter(function(row) {
-          return row['flag'] == query.flag
-        })
-      }
-      if (query.search) {
-        items = items.filter(function(row) {
-          return Object.keys(row).some(function(key) {
-            return String(row[key]).toLowerCase().indexOf(query.search) > -1
-          })
-        })
-      }
+    getFilter: state => pagination => {
+      let items = [...state.items]
+      items = FilterValue(items, pagination.find)
+      items = SearchValue(items, pagination.search)
+      items = SortByKey(items, pagination.sortBy)
       return items
     }
   },
@@ -64,7 +55,7 @@ export default {
       state.items = items
     },
     [SET_ITEM](state, item) {
-      state.item = Object.assign({}, item)
+      state.item = { ...item } // Object.assign({}, item)
     },
     [PUSH_ITEMS](state, item) {
       state.items.push(item)
@@ -90,7 +81,7 @@ export default {
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
     },
     async insert({ commit, state }) {
-      var item = Object.assign({}, state.item)
+      var item = { ...state.item } // Object.assign({}, state.item)
       item.created_by = 'Admin'
       item.created_at = new Date()
       // return FBStore.collection(collection)
@@ -104,7 +95,7 @@ export default {
       //   .catch(error => { commit(SET_CATCH, error, { root: true }) })
     },
     update({ commit, state }) {
-      var item = Object.assign({}, state.item)
+      var item = { ...state.item } // Object.assign({}, state.item)
       item.updated_by = 'Admin'
       item.updated_at = new Date()
       // FBStore.collection(collection).doc(item.id).set(item)
@@ -115,7 +106,7 @@ export default {
       //   .catch(error => { commit(SET_CATCH, error, { root: true }) })
     },
     delete({ commit, state }) {
-      var item = Object.assign({}, state.item)
+      var item = { ...state.item } // Object.assign({}, state.item)
       item.deleted_by = 'Admin'
       item.deleted_at = new Date()
       // FBStore.collection(collection).doc(item.id)
@@ -129,7 +120,7 @@ export default {
       //   .catch(error => { commit(SET_CATCH, error, { root: true }) })
     },
     remove({ commit, state }) {
-      var item = Object.assign({}, state.item)
+      var item = { ...state.item } // Object.assign({}, state.item)
       // FBStore.collection(collection).doc(item.id).delete()
       //   .then(docRef => {
       //     commit(REMOVE_ITEMS, item)

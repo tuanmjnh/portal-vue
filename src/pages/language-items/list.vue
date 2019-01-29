@@ -36,12 +36,9 @@
               <v-checkbox v-model="props.selected" primary hide-details></v-checkbox>
             </td>
             <!-- <td>{{ props.item.id }}</td> -->
-            <td>{{ props.item.title }}</td>
-            <td>{{ props.item.code }}</td>
-            <td>{{ props.item.orders }}</td>
-            <td>{{ props.item.created_at|formatDate('DD/MM/YYYY hh:mm') }}</td>
-            <td v-html="props.item.icon"></td>
-            <td class="justify-center layout px-0">
+            <td>{{ props.item.key }}</td>
+            <td>{{ props.item.value }}</td>
+            <!-- <td class="justify-center layout px-0">
               <v-btn v-if="pagination.find.flag===1" icon class="mx-0" @click="onItems(props.item)">
                 <i class="material-icons info--text">layers</i>
               </v-btn>
@@ -52,7 +49,7 @@
                 <i v-if="pagination.find.flag===1" class="material-icons error--text">delete</i>
                 <i v-else class="material-icons info--text">refresh</i>
               </v-btn>
-            </td>
+            </td> -->
           </tr>
         </template>
       </v-data-table>
@@ -80,16 +77,24 @@ export default {
     pagination: { search: '', sortBy: 'orders', find: { flag: 1 } },
     headers: [
       // { text: 'ID', value: 'id', align: 'left' },
-      { text: 'Title', value: 'title', align: 'left' },
-      { text: 'Code', value: 'code', align: 'left' },
-      { text: 'Orders', value: 'orders', sortable: true },
-      { text: 'Created', value: 'created_at' },
-      { text: 'Icon', value: 'icon' },
-      { text: '#', value: '#', sortable: false }
+      { text: 'Key', value: 'key', align: 'left' },
+      { text: 'Value', value: 'value' },
+      // { text: '#', value: '#', sortable: false }
     ]
   }),
   mounted() {
-    // this.$store.dispatch('languages/init')
+    // this.$store.dispatch('language_items/init')
+  },
+  created() {
+    this.$store.dispatch('language_items/select').then(this.loading = false)
+    // this.$store.dispatch('language_items/select')
+    //{
+    //     descending: this.pagination.descending,
+    //     page: this.pagination.page,
+    //     rowsPerPage: this.pagination.rowsPerPage,
+    //     sortBy: this.pagination.sortBy,
+    //     totalItems: this.pagination.totalItems
+    // }
   },
   computed: {
     items() {
@@ -102,14 +107,14 @@ export default {
       // totalItems: this.pagination.totalItems,
       // flag: 0
       // }
-      var rs = this.$store.getters['languages/getFilter'](this.pagination)
+      var rs = this.$store.getters['language_items/getFilter'](this.pagination)
       return rs
     }
   },
   watch: {
     // pagination: {
     //   onr() {
-    //     this.items = this.$store.dispatch('languages/pagination', this.pagination)
+    //     this.items = this.$store.dispatch('language_items/pagination', this.pagination)
     //   },
     //   deep: true
     // },
@@ -120,29 +125,18 @@ export default {
     dialog(val) { this.localDialog = val },
     localDialog(val) {
       this.$emit('handleDialog', val)
-      if (!val) this.$store.dispatch('languages/item')
+      if (!val) this.$store.dispatch('language_items/item')
     },
     itemsDialog(val) { this.localItemsDialog = val },
     localItemsDialog(val) { this.$emit('handleItemsDialog', val) }
   },
-  created() {
-    this.$store.dispatch('languages/select').then(this.loading = false)
-    // this.$store.dispatch('languages/select')
-    //{
-    //     descending: this.pagination.descending,
-    //     page: this.pagination.page,
-    //     rowsPerPage: this.pagination.rowsPerPage,
-    //     sortBy: this.pagination.sortBy,
-    //     totalItems: this.pagination.totalItems
-    // }
-  },
   methods: {
     onItems(item) {
-      this.$store.dispatch('languages/item', item)
+      this.$store.dispatch('language_items/item', item)
       this.localItemsDialog = !this.localItemsDialog
     },
     onEdit(item) {
-      this.$store.dispatch('languages/item', item)
+      this.$store.dispatch('language_items/item', item)
       this.localDialog = true
     },
     onDelete(item) {
@@ -150,7 +144,7 @@ export default {
       this.selected.push(item);
     },
     onOkConfirm() {
-      this.$store.dispatch('languages/delete', this.selected).then(this.selected = [])
+      this.$store.dispatch('language_items/delete', this.selected).then(this.selected = [])
     },
     onCancelConfirm() {
       this.selected = []

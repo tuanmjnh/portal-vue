@@ -38,16 +38,16 @@
                     :disabled="true" class="text-color-initial"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md6>
-                  <v-text-field v-model.trim="khachhang.so_gt" label="Số giấy tờ" :disabled="true"
-                    class="text-color-initial"></v-text-field>
+                  <v-text-field v-model.trim="khachhang.so_gt" label="Số giấy tờ"
+                    :disabled="true" class="text-color-initial"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md6>
                   <v-text-field v-model.trim="khachhang.mst" label="Mã số thuế" :disabled="true"
                     class="text-color-initial"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm6 md6>
-                  <v-text-field v-model.trim="khachhang.stk" label="Số tài khoản" :disabled="true"
-                    class="text-color-initial"></v-text-field>
+                  <v-text-field v-model.trim="khachhang.stk" label="Số tài khoản"
+                    :disabled="true" class="text-color-initial"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm12 md12 v-if="khachhang.cc_id">
                   Hợp đồng: <a class="mx-0 v-btn v-btn--icon theme--info" :href="vnptbkn.defaults.host+khachhang.attach"
@@ -56,8 +56,8 @@
                 <template v-if="!khachhang.cc_id">
                   <v-flex xs12 sm6 md6 v-if="khachhang.ma_gd">
                     <upload-files @handleUpload="uploadFiles=$event" :buttonUse="false"
-                      :multiple="false" :autoName="true" :http="vnptbkn" extension="application/pdf"
-                      buttonText="Ấn vào đây để chọn hợp đồng"></upload-files>
+                      :basePath="uploadFiles.basePath" :multiple="false" :autoName="true"
+                      :http="vnptbkn" extension="application/pdf" buttonText="Ấn vào đây để chọn hợp đồng"></upload-files>
                     <!-- :fileName="khachhang.ma_gd.replace(/\//g,'_')" -->
                   </v-flex>
                   <v-flex xs12 sm6 md6 v-if="khachhang.ma_gd">
@@ -159,8 +159,7 @@ export default {
   data: () => ({
     localDialog: false,
     tabActive: null,
-    editedIndex: -1,
-    uploadFiles: { files: [] },
+    uploadFiles: { files: [], basePath: 'Uploads\\HopDong' },
     vnptbkn: vnptbkn,
     headers: [
       { text: 'Mã TB', align: 'left', value: 'ma_tb' },

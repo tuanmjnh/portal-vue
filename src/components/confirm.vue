@@ -34,6 +34,9 @@ export default {
   watch: {
     dialog(val) {
       this.localDialog = true
+    },
+    localDialog(val) {
+      if (!val) this.$emit('cancel')
     }
   },
   methods: {
@@ -43,7 +46,7 @@ export default {
     },
     onCancel() {
       this.localDialog = false
-      this.$emit('cancel')
+      // this.$emit('cancel')
     }
   }
 }

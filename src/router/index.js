@@ -61,6 +61,22 @@ const routes = [
     meta: { description: 'Overview of environment', requiresAuth: true }
   },
   {
+    path: '/permissions',
+    name: 'permissions',
+    alias: '',
+    component: () =>
+      import ('../pages/permissions/index'),
+    meta: { description: 'Overview of environment', requiresAuth: true }
+  },
+  {
+    path: '/language-items',
+    name: 'language-items',
+    alias: '',
+    component: () =>
+      import ('../pages/language-items/index'),
+    meta: { description: 'Overview of environment', requiresAuth: true }
+  },
+  {
     path: '/languages',
     name: 'languages',
     alias: '',

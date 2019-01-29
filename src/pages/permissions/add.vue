@@ -17,32 +17,15 @@
                 </v-flex>
                 <v-flex xs12 sm4 md4>
                   <v-text-field v-model.trim="item.code" label="Code" :rules="[rules.required.code,rules.exist.code]"
-                    v-on:keyup="checkExistCode(item.code)"></v-text-field>
+                    v-on:keyup="checkExistCode()"></v-text-field>
                 </v-flex>
-                <v-flex xs12 sm6 md6 class="text-append-icon">
-                  <v-text-field v-model.trim="item.icon" label="Icon"></v-text-field>
-                  <div class="icon" v-html="item.icon"></div>
-                </v-flex>
-                <v-flex xs12 sm3 md3>
+                <v-flex xs12 sm6 md4>
                   <v-text-field type="number" v-model.trim="item.orders" label="Orders"
                     :rules="[rules.required.orders]"></v-text-field>
                 </v-flex>
-                <v-flex xs12 sm3 md3>
+                <v-flex xs12 sm6 md4>
                   <v-switch color="primary" :label="item.flag===1?'Show':'Hide'"
                     :true-value="1" :false-value="0" v-model.number="item.flag"></v-switch>
-                </v-flex>
-                <v-flex xs12 sm6 md6>
-                  <v-text-field v-model.trim="item.attach_file" label="Tệp dữ liệu"
-                    :disabled="true" class="text-color-initial"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <display-files :files="uploadFiles.files" :baseUrl="vnptbkn.defaults.host"
-                    :isShowName="false" classes="w-x"></display-files>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <upload-files @handleUpload="uploadFiles=$event" :buttonUse="false"
-                    :basePath="uploadFiles.basePath" :multiple="false" :autoName="true"
-                    :http="vnptbkn" extension="application/json" buttonText="Ấn vào đây để chọn tệp"></upload-files>
                 </v-flex>
               </v-layout>
             </v-tab-item>
@@ -75,24 +58,16 @@ import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
 import { quillEditor } from 'vue-quill-editor'
-import uploadFiles from '@/components/upload-files'
-import displayFiles from '@/components/display-files'
-import { vnptbkn } from '@/plugins/axios-config'
 export default {
   components: {
     'vue-quill-editor': quillEditor,
-    'upload-files': uploadFiles,
-    'display-files': displayFiles
   },
   props: {
     dialog: { type: Boolean, default: false }
   },
   data: () => ({
-    $this: this,
     localDialog: false,
     tabActive: null,
-    vnptbkn: vnptbkn,
-    uploadFiles: { files: [], basePath: 'Languages' },
     rules: {
       required: {
         title: val => !!val || 'Required.',
@@ -100,11 +75,7 @@ export default {
         orders: val => !!val || 'Required.'
       },
       exist: {
-        code: val => true || 'Exist.' //{
-        //console.log(val)
-        //var check = this.$store.dispatch('languages/existCode')
-        //true || 'Exist.'
-        //},
+        code: val => true || 'Exist.'
       },
       length: {
         counter: val => val.length <= 20 || 'Max 20 characters',
@@ -118,14 +89,14 @@ export default {
     }
   }),
   mounted() {
-    this.$store.dispatch('languages/item')
+    this.$store.dispatch('permissions/item')
   },
   created() {
   },
   computed: {
     item() {
-      var item = this.$store.state.languages.item
-      if (item.attach) item.attach_file = item.attach.replace('Languages/', '')
+      var item = this.$store.state.permissions.item
+      if (item.attach) item.attach_file = item.attach.replace('permissions/', '')
       return item
     }
   },
@@ -133,7 +104,7 @@ export default {
     dialog(val) { this.localDialog = val },
     localDialog(val) {
       this.$emit('handleDialog', val)
-      if (!val) this.$store.dispatch('languages/item')
+      if (!val) this.$store.dispatch('permissions/item')
     },
     uploadFiles: {
       handler(val) {
@@ -145,16 +116,17 @@ export default {
   },
   methods: {
     handleSave() {
-      if (this.item.id) this.$store.dispatch('languages/update')
-      else this.$store.dispatch('languages/insert').then((result) => {
-        this.$store.dispatch('languages/item')
+      if (this.item.id) this.$store.dispatch('permissions/update')
+      else this.$store.dispatch('permissions/insert').then((result) => {
+        this.$store.dispatch('permissions/item')
       })
     },
-    checkExistCode(code) {
+    checkExistCode() {
       var $this = this;
-      if (code && !this.item.id)
+      this.item.code = this.item.code.toString().toLowerCase()
+      if (this.item.code && !this.item.id)
         //setTimeout(function () {
-        $this.$store.dispatch('languages/existCode', code).then(rs => {
+        $this.$store.dispatch('permissions/existCode').then(rs => {
           if (rs) $this.rules.exist.code = true
           else $this.rules.exist.code = 'Exist'
         })

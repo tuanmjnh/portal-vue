@@ -2,7 +2,7 @@
   <div>
     <v-card>
       <v-card-title>
-        <v-text-field v-model="query.search" append-icon="search" label="Tìm kiếm hợp đồng"
+        <v-text-field v-model="pagination.search" append-icon="search" label="Tìm kiếm hợp đồng"
           single-line hide-details></v-text-field>
         <v-spacer></v-spacer>
         <v-tooltip bottom>
@@ -13,13 +13,13 @@
         </v-tooltip>
         <v-btn-toggle v-model="toggle_one" mandatory>
           <v-tooltip bottom>
-            <v-btn slot="activator" flat @click="query.flag=1">
+            <v-btn slot="activator" flat @click="pagination.find.flag=1">
               <i class="material-icons">view_list</i>
             </v-btn>
             <span>Danh sách hợp đồng</span>
           </v-tooltip>
           <v-tooltip bottom>
-            <v-btn slot="activator" flat @click="query.flag=0">
+            <v-btn slot="activator" flat @click="pagination.find.flag=0">
               <i class="material-icons">delete</i>
             </v-btn>
             <span>Danh sách hợp đồng đã cập nhật</span>
@@ -51,7 +51,7 @@
                 <i class="material-icons teal--text">assignment</i>
               </v-btn>
               <!-- <v-btn icon class="mx-0" @click="onDelete(props.item)">
-                <i v-if="query.flag===1" class="material-icons error--text">delete</i>
+                <i v-if="pagination.find.flag===1" class="material-icons error--text">delete</i>
                 <i v-else class="material-icons info--text">refresh</i>
               </v-btn> -->
             </td>
@@ -76,13 +76,10 @@ export default {
       toggle_one: 0,
       localDialog: false,
       confirmDialog: false,
-      query: { search: '', flag: 1 },
       rowPerPage: [10, 25, 50, 100, 200, 500], //  { text: "All", value: -1 }
       vnptbkn: vnptbkn,
-      pagination: {
-        sortBy: 'created_at',
-        descending: true
-      },
+      pagination: { search: '', sortBy: 'created_at', find: { flag: 1 } },
+      // pagination: { search: '', flag: 1, sortBy: 'created_at', descending: true },
       headers: [
         { text: 'Mã hợp đồng', value: 'contract_code' },
         { text: 'Tên khách hàng', value: 'customer_name' },
@@ -95,7 +92,7 @@ export default {
   },
   computed: {
     items() {
-      var rs = this.$store.getters['contract_customer/getFilter'](this.query)
+      var rs = this.$store.getters['contract_customer/getFilter'](this.pagination)
       return rs
     }
   },

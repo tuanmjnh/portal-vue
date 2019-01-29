@@ -99,17 +99,23 @@ export function FilesToHtml(files, str = '') {
   })
   return str
 }
-export function trimLeft(str, chars = ' ') {
-  if (!str) return ''
-  return str.replace(new RegExp('^[' + chars + ']+'), '')
+String.prototype.trimLeft = function(chars = ' ') {
+  var str = String(this)
+  if (Array.isArray(chars)) {
+    chars.forEach(e => { str = str.replace(new RegExp(`^[${e}]+`), '') })
+  } else
+    return str.replace(new RegExp(`^[${chars}]+`), '')
 }
-export function trimRight(str, chars = ' ') {
-  if (!str) return ''
-  return str.replace(new RegExp('[' + chars + ']+$'), '')
+String.prototype.trimRight = function(chars = ' ') {
+  var str = String(this)
+  if (Array.isArray(chars)) {
+    chars.forEach(e => { str = str.replace(new RegExp(`[${chars}]+$`), '') })
+  } else
+    return str.replace(new RegExp(`[${chars}]+$`), '')
 }
-export function trim(str, chars = ' ') {
-  if (!str) return ''
-  return this.trimRight(this.trimLeft(str, chars), chars)
+String.prototype.trim = function(chars = ' ') {
+  var str = String(this)
+  return str.trimLeft(chars).trimRight(chars)
 }
 export function isImage(str) {
   if (!str) return false
@@ -231,6 +237,35 @@ export function ObjectToFillSource(source, destination) {
       source[_key] = destination[_key]
       // if (source[key].toString().length > 0) rs += `${key}=${obj[key]}&`
     }
+  })
+  return source
+}
+export function SortByKey(source, sortBy, direction = 'asc') {
+  if (!source || !sortBy) return source
+  direction = direction === 'asc' ? 1 : -1
+  source = source.slice().sort(function(a, b) {
+    a = a[sortBy]
+    b = b[sortBy]
+    return (a === b ? 0 : a > b ? 1 : -1) * direction
+  })
+  return source
+}
+export function FilterValue(source, obj) {
+  if (!source || !obj) return source
+  Object.keys(obj).forEach(function(key, index) {
+    var _key = key.toLowerCase()
+    source = source.filter(function(row) {
+      return row[_key] === obj[_key]
+    })
+  })
+  return source
+}
+export function SearchValue(source, search) {
+  if (!source || !search) return source
+  source = source.filter(function(row) {
+    return Object.keys(row).some(function(key) {
+      return (String(row[key]).toLowerCase().indexOf(search) > -1)
+    })
   })
   return source
 }

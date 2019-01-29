@@ -9,7 +9,7 @@
         <div class="flex xs12 sm12 md12">
           <span class="headline">{{language.name}} - [{{language.code}}]</span>
         </div>
-        <v-select :items="items" v-model="modules" label="Modules" max-height="400"></v-select>
+        <v-select :items="items" v-model="modules" label="Modules" ></v-select> <!-- max-height="400" -->
         <v-spacer></v-spacer>
         <v-text-field v-model="query.search" append-icon="search" label="Search" single-line hide-details></v-text-field>
         <v-spacer></v-spacer>
@@ -119,11 +119,11 @@ export default {
     ]
   }),
   mounted() {
-    this.$store.dispatch('languages_items/item')
+    this.$store.dispatch('language_items/item')
   },
   computed: {
     items() {
-      var rs = this.$store.getters['languages_items/getFilter'](this.query)
+      var rs = this.$store.getters['language_items/getFilter'](this.query)
       return rs
     },
     item() {
@@ -139,17 +139,17 @@ export default {
     dialog(val) { this.localDialog = val },
     localDialog(val) {
       this.$emit('handleDialog', val)
-      if (!val) this.$store.dispatch('languages_items/item')
+      if (!val) this.$store.dispatch('language_items/item')
     }
   },
   methods: {
     handleSave() {
-      if (this.item.id) this.$store.dispatch('languages_items/update')
-      else this.$store.dispatch('languages_items/insert')
+      if (this.item.id) this.$store.dispatch('language_items/update')
+      else this.$store.dispatch('language_items/insert')
     }
   },
   created() {
-    this.$store.dispatch('languages_items/item')
+    this.$store.dispatch('language_items/item')
   },
 }
 </script>

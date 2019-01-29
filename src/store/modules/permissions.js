@@ -1,18 +1,16 @@
 import { SET_CATCH, SET_ITEMS, PUSH_ITEMS, UPDATE_ITEMS, REMOVE_ITEMS, SET_ITEM, SET_MESSAGE } from '../mutation-type'
 import { FilterValue, SearchValue, SortByKey } from '@/plugins/helpers'
 import { vnptbkn } from '@/plugins/axios-config'
-const collection = 'languages'
+const collection = 'permissions'
 export default {
   namespaced: true,
   state: {
     items: [],
     item: {},
     default: {
-      id: '',
+      id: 0,
       code: '',
       title: '',
-      icon: '<i class="material-icons">outlined_flag</i>',
-      attach: '',
       orders: 1,
       descs: '',
       created_by: '',
@@ -35,19 +33,6 @@ export default {
       return state.items.filter(x => x.flag === flag)
     },
     getFilter: state => pagination => {
-      // let items = state.items
-      // if (pagination.flag >= 0) {
-      //   items = items.filter(function(row) {
-      //     return row['flag'] == pagination.flag
-      //   })
-      // }
-      // if (pagination.search) {
-      //   items = items.filter(function(row) {
-      //     return Object.keys(row).some(function(key) {
-      //       return (String(row[key]).toLowerCase().indexOf(pagination.search) > -1)
-      //     })
-      //   })
-      // }
       let items = [...state.items]
       items = FilterValue(items, pagination.find)
       items = SearchValue(items, pagination.search)
@@ -201,8 +186,8 @@ export default {
       if (item) commit(SET_ITEM, item)
       else commit(SET_ITEM, state.default)
     },
-    existCode({ commit }, val) {
-      return vnptbkn.get(collection + '/ExistCode/' + val, { timeout: 1000 }).then(function(res) { //, { timeout: 3000 }
+    existCode({ commit, state }) {
+      return vnptbkn.get(collection + '/ExistCode/' + state.item.code, { timeout: 1000 }).then(function(res) { //, { timeout: 3000 }
           if (res.status === 200) {
             if (res.data.msg === 'exist') return false
             else return true

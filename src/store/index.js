@@ -11,7 +11,9 @@ import { vnptbkn } from '@/plugins/axios-config'
 import auth from './modules/auth'
 import users from './modules/users'
 import languages from './modules/languages'
-import languages_items from './modules/languages_items'
+import permissions from './modules/permissions'
+import modules from './modules/modules'
+import language_items from './modules/language_items'
 import contract_customer from './modules/contract_customer'
 import contract_enterprise from './modules/contract_enterprise'
 Vue.use(Vuex)
@@ -19,8 +21,10 @@ export default new Vuex.Store({
   modules: {
     auth: auth,
     users: users,
+    permissions: permissions,
+    modules: modules,
     languages: languages,
-    languages_items: languages_items,
+    language_items: language_items,
     contract_customer: contract_customer,
     contract_enterprise: contract_enterprise
   },

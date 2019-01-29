@@ -12,13 +12,13 @@
         </v-tooltip>
         <v-btn-toggle v-model="toggle_one" mandatory>
           <v-tooltip bottom>
-            <v-btn slot="activator" flat @click="query.flag=1">
+            <v-btn slot="activator" flat @click="pagination.find.flag=1">
               <i class="material-icons">view_list</i>
             </v-btn>
             <span>List use</span>
           </v-tooltip>
           <v-tooltip bottom>
-            <v-btn slot="activator" flat @click="query.flag=0">
+            <v-btn slot="activator" flat @click="pagination.find.flag=0">
               <i class="material-icons">delete</i>
             </v-btn>
             <span>List delete</span>
@@ -43,7 +43,7 @@
                 <i class="material-icons teal--text">edit</i>
               </v-btn>
               <v-btn icon class="mx-0" @click="onDelete(props.item)">
-                <i v-if="query.flag===1" class="material-icons error--text">delete</i>
+                <i v-if="pagination.find.flag===1" class="material-icons error--text">delete</i>
                 <i v-else class="material-icons info--text">refresh</i>
               </v-btn>
             </td>
@@ -67,7 +67,7 @@ export default {
       toggle_one: 0,
       localDialog: false,
       confirmDialog: false,
-      query: { search: '', flag: 1 },
+      pagination: { search: '', sortBy: 'created_at', find: { flag: 1 } },
       rowPerPage: [5, 10, 25, 50, 100, { text: "All", value: -1 }],
       headers: [
         { text: 'Tài khoản', value: 'username' },
@@ -80,7 +80,7 @@ export default {
   },
   computed: {
     items() {
-      var rs = this.$store.getters['users/getFilter'](this.query)
+      var rs = this.$store.getters['users/getFilter'](this.pagination)
       return rs
     }
   },

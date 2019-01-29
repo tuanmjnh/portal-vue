@@ -1,12 +1,28 @@
 import axios from 'axios'
 import * as _auth from './storage-auth'
-var host = 'http://localhost:5000/'
-// var host = 'http://mle.dominet.com.vn/'
-// var host = 'http://localhost/mle/'
-var api = 'api/'
+let host = 'http://localhost:5000/'
+let api = 'api/'
+const source = axios.CancelToken.source();
 const vnptbkn = axios.create({
   host: host,
   api: api,
+  upload: 'filemanager',
+  baseURL: host + api,
+  // timeout: 5000,
+  headers: {
+    Authorization: _auth.GetToken() || '',
+    Author: _auth.GetUser() || '',
+    Remember: _auth.GetRemember()
+  }
+})
+// vnptbkn.CancelToken = axios.CancelToken;
+// vnptbkn.isCancel = axios.isCancel;
+host = 'http://localhost:8080/'
+api = ''
+const localhost = axios.create({
+  host: host,
+  api: api,
+  upload: 'filemanager',
   baseURL: host + api,
   // timeout: 1000,
   headers: {
@@ -29,4 +45,4 @@ const setHeaderAuth = function() {
 //   }
 // });
 
-export { vnptbkn, setHeaderAuth }
+export { vnptbkn, setHeaderAuth, localhost, source }

@@ -20,3 +20,31 @@
 .text-transform-initial {
   text-transform: initial !important;
 }
+
+.text-prepend-icon {
+  position: relative;
+
+  .icon {
+    position: absolute;
+    top: 23px;
+    left: 0;
+  }
+
+  input {
+    padding-left: 26px;
+  }
+}
+
+.text-append-icon {
+  position: relative;
+
+  .icon {
+    position: absolute;
+    top: 23px;
+    right: 0;
+  }
+
+  input {
+    padding-right: 26px;
+  }
+}

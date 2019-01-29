@@ -20,13 +20,13 @@ import { NewGuid, CheckExtension, getExtension } from '@/plugins/helpers';
 export default {
   props: {
     http: null,
-    multiple: { type: Boolean, default: false },
+    httpOptions: { type: Object, default: null },
+    baseUrl: { type: String, default: 'http://localhost:8080/filemanager' },
+    basePath: { type: String, default: 'Uploads' },
     fieldName: { type: String, default: 'file-upload' },
     fileName: { type: String, default: null },
+    multiple: { type: Boolean, default: false },
     autoName: { type: Boolean, default: false },
-    httpOptions: { type: Object, default: null },
-    baseUrl: { type: String, default: 'http://localhost:8080' },
-    controller: { type: String, default: 'fileManager' },
     buttonUse: { type: Boolean, default: false },
     buttonText: { type: String, default: 'Drag your file(s) here to begin<br> or click to browse' },
     extension: { type: String, default: null },
@@ -58,22 +58,22 @@ export default {
           }
         }
         formData.append(tmp.fieldName, tmp.file, tmp.fileName)
+        formData.append('basePath', this.basePath)
         this.files.push(tmp)
         // console.log(this.files)
       })
       if (this.http)
-        this.http.post(this.http.defaults.baseURL + this.controller, formData).then((rs) => {
-          this.$emit('handleUpload', rs.data)
+        this.http.post(this.http.defaults.baseURL + this.http.defaults.upload, formData).then((rs) => {
+          this.$emit('handleUpload', Object.assign(rs.data, { basePath: this.basePath }))
           this.clear();
         })
       else
-        axios.post(this.baseUrl + this.controller, formData, { headers: this.httpOptions }).then((rs) => {
+        axios.post(this.baseUrl, formData, { headers: this.httpOptions }).then((rs) => {
           // console.log(rs.data);
-          this.$emit('handleUpload', rs.data)
+          this.$emit('handleUpload', Object.assign(rs.data, { basePath: this.basePath }))
           this.clear();
         });
-
-      // console.log(this.http)
+      // console.log(this.http.defaults)
     },
     clear() {
       this.uploadReady = false
@@ -111,7 +111,8 @@ export default {
 
 .file-upload-content:hover {
   /*background: #dfdfdf;  when mouse over to the drop zone, change color */
-  color: #8d8d8d;
+  // color: #8d8d8d;
+  color: #3684d8;
 }
 
 .file-upload [type="file"] {

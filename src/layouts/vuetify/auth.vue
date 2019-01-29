@@ -12,7 +12,7 @@
           <v-container grid-list-md>
             <v-layout wrap>
               <v-flex xs12 sm12 md12>
-                <v-text-field v-model="item.username" label="Tài khoản"></v-text-field>
+                <v-text-field v-model="item.username" label="Tài khoản" v-focus.vuetify></v-text-field>
               </v-flex>
               <v-flex xs12 sm12 md12>
                 <v-text-field type="password" v-model="item.password" label="Mật khẩu"></v-text-field>
