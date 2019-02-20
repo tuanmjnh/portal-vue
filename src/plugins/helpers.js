@@ -117,6 +117,30 @@ String.prototype.trim = function(chars = ' ') {
   var str = String(this)
   return str.trimLeft(chars).trimRight(chars)
 }
+Array.prototype.pushIfNotExist = function(element, comparer = null) {
+  if (comparer) {
+    if (this.indexOf(comparer) < 0) this.push(element);
+  } else {
+    if (Array.isArray(element)) {
+      element.forEach(e => {
+        if (this.indexOf(e) < 0) this.push(e);
+      });
+    } else {
+      if (this.indexOf(element) < 0) this.push(element);
+    }
+  }
+};
+// Object.prototype.isEmpty = function() {
+//   for (var key in this) {
+//     if (this.hasOwnProperty(key))
+//       return false;
+//   }
+//   return true;
+// }
+
+function onlyUnique(value, index, self) {
+  return self.indexOf(value) === index;
+}
 export function isImage(str) {
   if (!str) return false
   return /\.(gif|jpg|jpeg|tiff|png)$/i.test(str.toLowerCase())

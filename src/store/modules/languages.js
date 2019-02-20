@@ -7,6 +7,7 @@ export default {
   state: {
     items: [],
     item: {},
+    languages_default: 'vi-VN',
     default: {
       id: '',
       code: '',
@@ -95,7 +96,6 @@ export default {
         obj.limit = 5
         // cll = cll.limit(5)
       }
-      console.log(obj)
       if (obj.search.length > 0)
         state.cll
         .where(obj.search[0], obj.search[1], obj.search[2])

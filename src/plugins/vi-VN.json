@@ -1,0 +1,85 @@
+{
+  "global": {
+    "search": "Tìm kiếm",
+    "add": "Thêm mới",
+    "use": "Sử dụng",
+    "using": "Đang sử dụng",
+    "used": "Đã sử dụng",
+    "delete": "Xóa",
+    "deleting": "Đang xóa",
+    "deleted": "Đã xóa",
+    "edit": "Sửa",
+    "editing": "Đang sửa",
+    "edited": "Đã sửa",
+    "recover": "Khôi phục",
+    "recovering": "Đang khôi phục",
+    "recovered": "Đã khôi phục",
+    "orders": "Thứ tự",
+    "images": "Ảnh",
+    "descs": "Miêu tả",
+    "contents": "Nội dung",
+    "created_by": "Người tạo",
+    "created_at": "Ngày tạo",
+    "updated_by": "Người sửa",
+    "updated_at": "Ngày sửa",
+    "deleted_by": "Người xóa",
+    "deleted_at": "Ngày xóa",
+    "flag": "Cờ",
+    "login": "Đăng nhập",
+    "logout": "Đăng xuất",
+    "setting": "Cài đặt",
+    "profile": "Hồ sơ"
+  },
+  "messages": {
+    "connection": "Không thể kết nối đến máy chủ, vui lòng thực hiện lại!",
+    "exist": "Đã tồn tại!",
+    "notexist": "Không tồn tại!",
+    "data": "Lỗi dữ liệu, vui lòng thử lại!",
+    "add": "Thêm mới thành công!",
+    "update": "Cập nhật thành công!"
+  },
+  "auth": {
+    "title": "Đăng nhập hệ thống",
+    "username": "Tài khoản",
+    "password": "Mật khẩu",
+    "reset_password": "Xác nhận mật khẩu",
+    "remember": "Ghi nhớ",
+    "msg_login_locked": "Tài khoản đã bị khóa, vui lòng liên hệ Admin!",
+    "msg_login_success": "Đăng nhập thành công!",
+    "msg_logout_success": "Đăng xuất thành công!",
+    "msg_login_error": "Tài khoản hoặc mật khẩu không đúng!",
+    "msg_login_error_username": "Tài khoản không đúng!",
+    "msg_login_error_password": "Mật khẩu không đúng!"
+  },
+  "users": {
+    "title": "Đăng nhập hệ thống",
+    "username": "Tài khoản",
+    "password": "Mật khẩu",
+    "reset_password": "Xác nhận mật khẩu",
+    "full_name": "Họ tên",
+    "mobile": "Họ tên",
+    "email": "Họ tên",
+    "address": "Họ tên"
+  },
+  "roles": {
+
+  },
+  "modules": {
+
+  },
+  "permissions": {
+
+  },
+  "languages": {
+
+  },
+  "language_items": {
+
+  },
+  "contract_customer": {
+
+  },
+  "contract_enterprise": {
+
+  }
+}

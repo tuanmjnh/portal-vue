@@ -19,6 +19,8 @@ import filters from './plugins/filters'
 // Directive
 import directive from './plugins/directive'
 
+// import * as _store from '@/plugins/storage'
+// console.log(JSON.parse(_store.Get('language')))
 // Components
 Vue.config.productionTip = false
 let app

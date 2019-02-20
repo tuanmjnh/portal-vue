@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import { SET_MESSAGE, SET_CATCH } from './mutation-type'
 import { vnptbkn } from '@/plugins/axios-config'
+import * as _languages from '@/plugins/languages'
 //
 // import state from './state'
 // import actions from './actions'
@@ -10,9 +11,10 @@ import { vnptbkn } from '@/plugins/axios-config'
 // import nav from './modules/nav'
 import auth from './modules/auth'
 import users from './modules/users'
-import languages from './modules/languages'
-import permissions from './modules/permissions'
+import setting from './modules/setting'
 import modules from './modules/modules'
+import permissions from './modules/permissions'
+import languages from './modules/languages'
 import language_items from './modules/language_items'
 import contract_customer from './modules/contract_customer'
 import contract_enterprise from './modules/contract_enterprise'
@@ -21,8 +23,9 @@ export default new Vuex.Store({
   modules: {
     auth: auth,
     users: users,
-    permissions: permissions,
+    setting: setting,
     modules: modules,
+    permissions: permissions,
     languages: languages,
     language_items: language_items,
     contract_customer: contract_customer,
@@ -31,6 +34,11 @@ export default new Vuex.Store({
   state: {
     _noimage: `Uploads/noimage.jpg`,
     _message: { show: false },
+    $language_def: 'vi-VN',
+    $language: _languages.GetLanguage(),
+    $languages: _languages.GetLanguages(),
+    // _language: 'vi-VN',
+    // _language_items: JSON.parse(_store.Get('language'))
     // _axios: {
     //   vnptbkn: { host: vnptbkn.defaults.host, api: vnptbkn.defaults.api }
     // }
@@ -42,7 +50,18 @@ export default new Vuex.Store({
     },
     messageClose({ state }, data) {
       state._message.show = data
-    }
+    },
+    async setLanguage({ commit, state }) {
+      commit('SET_LANGUAGE', state.$language)
+      await vnptbkn.get(`../Languages/${state.$language}.json`).then(function(res) {
+          if (res.status == 200) {
+            commit('SET_LANGUAGES', res.data)
+            _languages.SetLanguage(state.$language)
+            _languages.SetLanguages(JSON.stringify(res.data))
+          } else commit(SET_CATCH, null)
+        })
+        .catch(function(error) { commit(SET_CATCH, error) })
+    },
   }, // Actions
   mutations: {
     [SET_MESSAGE](state, res) {
@@ -91,6 +110,12 @@ export default new Vuex.Store({
       }
       // state._message.show = true
       // console.log(state._message)
+    },
+    ['SET_LANGUAGE'](state, data) {
+      state.$language = data ? data : state.$language_def
+    },
+    ['SET_LANGUAGES'](state, data) {
+      state.$languages = data
     }
   } // Mutations
 })

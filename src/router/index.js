@@ -92,6 +92,14 @@ const routes = [
       import ('../pages/informations/index'),
     meta: { description: 'Overview of environment', requiresAuth: true }
   },
+  {
+    path: '/setting',
+    name: 'setting',
+    alias: '',
+    component: () =>
+      import ('../pages/setting/index'),
+    meta: { description: 'Overview of environment', requiresAuth: true }
+  },
   // {
   //   path: '/languages',
   //   name: 'languages',

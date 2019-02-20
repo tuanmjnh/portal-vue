@@ -39,9 +39,9 @@
                   <display-files :files="uploadFiles.files" :baseUrl="vnptbkn.defaults.host"
                     :isShowName="false" classes="w-x"></display-files>
                 </v-flex>
-                <v-flex xs12 sm6 md4>
+                <v-flex xs12 sm6 md4 v-if="item.code">
                   <upload-files @handleUpload="uploadFiles=$event" :buttonUse="false"
-                    :basePath="uploadFiles.basePath" :multiple="false" :autoName="true"
+                    :basePath="uploadFiles.basePath" :multiple="false" :autoName="false" :fileName="item.code"
                     :http="vnptbkn" extension="application/json" buttonText="Ấn vào đây để chọn tệp"></upload-files>
                 </v-flex>
               </v-layout>

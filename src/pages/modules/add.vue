@@ -28,7 +28,7 @@
                 </v-flex>
                 <v-flex xs12 md6 sm6>
                   <v-select :items="permissions" item-text="title" item-value="code"
-                    v-model="permissions_selected" :menu-props="{ maxHeight: '400' }"
+                    v-model="permissions_selected" :menu-props="{ maxHeight: '400' }" :hide-selected="true"
                     label="Permissions" multiple persistent-hint hint="Pick your permissions"></v-select>
                 </v-flex>
                 <v-flex xs6 sm3 md3>

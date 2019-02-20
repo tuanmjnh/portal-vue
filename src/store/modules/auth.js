@@ -28,7 +28,7 @@ export default {
     }
   },
   actions: {
-    async login({ commit, state }) {
+    async login({ commit, state, rootState }) {
       await vnptbkn
         .post(collection, state.item)
         .then(function(res) {
@@ -44,10 +44,10 @@ export default {
           // commit message
           if (res.data.message == 'danger') {
             res.color = 'danger'
-            res.text = 'Lỗi kết nối đến cơ sở dữ liệu!'
+            res.text = rootState.$languages.messages.connection
           } else if (res.data.message == 'locked') {
             res.color = 'danger'
-            res.text = 'Tài khoản đã bị khóa, vui lòng liên hệ Admin!'
+            res.text = rootState.$languages.auth.msg_login_locked
           }
           // else if (res.data.message == 'null') {
           //   res.color = 'danger'
@@ -55,22 +55,22 @@ export default {
           // }
           else if (res.data.message == 'success') {
             res.color = 'success'
-            res.text = 'Đăng nhập hệ thống thành công!'
+            res.text = rootState.$languages.auth.msg_login_success
           } else {
             res.color = 'danger'
-            res.text = 'Tài khoản hoặc mật khẩu không đúng!'
+            res.text = rootState.$languages.auth.msg_login_error
           }
           commit(SET_MESSAGE, res, { root: true })
           setHeaderAuth()
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) }) // commit catch
     },
-    async logout({ commit }) {
+    async logout({ commit, rootState }) {
       _auth.RemoveAuth()
       commit('SET_ISAUTH')
       // commit('REMOVE_AUTH', {}, { root: true })
       var res = {
-        data: { message: { type: 'danger', text: 'Đăng xuất thành công!' } },
+        data: { message: { type: 'danger', text: rootState.$languages.auth.msg_logout_success } },
         status: 200,
         statusText: 'OK'
       }

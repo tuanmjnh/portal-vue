@@ -87,7 +87,7 @@
               <i class="material-icons">ballot</i>
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title>Hồ sơ</v-list-tile-title>
+              <v-list-tile-title>{{$store.state.$languages.global.profile}}</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
           <v-list-tile @click="$router.push('/setting')">
@@ -95,7 +95,7 @@
               <i class="material-icons">settings_applications</i>
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title>Cài đặt</v-list-tile-title>
+              <v-list-tile-title>{{$store.state.$languages.global.setting}}</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
           <v-list-tile @click="Logout">
@@ -103,7 +103,7 @@
               <i class="material-icons">exit_to_app</i>
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title>Đăng xuất</v-list-tile-title>
+              <v-list-tile-title>{{$store.state.$languages.global.logout}}</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
         </v-list>

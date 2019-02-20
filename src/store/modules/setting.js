@@ -1,23 +1,18 @@
 import { SET_CATCH, SET_ITEMS, PUSH_ITEMS, UPDATE_ITEMS, REMOVE_ITEMS, SET_ITEM, SET_MESSAGE } from '../mutation-type'
 import { FilterValue, SearchValue, SortByKey } from '@/plugins/helpers'
 import { vnptbkn } from '@/plugins/axios-config'
-const collection = 'modules'
+const collection = 'setting'
 export default {
   namespaced: true,
   state: {
     items: [],
     item: {},
     default: {
-      id: '',
+      id: 0,
       code: '',
       title: '',
-      icon: '<i class="material-icons">view_module</i>',
-      image: '',
-      urls: '',
-      permissions: '',
       orders: 1,
       descs: '',
-      contents: '',
       created_by: '',
       created_at: new Date(),
       updated_by: '',
@@ -43,13 +38,6 @@ export default {
       items = SearchValue(items, pagination.search)
       items = SortByKey(items, pagination.sortBy)
       return items
-    },
-    getCodeFilter: state => pagination => {
-      let items = [...state.items]
-      items = FilterValue(items, pagination.find)
-      items = SearchValue(items, pagination.search)
-      items = SortByKey(items, pagination.sortBy)
-      return items.map(e => e.code)
     }
   },
   mutations: {
@@ -72,6 +60,54 @@ export default {
     }
   },
   actions: {
+    pagination({ commit, state }, { search, pagination }) {
+      var items = []
+      var obj = {
+        search: [],
+        orderBy: [],
+        limit: 5
+      }
+      if (search) {
+        obj.search.push('name', '>=', search)
+        obj.search.push('name', '<=', search)
+        // cll = cll.where('name', '==', 'lang 0')
+      }
+      if (pagination.sortBy) {
+        obj.orderBy.push('name', pagination.descending ? 'desc' : 'asc')
+        // cll = cll.orderBy('name', pagination.descending ? 'desc' : 'asc')
+      }
+      if (pagination.rowsPerPage) {
+        obj.limit = 5
+        // cll = cll.limit(5)
+      }
+      console.log(obj)
+      if (obj.search.length > 0)
+        state.cll
+        .where(obj.search[0], obj.search[1], obj.search[2])
+        .orderBy(obj.orderBy[0], obj.orderBy[1])
+        .limit(obj.limit)
+        .get().then(query => {
+          query.forEach(function(doc) {
+            var item = state.default
+            item = doc.data()
+            item.id = doc.id
+            items.push(item)
+          })
+        })
+      else
+        state.cll
+        .orderBy(obj.orderBy[0], obj.orderBy[1])
+        .limit(obj.limit)
+        .get().then(query => {
+          query.forEach(function(doc) {
+            var item = state.default
+            item = doc.data()
+            item.id = doc.id
+            items.push(item)
+          })
+        })
+      commit(SET_ITEMS, items)
+    },
     async select({ commit, state }) {
       await vnptbkn.get(collection).then(function(res) {
           if (res.status === 200) {
