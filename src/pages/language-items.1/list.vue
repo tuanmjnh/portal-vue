@@ -38,7 +38,7 @@
           </v-tooltip>
         </v-btn-toggle> -->
       </v-card-title>
-      <v-data-table class="elevation-1" v-model="selected" select-all item-key="id"
+      <v-data-table class="elevation-1" v-model="selected" select-all item-key="key"
         :headers="headers" :items="items" :rows-per-page-items="rowPerPage"
         :pagination.sync="pagination" :search="pagination.search">
         <!--:loading="loading" :pagination.sync="pagination" :total-items="totalItems" -->
@@ -72,9 +72,9 @@
               </v-edit-dialog>
             </td>
             <td class="justify-center layout px-0">
-              <v-btn icon class="mx-0" @click="onEdit(props.item)">
+              <!-- <v-btn icon class="mx-0" @click="onEdit(props.item)">
                 <i class="material-icons teal--text">edit</i>
-              </v-btn>
+              </v-btn> -->
               <v-btn icon class="mx-0" @click="onDelete(props.item)">
                 <i class="material-icons error--text">delete</i>
               </v-btn>
@@ -130,7 +130,8 @@ export default {
       return rs
     },
     items() {
-      const rs = JSON.parse(JSON.stringify(this.$store.getters['language_items/getFilter'](this.pagination)))
+      const rs = JSON.parse(JSON.stringify(this.$store.state.language_items.items))
+      // const rs = this.$store.getters['language_items/getFilter'](this.pagination)
       return rs
     },
     languages() {
@@ -169,18 +170,26 @@ export default {
     },
     onDelete(item) {
       this.confirmDialog = !this.confirmDialog
-      this.selected.push(item);
+      this.$store.dispatch('language_items/item', item)
     },
     onOkConfirm() {
-      this.$store.dispatch('language_items/delete', this.selected).then(this.selected = [])
+      this.$store.dispatch('language_items/delete')
     },
     onCancelConfirm() {
-      this.selected = []
+      this.$store.dispatch('language_items/item')
     },
     onQuickSave(item) {
-      this.$store.dispatch('language_items/item', item).then(() => {
-        this.$store.dispatch('language_items/update')
-      })
+      // console.log(this.lang_data)
+      // var data = {}
+      // this.lang_data.forEach(e => {
+      //   if (data[e.module_code] != undefined)
+      //     data[e.module_code][e.key] = e.value
+      //   else data[e.module_code] = JSON.parse(`{"${e.key}":"${e.value}"}`)
+      // });
+      this.$store.dispatch('language_items/update', this.items)
+      // this.$store.dispatch('language_items/item', item).then(() => {
+      //   this.$store.dispatch('language_items/update')
+      // })
     },
   }
 }

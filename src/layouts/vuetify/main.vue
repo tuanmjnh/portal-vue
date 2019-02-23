@@ -7,7 +7,7 @@
         <v-list>
           <v-list-tile>
             <v-list-tile-action>
-              <v-icon>store</v-icon>
+              <v-icon>dashboard</v-icon>
             </v-list-tile-action>
             <v-list-tile-content class="title">
               <v-list-tile-title>Portal</v-list-tile-title>
@@ -87,7 +87,7 @@
               <i class="material-icons">ballot</i>
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title>{{$store.state.$languages.global.profile}}</v-list-tile-title>
+              <v-list-tile-title>{{$store.getters.languages('global.profile')}}</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
           <v-list-tile @click="$router.push('/setting')">
@@ -95,7 +95,7 @@
               <i class="material-icons">settings_applications</i>
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title>{{$store.state.$languages.global.setting}}</v-list-tile-title>
+              <v-list-tile-title>{{$store.getters.languages('global.setting')}}</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
           <v-list-tile @click="Logout">
@@ -103,7 +103,7 @@
               <i class="material-icons">exit_to_app</i>
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title>{{$store.state.$languages.global.logout}}</v-list-tile-title>
+              <v-list-tile-title>{{$store.getters.languages('global.logout')}}</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
@@ -135,7 +135,17 @@
       </v-list>
     </v-navigation-drawer>
     <v-footer :fixed="fixed" app>
-      <span>&copy; 2018</span>
+      <!-- <v-layout wrap class="pl-3"> -->
+        <v-flex xs3 sm3 md2 class="pl-3">
+          <v-select :items="dataLanguages" v-model="$store.state.$language"
+            :hide-selected="true" item-text="title" item-value="code"></v-select>
+        </v-flex>
+        <v-spacer></v-spacer>
+        <!-- <v-flex xs9 sm9 md10></v-flex> -->
+        <v-flex xs3 sm3 md2 class="text-lg-right">
+          <span>Coppyright &copy; 2019</span>
+        </v-flex>
+      <!-- </v-layout> -->
     </v-footer>
   </div>
 </template>
@@ -191,8 +201,11 @@ export default {
       { icon: "settings_applications", title: "Setting", push: "setting" },
       { icon: "exit_to_app", title: "Logout", go: "auth", store: "auth/logout" }
     ]
-  })
-  ,
+  }),
+  created() {
+    // console.log(this.authUser)
+    // this.$store.dispatch('languages_items/init')
+  },
   computed: {
     snackbar() {
       var rs = this.$store.state._message
@@ -204,6 +217,14 @@ export default {
     },
     authUser() {
       var rs = this.$store.state.auth.user
+      return rs
+    },
+    dataLanguages() {
+      const rs = this.$store.state.languages.items
+      return rs
+    },
+    language() {
+      const rs = this.$store.state.$language
       return rs
     }
   },
@@ -223,9 +244,10 @@ export default {
       return _auth.GetStorage(key)
     }
   },
-  created() {
-    // console.log(this.authUser)
-    // this.$store.dispatch('languages_items/init')
+  watch: {
+    language(val) {
+      this.$store.dispatch('setLanguage')
+    }
   }
 }
 </script>

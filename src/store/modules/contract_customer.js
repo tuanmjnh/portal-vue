@@ -115,7 +115,7 @@ export default {
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
     },
-    async insert({ commit, state }) {
+    async insert({ commit, state, rootGetters }) {
       // const khachhang = { ...state.khachhang } // Object.assign({}, state.khachhang)
       // state.khachhang.created_by = vnptbkn.defaults.headers.Author
       // state.khachhang.created_at = new Date()
@@ -129,17 +129,17 @@ export default {
         .then(function(res) {
           if (res.status == 200) {
             if (res.data.msg === 'exist') {
-              commit(SET_MESSAGE, { text: 'Hợp đồng đã tồn tại!', color: 'warning' }, { root: true })
+              commit(SET_MESSAGE, { text: rootGetters.languages('contract_customer.msg_err_exist'), color: 'warning' }, { root: true })
               return
             }
             if (res.data.msg === 'danger') {
-              commit(SET_MESSAGE, { text: 'Lỗi dữ liệu, vui lòng thử lại!', color: res.data.msg }, { root: true })
+              commit(SET_MESSAGE, { text: rootGetters.languages('messages.err_data'), color: res.data.msg }, { root: true })
               return
             }
             if (res.data.data.khachhang) {
               commit(PUSH_ITEMS, res.data.data.khachhang)
             }
-            commit(SET_MESSAGE, { text: 'Thêm mới hợp đồng thành công!', color: res.data.msg }, { root: true })
+            commit(SET_MESSAGE, { text: rootGetters.languages('messages.suc_add'), color: res.data.msg }, { root: true })
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
@@ -187,21 +187,21 @@ export default {
       if (thuebao) commit('SET_THUEBAO', thuebao)
       else commit('SET_THUEBAO', [])
     },
-    async getContract({ commit, state }) {
+    async getContract({ commit, state, rootGetters }) {
       await vnptbkn
         .get(collection + '/getContract?key=' + state.khachhang.ma_gd)
         .then(function(res) {
           if (res.status == 200) {
             if (res.data.msg === 'notexist') {
-              commit(SET_MESSAGE, { text: 'Không tìm thấy hợp đồng!', color: 'warning' }, { root: true })
+              commit(SET_MESSAGE, { text: rootGetters.languages('contract_customer.msg_err_exist_contact'), color: 'warning' }, { root: true })
               return
             }
             if (res.data.msg === 'exist') {
-              commit(SET_MESSAGE, { text: 'Hợp đồng đã tồn tại!', color: 'warning' }, { root: true })
+              commit(SET_MESSAGE, { text: rootGetters.languages('contract_customer.msg_err_exist'), color: 'warning' }, { root: true })
               return
             }
             if (res.data.msg === 'danger') {
-              commit(SET_MESSAGE, { text: 'Lỗi dữ liệu, vui lòng thử lại!', color: res.data.msg }, { root: true })
+              commit(SET_MESSAGE, { text: rootGetters.languages('messages.err_data'), color: res.data.msg }, { root: true })
               return
             }
             if (res.data.data.khachhang && res.data.data.thuebao && res.data.data.thuebao.length > 0) {

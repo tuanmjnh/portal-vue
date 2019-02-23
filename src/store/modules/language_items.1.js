@@ -7,20 +7,15 @@ export default {
   namespaced: true,
   state: {
     items: [],
-    item: { module_code: 'global' },
+    item: { module_code: 'global', key: '', value: '' },
     module_code: [],
     current_language: '',
     lang_code: 'vi-VN',
     lang_data: '',
-    modules: ['global'],
+    modules: [],
     modules_default: ['global'],
-    default: {
-      id: 0,
-      lang_code: 'vi-VN',
-      module_code: 'global',
-      key: '',
-      value: ''
-    }
+    item_default: { module_code: 'global', key: '', value: '' },
+    default: { lang_code: 'vi-VN', lang_data: {} }
   },
   getters: {
     getAll(state) {
@@ -41,9 +36,17 @@ export default {
     }
   },
   mutations: {
-    [SET_ITEMS](state, items) {
-      // state.modules.push(key)
-      state.items = [...items]
+    [SET_ITEMS](state, lang_data) {
+      state.items = []
+      state.modules = state.modules_default
+      let _tmp = lang_data ? JSON.parse(lang_data) : null
+      if (_tmp)
+        Object.keys(_tmp).forEach(function(key, index) {
+          state.modules.push(key)
+          Object.keys(_tmp[key]).forEach(function(skey, sindex) {
+            state.items.push({ module_code: key, key: skey, value: _tmp[key][skey] })
+          })
+        })
     },
     [SET_ITEM](state, item) {
       state.item = { ...item }
@@ -58,7 +61,10 @@ export default {
       state.items.splice(index, 1, item)
     },
     [REMOVE_ITEMS](state, item) {
-      const index = state.items.findIndex(x => x.id === item.id)
+      const index = state.items.findIndex(x =>
+        x.module_code === item.module_code &&
+        x.key === item.key &&
+        x.value === item.value)
       if (index >= 0) state.items.splice(index, 1)
     },
     'SET_LANG_DATA'(state, data) {
@@ -88,7 +94,10 @@ export default {
         .get(`${collection}/getlang/${state.lang_code}`)
         .then(function(res) {
           if (res.status === 200) {
-            if (res.data.data) commit(SET_ITEMS, res.data.data)
+            state.lang_data = ''
+            if (res.data.data && res.data.data.length > 0)
+              state.lang_data = res.data.data[0].lang_data // JSON.stringify(vi)
+            commit(SET_ITEMS, state.lang_data)
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
@@ -96,83 +105,126 @@ export default {
     async insert({ commit, state, rootGetters }) {
       // state.item.created_by = vnptbkn.defaults.headers.Author
       // state.item.created_at = new Date()
-      const data = { ...state.item, ...{ lang_code: state.lang_code } }
+      // state.lang_data = { ...(typeof state.lang_data === 'string' ? (state.lang_data ? JSON.parse(state.lang_data) : {}) : state.lang_data), ...data }
+      // state.lang_data = { ...(typeof state.lang_data === 'string' ? (state.lang_data ? JSON.parse(state.lang_data) : {}) : state.lang_data) }
+      // if (Object.keys(state.lang_data).length) {
+      //   if (state.lang_data[state.item.module_code] != undefined)
+      //     state.lang_data[state.item.module_code][state.item.key] = state.item.value
+      //   else state.lang_data = { ...state.lang_data, ...JSON.parse(`{"${state.item.module_code}":{"${state.item.key}":"${state.item.value}"}}`) }
+      // } else state.lang_data = JSON.parse(`{"${state.item.module_code}":{"${state.item.key}":"${state.item.value}"}}`)
+      // state.lang_data = JSON.stringify(state.lang_data)
+      commit(PUSH_ITEMS, state.item)
+      commit('SET_LANG_DATA', state.items)
       await vnptbkn
-        .post(collection, data)
+        .post(collection, {
+          'lang_code': state.lang_code,
+          'lang_data': state.lang_data
+        })
         .then(function(res) {
           if (res.status == 200) {
             if (res.data.msg === 'exist') {
-              commit(SET_MESSAGE, { text: rootGetters.languages('messages.err_exist'), color: 'warning' }, { root: true })
+              commit(SET_MESSAGE, {
+                color: 'warning',
+                text: rootGetters.languages('messages.err_exist')
+              }, { root: true })
               return
             }
             if (res.data.msg === 'danger') {
-              commit(SET_MESSAGE, { text: rootGetters.languages('messages.err_data'), color: res.data.msg }, { root: true })
+              commit(SET_MESSAGE, {
+                color: res.data.msg,
+                text: rootGetters.languages('messages.err_data')
+              }, { root: true })
               return
             }
             // Success
             state.item.key = ''
             state.item.value = ''
-            commit(PUSH_ITEMS, data)
-            commit(SET_MESSAGE, { text: rootGetters.languages('messages.suc_add'), color: res.data.msg }, { root: true })
+            commit(SET_MESSAGE, {
+              color: res.data.msg,
+              text: rootGetters.languages('messages.suc_add')
+            }, { root: true })
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
     },
-    async update({ commit, state, rootGetters }) {
-      const data = { ...state.item, ...{ lang_code: state.lang_code } }
+    async update({ commit, state, rootGetters }, items) {
+      if (items) commit('SET_LANG_DATA', items)
       await vnptbkn
-        .put(collection, data)
+        .put(collection, {
+          'lang_code': state.lang_code,
+          'lang_data': state.lang_data
+        })
         .then(function(res) {
           if (res.status == 200) {
             if (res.data.msg === 'danger') {
-              commit(SET_MESSAGE, { text: rootGetters.languages('messages.err_data'), color: res.data.msg }, { root: true })
+              commit(SET_MESSAGE, {
+                color: res.data.msg,
+                text: rootGetters.languages('messages.err_data')
+              }, { root: true })
               return
             }
             // Success
-            commit(UPDATE_ITEMS, data)
-            commit(SET_MESSAGE, { text: rootGetters.languages('messages.suc_update'), color: res.data.msg }, { root: true })
+            commit(SET_ITEMS, state.lang_data)
+            commit(SET_MESSAGE, {
+              color: res.data.msg,
+              text: rootGetters.languages('messages.suc_update')
+            }, { root: true })
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
     },
-    async delete({ commit, state, rootGetters }, selected) {
-      var _selected = [...selected]
+    async delete({ commit, state, rootGetters }) {
+      commit(REMOVE_ITEMS, state.item)
+      commit('SET_LANG_DATA', state.items)
       await vnptbkn
-        .put(`${collection}/delete`, _selected)
+        .put(collection, {
+          'lang_code': state.lang_code,
+          'lang_data': state.lang_data
+        })
         .then(function(res) {
           if (res.status == 200) {
             if (res.data.msg === 'danger') {
-              commit(SET_MESSAGE, { text: rootGetters.languages('messages.err_data'), color: res.data.msg }, { root: true })
+              commit(SET_MESSAGE, {
+                color: res.data.msg,
+                text: rootGetters.languages('messages.err_data')
+              }, { root: true })
               return
             }
             // Success
-            // commit(REMOVE_ITEMS, data)
-            _selected.forEach(e => { commit(REMOVE_ITEMS, e) });
-            commit(SET_MESSAGE, { text: rootGetters.languages('messages.suc_delete'), color: res.data.msg }, { root: true })
+            commit(SET_ITEMS, state.lang_data)
+            commit(SET_MESSAGE, {
+              color: res.data.msg,
+              text: rootGetters.languages('messages.suc_delete')
+            }, { root: true })
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
     },
-    async remove({ commit, state, rootGetters }, selected) {
-      var _selected = [...selected]
+    async remove({ commit, state, rootGetters }) {
       await vnptbkn
-        .delete(collection, _selected)
+        .delete(collection, state.item)
         .then(function(res) {
           if (res.status == 200) {
             if (res.data.msg === 'danger') {
-              commit(SET_MESSAGE, { text: rootGetters.languages('messages.err_data'), color: res.data.msg }, { root: true })
+              commit(SET_MESSAGE, {
+                color: res.data.msg,
+                text: rootGetters.languages('messages.err_data')
+              }, { root: true })
               return
             }
             // Success
-            _selected.forEach(e => { commit(REMOVE_ITEMS, e) });
-            commit(SET_MESSAGE, { text: rootGetters.languages('messages.suc_delete'), color: res.data.msg }, { root: true })
+            commit(REMOVE_ITEMS, state.item)
+            commit(SET_MESSAGE, {
+              color: res.data.msg,
+              text: rootGetters.languages('messages.suc_delete')
+            }, { root: true })
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
     },
     async item({ commit, state }, item) {
       if (item) commit(SET_ITEM, item)
-      else commit(SET_ITEM, state.default)
+      else commit(SET_ITEM, state.item_default)
     }
   }
 }

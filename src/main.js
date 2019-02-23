@@ -1,7 +1,8 @@
 import '@babel/polyfill'
 import Vue from 'vue'
-import './plugins/vuetify'
 import App from './App.vue'
+// Vuetify
+import './plugins/vuetify'
 // jQuery
 import $ from 'jquery';
 window.jQuery = $;

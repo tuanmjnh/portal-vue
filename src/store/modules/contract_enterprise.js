@@ -81,7 +81,7 @@ export default {
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
     },
-    async insert({ commit, state }) {
+    async insert({ commit, state, rootGetters }) {
       var item = Object.assign({}, state.item)
       item.created_by = 'Admin'
       item.created_at = new Date()
@@ -90,7 +90,7 @@ export default {
       //   .then(docRef => {
       //     item.id = docRef.id
       //     commit(PUSH_ITEMS, item)
-      //     commit(SET_MESSAGE, { text: 'Cập nhật thành công', color: 'success' }, { root: true })
+      //     commit(SET_MESSAGE, { text: rootGetters.languages('messages.suc_add'), color: 'success' }, { root: true })
       //   })
       //   .then(() => { commit(SET_ITEM, state.default) })
       //   .catch(error => { commit(SET_CATCH, error, { root: true }) })

@@ -43,7 +43,26 @@ export default new Vuex.Store({
     //   vnptbkn: { host: vnptbkn.defaults.host, api: vnptbkn.defaults.api }
     // }
   }, // State
-  getters: {}, // = computed properties
+  getters: {
+    languages: state => key => {
+      const _key = key.split('.')
+      if (!state.$languages[_key[0]]) return key
+      var rs = _key.length > 0 ? state.$languages[_key[0]] : key
+      //
+      if (!state.$languages[_key[0]][_key[1]]) return key
+      rs = _key.length > 1 ? state.$languages[_key[0]][_key[1]] : key
+      return rs
+    }
+    // languages: state => key => {
+    //   const _key = key.split('.')
+    //   if (!state.$languages[_key[0]]) return key
+    //   var rs = _key.length > 0 ? state.$languages[_key[0]] : key
+    //   //
+    //   if (!state.$languages[_key[0]][_key[1]]) return key
+    //   rs = _key.length > 1 ? state.$languages[_key[0]][_key[1]] : key
+    //   return rs
+    // }
+  }, // = computed properties
   actions: {
     message({ commit }, data) {
       commit(SET_MESSAGE, data)
@@ -52,16 +71,53 @@ export default new Vuex.Store({
       state._message.show = data
     },
     async setLanguage({ commit, state }) {
+      // Data Items
+      let lang_data = {}
       commit('SET_LANGUAGE', state.$language)
-      await vnptbkn.get(`../Languages/${state.$language}.json`).then(function(res) {
+      // commit('SET_LANGUAGES', lang_data)
+      await vnptbkn.get(`language-items/getlang/${state.$language}`).then(function(res) {
           if (res.status == 200) {
-            commit('SET_LANGUAGES', res.data)
             _languages.SetLanguage(state.$language)
-            _languages.SetLanguages(JSON.stringify(res.data))
+            if (res.data.data) {
+              res.data.data.forEach(e => {
+                if (!lang_data[e.module_code] || lang_data[e.module_code] === undefined) lang_data[e.module_code] = {}
+                Object.assign(lang_data[e.module_code], JSON.parse(`{"${e.key}":"${e.value}"}`))
+              });
+              commit('SET_LANGUAGES', lang_data)
+              // state.$languages = _languages.GetLanguages()
+              _languages.SetLanguages(lang_data)
+            }
           } else commit(SET_CATCH, null)
         })
         .catch(function(error) { commit(SET_CATCH, error) })
+
+      // Data Json
+      // commit('SET_LANGUAGE', state.$language)
+      // await vnptbkn.get(`language-items/getlang/${state.$language}`).then(function(res) {
+      //     if (res.status == 200) {
+      //       let lang_data = ''
+      //       _languages.SetLanguage(state.$language)
+      //       if (res.data.data && res.data.data.length > 0)
+      //         lang_data = res.data.data[0].lang_data
+      //       _languages.SetLanguages(lang_data)
+      //       state.$languages = _languages.GetLanguages()
+      //     } else commit(SET_CATCH, null)
+      //   })
+      //   .catch(function(error) { commit(SET_CATCH, error) })
+
+      // Json File
+      // await vnptbkn.get(`../Languages/${state.$language}.json`).then(function(res) {
+      //     if (res.status == 200) {
+      //       commit('SET_LANGUAGES', res.data)
+      //       _languages.SetLanguage(state.$language)
+      //       _languages.SetLanguages(JSON.stringify(res.data))
+      //     } else commit(SET_CATCH, null)
+      //   })
+      //   .catch(function(error) { commit(SET_CATCH, error) })
     },
+    ['TEST']({ state, getters }) {
+      console.log(getters.languages('auth.msg_err_expired'))
+    }
   }, // Actions
   mutations: {
     [SET_MESSAGE](state, res) {
@@ -77,7 +133,7 @@ export default new Vuex.Store({
         statusText: res.statusText || 'Error'
       }
     },
-    [SET_CATCH](state, error) {
+    [SET_CATCH]({ state, getters }, error) {
       if (!error.response) {
         console.log(error)
         return
@@ -91,7 +147,7 @@ export default new Vuex.Store({
           timeout: 6000,
           show: true,
           color: 'danger',
-          text: 'Vui lòng đăng nhập lại!', // error.response ? error.response.statusText : error,
+          text: getters.languages('auth.msg_err_expired'), // error.response ? error.response.statusText : error,
           status: error.response ? error.response.status : 0,
           statusText: error.response ? error.response.statusText : error
         }
@@ -103,7 +159,7 @@ export default new Vuex.Store({
           timeout: 6000,
           show: true,
           color: 'danger',
-          text: 'Không thể kết nối đến máy chủ, vui lòng thực hiện lại!', // error.response ? error.response.statusText : error,
+          text: getters.languages('messages.err_connection'), // error.response ? error.response.statusText : error,
           status: error.response ? error.response.status : 0,
           statusText: error.response ? error.response.statusText : error
         }

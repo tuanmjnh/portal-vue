@@ -131,68 +131,68 @@ export default {
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
     },
-    async insert({ commit, state }) {
+    async insert({ commit, state, rootGetters }) {
       state.item.created_by = vnptbkn.defaults.headers.Author
       state.item.created_at = new Date()
       await vnptbkn.post(collection, state.item).then(function(res) {
           if (res.status == 200) {
             if (res.data.msg === 'exist') {
-              commit(SET_MESSAGE, { text: 'Mã ngôn ngữ tồn tại!', color: 'warning' }, { root: true })
+              commit(SET_MESSAGE, { text: rootGetters.languages('languages.msg_err_code_exist'), color: 'warning' }, { root: true })
               return
             }
             if (res.data.msg === 'danger') {
-              commit(SET_MESSAGE, { text: 'Lỗi dữ liệu, vui lòng thử lại!', color: res.data.msg }, { root: true })
+              commit(SET_MESSAGE, { text: rootGetters.languages('messages.err_data'), color: res.data.msg }, { root: true })
               return
             }
             // Success
             commit(PUSH_ITEMS, res.data.data)
-            commit(SET_MESSAGE, { text: 'Thêm mới thành công!', color: res.data.msg }, { root: true })
+            commit(SET_MESSAGE, { text: rootGetters.languages('messages.suc_add'), color: res.data.msg }, { root: true })
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
     },
-    async update({ commit, state }) {
+    async update({ commit, state, rootGetters }) {
       state.item.updated_by = vnptbkn.defaults.headers.Author
       state.item.updated_at = new Date()
       await vnptbkn.put(collection, state.item).then(function(res) {
           if (res.status == 200) {
             if (res.data.msg === 'danger') {
-              commit(SET_MESSAGE, { text: 'Lỗi dữ liệu, vui lòng thử lại!', color: res.data.msg }, { root: true })
+              commit(SET_MESSAGE, { text: rootGetters.languages('messages.err_data'), color: res.data.msg }, { root: true })
               return
             }
             // Success
             commit(UPDATE_ITEMS, state.item)
-            commit(SET_MESSAGE, { text: 'Cập nhật thành công!', color: res.data.msg }, { root: true })
+            commit(SET_MESSAGE, { text: rootGetters.languages('messages.suc_update'), color: res.data.msg }, { root: true })
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
     },
-    async delete({ commit }, selected) {
+    async delete({ commit, rootGetters }, selected) {
       var _selected = [...selected]
       for (let i = 0; i < _selected.length; i++) _selected[i].flag = _selected[i].flag === 0 ? 1 : 0
       await vnptbkn.put(collection + '/delete', _selected).then(function(res) {
           if (res.status == 200) {
             if (res.data.msg === 'danger') {
-              commit(SET_MESSAGE, { text: 'Lỗi dữ liệu, vui lòng thử lại!', color: res.data.msg }, { root: true })
+              commit(SET_MESSAGE, { text: rootGetters.languages('messages.err_data'), color: res.data.msg }, { root: true })
               return
             }
             // Success
             _selected.forEach(e => { commit(UPDATE_ITEMS, e) });
-            commit(SET_MESSAGE, { text: 'Cập nhật thành công!', color: res.data.msg }, { root: true })
+            commit(SET_MESSAGE, { text: rootGetters.languages('messages.suc_delete'), color: res.data.msg }, { root: true })
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
     },
-    async remove({ commit, state }) {
+    async remove({ commit, state, rootGetters }) {
       await vnptbkn.delete(collection, state.item).then(function(res) {
           if (res.status == 200) {
             if (res.data.msg === 'danger') {
-              commit(SET_MESSAGE, { text: 'Lỗi dữ liệu, vui lòng thử lại!', color: res.data.msg }, { root: true })
+              commit(SET_MESSAGE, { text: rootGetters.languages('messages.err_data'), color: res.data.msg }, { root: true })
               return
             }
             // Success
             commit(REMOVE_ITEMS, state.item)
-            commit(SET_MESSAGE, { text: 'Cập nhật thành công!', color: res.data.msg }, { root: true })
+            commit(SET_MESSAGE, { text: rootGetters.languages('messages.suc_delete'), color: res.data.msg }, { root: true })
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })

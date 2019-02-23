@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import 'vuetify/src/stylus/app.styl'
 import {
   Vuetify,
   VApp,
@@ -28,9 +29,9 @@ import {
   VDatePicker,
   VDialog,
   VSnackbar,
-  transitions
+  transitions,
+  VProgressCircular
 } from 'vuetify'
-import 'vuetify/src/stylus/app.styl'
 Vue.use(Vuetify, {
   components: {
     VApp,
@@ -60,7 +61,8 @@ Vue.use(Vuetify, {
     VDatePicker,
     VDialog,
     VSnackbar,
-    transitions
+    transitions,
+    VProgressCircular
   },
   theme: {
     primary: '#1976D2',

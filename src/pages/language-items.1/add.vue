@@ -119,8 +119,14 @@ export default {
       // var data = JSON.parse(`{"${this.module}":{"${this.key}":"${this.value}"}}`)
       // var data = { module_code: this.module_code, key: this.key, value: this.value }
       if (this.valid) {
-        if (this.item.id) this.$store.dispatch('language_items/update')
-        else this.$store.dispatch('language_items/insert')
+        this.$store.dispatch('language_items/insert')
+        // if (this.item.id) 
+        // this.$store.dispatch('language_items/update')
+        // else this.$store.dispatch('language_items/insert').then((result) => {
+        //   // this.key = ''
+        //   // this.value = ''
+        //   // this.$store.dispatch('language_items/item')
+        // })
       }
     },
     checkExistCode() {

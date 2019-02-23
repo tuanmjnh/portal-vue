@@ -28,7 +28,7 @@ export default {
     }
   },
   actions: {
-    async login({ commit, state, rootState }) {
+    async login({ commit, state, rootGetters }) {
       await vnptbkn
         .post(collection, state.item)
         .then(function(res) {
@@ -44,10 +44,10 @@ export default {
           // commit message
           if (res.data.message == 'danger') {
             res.color = 'danger'
-            res.text = rootState.$languages.messages.connection
+            res.text = rootGetters.languages('global.err_connection')
           } else if (res.data.message == 'locked') {
             res.color = 'danger'
-            res.text = rootState.$languages.auth.msg_login_locked
+            res.text = rootGetters.languages('auth.msg_login_locked')
           }
           // else if (res.data.message == 'null') {
           //   res.color = 'danger'
@@ -55,22 +55,22 @@ export default {
           // }
           else if (res.data.message == 'success') {
             res.color = 'success'
-            res.text = rootState.$languages.auth.msg_login_success
+            res.text = rootGetters.languages('auth.msg_suc_login')
           } else {
             res.color = 'danger'
-            res.text = rootState.$languages.auth.msg_login_error
+            res.text = rootGetters.languages('auth.msg_err_login')
           }
           commit(SET_MESSAGE, res, { root: true })
           setHeaderAuth()
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) }) // commit catch
     },
-    async logout({ commit, rootState }) {
+    async logout({ commit, rootGetters }) {
       _auth.RemoveAuth()
       commit('SET_ISAUTH')
       // commit('REMOVE_AUTH', {}, { root: true })
       var res = {
-        data: { message: { type: 'danger', text: rootState.$languages.auth.msg_logout_success } },
+        data: { message: { type: 'danger', text: rootGetters.languages('auth.msg_suc_logout') } },
         status: 200,
         statusText: 'OK'
       }
