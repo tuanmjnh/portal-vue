@@ -5,21 +5,21 @@
         <!-- <v-container grid-list-md> -->
         <v-layout wrap class="pt-2">
           <v-flex xs12 sm3 md3 class="mr-3">
-            <v-select label="languages" :items="languages" v-model="$store.state.language_items.lang_code"
-              :hide-selected="true" item-text="title" item-value="code"></v-select>
+            <v-select :items="languages" v-model="$store.state.language_items.lang_code"
+              :hide-selected="true" item-text="title" item-value="code" :label="$store.getters.languages('languages.title')"></v-select>
           </v-flex>
           <v-flex xs12 sm4 md4>
-            <v-combobox v-model="pagination.search" :items="modules" label="Modules"
-              item-text="code" item-value="code" :auto-select-first="true"></v-combobox>
+            <v-combobox v-model="pagination.search" :items="modules" item-text="code"
+              item-value="code" :auto-select-first="true" :label="$store.getters.languages('global.search')"></v-combobox>
             <!-- <v-text-field v-model="pagination.search" append-icon="search" label="Search"
               single-line hide-details></v-text-field> -->
           </v-flex>
           <v-spacer></v-spacer>
           <v-tooltip bottom>
-            <v-btn slot="activator" color="primary" small fab flat @click="localDialog=!localDialog">
-              <i class="material-icons">add</i>
+            <v-btn flat icon slot="activator" color="primary" @click="localDialog=!localDialog">
+              <v-icon>add</v-icon>
             </v-btn>
-            <span>Add</span>
+            <span>{{$store.getters.languages('global.add')}}</span>
           </v-tooltip>
         </v-layout>
         <!-- </v-container> -->
@@ -40,6 +40,7 @@
       </v-card-title>
       <v-data-table class="elevation-1" v-model="selected" select-all item-key="id"
         :headers="headers" :items="items" :rows-per-page-items="rowPerPage"
+        :rows-per-page-text="$store.getters.languages('global.rows_per_page')"
         :pagination.sync="pagination" :search="pagination.search">
         <!--:loading="loading" :pagination.sync="pagination" :total-items="totalItems" -->
         <template slot="items" slot-scope="props">
@@ -72,18 +73,26 @@
               </v-edit-dialog>
             </td>
             <td class="justify-center layout px-0">
-              <v-btn icon class="mx-0" @click="onEdit(props.item)">
-                <i class="material-icons teal--text">edit</i>
-              </v-btn>
-              <v-btn icon class="mx-0" @click="onDelete(props.item)">
-                <i class="material-icons error--text">delete</i>
-              </v-btn>
+              <v-tooltip bottom>
+                <v-btn flat icon slot="activator" color="teal" class="mx-0" @click="onEdit(props.item)">
+                  <v-icon>edit</v-icon>
+                </v-btn>
+                <span>{{$store.getters.languages('global.edit')}}</span>
+              </v-tooltip>
+              <v-tooltip bottom>
+                <v-btn flat icon slot="activator" color="error" class="mx-0" @click="onDelete(props.item)">
+                  <v-icon>delete</v-icon>
+                </v-btn>
+                <span>{{$store.getters.languages('global.delete')}}</span>
+              </v-tooltip>
             </td>
           </tr>
         </template>
       </v-data-table>
     </v-card>
-    <tpl-confirm :dialog="confirmDialog" @ok="onOkConfirm" @cancel="onCancelConfirm"></tpl-confirm>
+    <tpl-confirm :dialog="confirmDialog" @onAccept="onCFMAccept" @onCancel="onCFMCancel"
+      :title="$store.getters.languages('global.message')" :content="$store.getters.languages('messages.confirm_content')"
+      :btnAcceptText="$store.getters.languages('global.accept')" :btnCancelText="$store.getters.languages('global.cancel')"></tpl-confirm>
   </div>
 </template>
 
@@ -102,7 +111,7 @@ export default {
     localDialog: false,
     localItemsDialog: false,
     confirmDialog: false,
-    rowPerPage: [10, 25, 50, 100, 200, 500], //  { text: "All", value: -1 }
+    rowPerPage: [25, 50, 100, 200, 500], //  { text: "All", value: -1 }
     pagination: { search: 'global', sortBy: 'key' },
     rules: {
       required: {
@@ -154,7 +163,7 @@ export default {
     dialog(val) { this.localDialog = val },
     localDialog(val) {
       this.$emit('handleDialog', val)
-      // if (!val) this.$store.dispatch('language_items/item')
+      if (!val) this.$store.dispatch('language_items/item')
     },
     itemsDialog(val) { this.localItemsDialog = val },
     localItemsDialog(val) { this.$emit('handleItemsDialog', val) },
@@ -171,10 +180,10 @@ export default {
       this.confirmDialog = !this.confirmDialog
       this.selected.push(item);
     },
-    onOkConfirm() {
+    onCFMAccept() {
       this.$store.dispatch('language_items/delete', this.selected).then(this.selected = [])
     },
-    onCancelConfirm() {
+    onCFMCancel() {
       this.selected = []
     },
     onQuickSave(item) {

@@ -16,7 +16,7 @@
 
 <script>
 import axios from 'axios'
-import { NewGuid, CheckExtension, getExtension } from '@/plugins/helpers';
+import { NewGuid } from '@/plugins/helpers';
 export default {
   props: {
     http: null,
@@ -47,13 +47,13 @@ export default {
           tmp = {
             fieldName: this.fieldName,
             fileName:
-              this.autoName === true ? NewGuid() + getExtension(event.target.files[x].name) : event.target.files[x].name,
+              this.autoName === true ? NewGuid() + event.target.files[x].name.getExt() : event.target.files[x].name,
             file: event.target.files[x]
           }
         } else {
           tmp = {
             fieldName: this.fieldName,
-            fileName: this.autoName ? NewGuid() + getExtension(event.target.files[x].name) : (this.fileName ? this.fileName + getExtension(event.target.files[x].name) : event.target.files[x].name),
+            fileName: this.autoName ? NewGuid() + event.target.files[x].name.getExt() : (this.fileName ? this.fileName + event.target.files[x].name.getExt() : event.target.files[x].name),
             file: event.target.files[x]
           }
         }

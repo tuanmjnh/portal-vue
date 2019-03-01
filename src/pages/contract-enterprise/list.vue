@@ -2,7 +2,7 @@
   <div>
     <v-card>
       <v-card-title>
-        <v-text-field v-model="query.search" append-icon="search" label="Search" single-line hide-details></v-text-field>
+        <v-text-field v-model="pagination.search" append-icon="search" label="Search" single-line hide-details></v-text-field>
         <v-spacer></v-spacer>
         <v-tooltip bottom>
           <v-btn slot="activator" color="primary" small fab flat @click="localDialog=!localDialog">

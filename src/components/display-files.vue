@@ -4,18 +4,17 @@
       <div class="file-item">
         <div class="file-item-content">
           <div :class="[classes,'file-item-view']">
-            <img v-if="getExtension(item.extension)==='image'" :src="baseUrl+item.full_name"
-              :title="item.name">
-            <a :href="baseUrl+item.full_name" target="_blank" v-if="getExtension(item.extension)==='audio'">
+            <img :src="baseUrl+item.full_name" :title="item.name" v-if="item.extension.isImage()">
+            <a :href="baseUrl+item.full_name" target="_blank" v-else-if="item.extension.isAudio()">
               <i class="material-icons">audiotrack</i>
             </a>
-            <a :href="baseUrl+item.full_name" target="_blank" v-if="getExtension(item.extension)==='video'">
+            <a :href="baseUrl+item.full_name" target="_blank" v-else-if="item.extension.isVideo()">
               <i class="material-icons">camera_roll</i>
             </a>
-            <a :href="baseUrl+item.full_name" target="_blank" v-if="getExtension(item.extension)==='pdf'">
+            <a :href="baseUrl+item.full_name" target="_blank" v-else-if="item.extension.isPdf()">
               <i class="material-icons">picture_as_pdf</i>
             </a>
-            <a :href="baseUrl+item.full_name" target="_blank" v-if="getExtension(item.extension)==='file'">
+            <a :href="baseUrl+item.full_name" target="_blank" v-else>
               <i class="material-icons">insert_drive_file</i>
             </a>
           </div>
@@ -27,7 +26,7 @@
 </template>
 
 <script>
-import { isImage, isAudio, isVideo, isPdf } from '@/plugins/helpers';
+// import { isImage, isAudio, isVideo, isPdf } from '@/plugins/helpers';
 export default {
   props: {
     files: { type: Array, default: null },
@@ -36,13 +35,13 @@ export default {
     isShowName: { type: Boolean, default: true },
   },
   methods: {
-    getExtension(extension) {
-      if (isImage(extension)) return 'image';
-      else if (isAudio(extension)) return 'audio';
-      else if (isVideo(extension)) return 'video';
-      else if (isPdf(extension)) return 'pdf';
-      else return 'file';
-    }
+    // getExtension(extension) {
+    //   if (isImage(extension)) return 'image';
+    //   else if (isAudio(extension)) return 'audio';
+    //   else if (isVideo(extension)) return 'video';
+    //   else if (isPdf(extension)) return 'pdf';
+    //   else return 'file';
+    // }
   }
 }
 </script>

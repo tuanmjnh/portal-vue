@@ -2,34 +2,45 @@
   <div>
     <v-card>
       <v-card-title>
-        <v-text-field v-model="pagination.search" append-icon="search" label="Search"
+        <v-text-field v-model="pagination.search" append-icon="search" :label="$store.getters.languages('global.search')"
           single-line hide-details></v-text-field>
         <v-spacer></v-spacer>
         <v-tooltip bottom>
-          <v-btn slot="activator" color="primary" small fab flat @click="localDialog=!localDialog">
-            <i class="material-icons">add</i>
+          <v-btn flat icon slot="activator" color="primary" @click="localDialog=!localDialog">
+            <v-icon>add</v-icon>
           </v-btn>
-          <span>Add</span>
+          <span>{{$store.getters.languages('global.add')}}</span>
         </v-tooltip>
         <v-btn-toggle v-model="toggle_one" mandatory>
           <v-tooltip bottom>
             <v-btn slot="activator" flat @click="pagination.find.flag=1">
-              <i class="material-icons">view_list</i>
+              <v-icon>view_list</v-icon>
             </v-btn>
-            <span>List use</span>
+            <span>{{$store.getters.languages('global.using')}}</span>
           </v-tooltip>
           <v-tooltip bottom>
             <v-btn slot="activator" flat @click="pagination.find.flag=0">
-              <i class="material-icons">delete</i>
+              <v-icon>delete</v-icon>
             </v-btn>
-            <span>List delete</span>
+            <span>{{$store.getters.languages('global.deleted')}}</span>
           </v-tooltip>
         </v-btn-toggle>
       </v-card-title>
       <v-data-table class="elevation-1" v-model="selected" select-all item-key="id"
         :headers="headers" :items="items" :rows-per-page-items="rowPerPage"
+        :rows-per-page-text="$store.getters.languages('global.rows_per_page')"
         :pagination.sync="pagination" :search="pagination.search">
         <!--:loading="loading" :pagination.sync="pagination" :total-items="totalItems" -->
+        <!-- <template slot="headers" slot-scope="props">
+          <th>
+            <v-checkbox :input-value="props.all" :indeterminate="props.indeterminate"
+              primary hide-details @click.stop="toggleAll"></v-checkbox>
+          </th>
+          <th v-for="header in props.headers" :key="header.text" 
+          :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '', header.align]"
+            @click="changeSort(header.value)">
+            <v-icon small>arrow_upward</v-icon>{{ $store.getters.languages('header.text') }}</th>
+        </template> -->
         <template slot="items" slot-scope="props">
           <tr>
             <td>
@@ -42,22 +53,32 @@
             <td>{{ props.item.created_at|formatDate('DD/MM/YYYY hh:mm') }}</td>
             <td v-html="props.item.icon"></td>
             <td class="justify-center layout px-0">
-              <v-btn v-if="pagination.find.flag===1" icon class="mx-0" @click="onItems(props.item)">
-                <i class="material-icons info--text">layers</i>
-              </v-btn>
-              <v-btn icon class="mx-0" @click="onEdit(props.item)">
-                <i class="material-icons teal--text">edit</i>
-              </v-btn>
-              <v-btn icon class="mx-0" @click="onDelete(props.item)">
-                <i v-if="pagination.find.flag===1" class="material-icons error--text">delete</i>
-                <i v-else class="material-icons info--text">refresh</i>
-              </v-btn>
+              <v-tooltip bottom>
+                <v-btn flat icon slot="activator" color="teal" class="mx-0" @click="onEdit(props.item)">
+                  <v-icon>edit</v-icon>
+                </v-btn>
+                <span>{{$store.getters.languages('global.edit')}}</span>
+              </v-tooltip>
+              <v-tooltip bottom v-if="pagination.find.flag===1">
+                <v-btn flat icon slot="activator" color="error" class="mx-0" @click="onDelete(props.item)">
+                  <v-icon>delete</v-icon>
+                </v-btn>
+                <span>{{$store.getters.languages('global.delete')}}</span>
+              </v-tooltip>
+              <v-tooltip bottom v-else>
+                <v-btn flat icon slot="activator" color="info" class="mx-0" @click="onDelete(props.item)">
+                  <v-icon>refresh</v-icon>
+                </v-btn>
+                <span>{{$store.getters.languages('global.recover')}}</span>
+              </v-tooltip>
             </td>
           </tr>
         </template>
       </v-data-table>
     </v-card>
-    <tpl-confirm :dialog="confirmDialog" @ok="onOkConfirm" @cancel="onCancelConfirm"></tpl-confirm>
+    <tpl-confirm :dialog="confirmDialog" @onAccept="onCFMAccept" @onCancel="onCFMCancel"
+      :title="$store.getters.languages('global.message')" :content="$store.getters.languages('messages.confirm_content')"
+      :btnAcceptText="$store.getters.languages('global.accept')" :btnCancelText="$store.getters.languages('global.cancel')"></tpl-confirm>
   </div>
 </template>
 
@@ -80,43 +101,31 @@ export default {
     pagination: { search: '', sortBy: 'orders', find: { flag: 1 } },
     headers: [
       // { text: 'ID', value: 'id', align: 'left' },
-      { text: 'Title', value: 'title', align: 'left' },
-      { text: 'Code', value: 'code', align: 'left' },
-      { text: 'Orders', value: 'orders', sortable: true },
-      { text: 'Created', value: 'created_at' },
+      { text: 'languages.title', value: 'title', align: 'left' },
+      { text: 'global.code', value: 'code', align: 'left' },
+      { text: 'global.orders', value: 'orders' },
+      { text: 'global.created_at', value: 'created_at' },
       { text: 'Icon', value: 'icon' },
       { text: '#', value: '#', sortable: false }
     ]
   }),
+  beforeCreate() {
+  },
+  created() {
+    this.headers.forEach(e => { e.text = this.$store.getters.languages(e.text) });
+    this.$store.dispatch('languages/select').then(this.loading = false)
+  },
+  beforeMount() {
+  },
   mounted() {
-    // this.$store.dispatch('languages/init')
   },
   computed: {
     items() {
-      // var pagination = {
-      // search: this.search,
-      // page: this.pagination.page,
-      // descending: this.pagination.descending,
-      // rowsPerPage: this.pagination.rowsPerPage,
-      // sortBy: this.pagination.sortBy,
-      // totalItems: this.pagination.totalItems,
-      // flag: 0
-      // }
       var rs = this.$store.getters['languages/getFilter'](this.pagination)
       return rs
     }
   },
   watch: {
-    // pagination: {
-    //   onr() {
-    //     this.items = this.$store.dispatch('languages/pagination', this.pagination)
-    //   },
-    //   deep: true
-    // },
-    // items(val) {
-    // this.totalItems = val.length
-    // console.log(this.pagination)
-    // },
     dialog(val) { this.localDialog = val },
     localDialog(val) {
       this.$emit('handleDialog', val)
@@ -124,17 +133,6 @@ export default {
     },
     itemsDialog(val) { this.localItemsDialog = val },
     localItemsDialog(val) { this.$emit('handleItemsDialog', val) }
-  },
-  created() {
-    this.$store.dispatch('languages/select').then(this.loading = false)
-    // this.$store.dispatch('languages/select')
-    //{
-    //     descending: this.pagination.descending,
-    //     page: this.pagination.page,
-    //     rowsPerPage: this.pagination.rowsPerPage,
-    //     sortBy: this.pagination.sortBy,
-    //     totalItems: this.pagination.totalItems
-    // }
   },
   methods: {
     onItems(item) {
@@ -149,10 +147,10 @@ export default {
       this.confirmDialog = !this.confirmDialog
       this.selected.push(item);
     },
-    onOkConfirm() {
+    onCFMAccept() {
       this.$store.dispatch('languages/delete', this.selected).then(this.selected = [])
     },
-    onCancelConfirm() {
+    onCFMCancel() {
       this.selected = []
     }
   }

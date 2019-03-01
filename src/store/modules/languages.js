@@ -1,5 +1,4 @@
 import { SET_CATCH, SET_ITEMS, PUSH_ITEMS, UPDATE_ITEMS, REMOVE_ITEMS, SET_ITEM, SET_MESSAGE } from '../mutation-type'
-import { FilterValue, SearchValue, SortByKey } from '@/plugins/helpers'
 import { vnptbkn } from '@/plugins/axios-config'
 const collection = 'languages'
 export default {
@@ -49,11 +48,14 @@ export default {
       //     })
       //   })
       // }
-      let items = [...state.items]
-      items = FilterValue(items, pagination.find)
-      items = SearchValue(items, pagination.search)
-      items = SortByKey(items, pagination.sortBy)
-      return items
+      // let items = [...state.items]
+      // items = FilterValue(items, pagination.find)
+      // items = SearchValue(items, pagination.search)
+      // items = SortByKey(items, pagination.sortBy)
+      // items.FilterValue(pagination.find)
+      // items.SearchValue(pagination.search)
+      // items.SortByKey(pagination.sortBy)
+      return state.items.filterValue(pagination.find)
     }
   },
   mutations: {

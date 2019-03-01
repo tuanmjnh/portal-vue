@@ -45,7 +45,7 @@ export default new Vuex.Store({
   }, // State
   getters: {
     languages: state => key => {
-      const _key = key.split('.')
+      const _key = key.toLowerCase().split('.')
       if (!state.$languages[_key[0]]) return key
       var rs = _key.length > 0 ? state.$languages[_key[0]] : key
       //
@@ -115,8 +115,11 @@ export default new Vuex.Store({
       //   })
       //   .catch(function(error) { commit(SET_CATCH, error) })
     },
-    ['TEST']({ state, getters }) {
-      console.log(getters.languages('auth.msg_err_expired'))
+    async ['TEST']({ commit, state, getters }) {
+      var error = {}
+      error.response = { status: 401 }
+      // console.log(getters.languages('auth.msg_err_expired'))
+      await commit(SET_CATCH, error)
     }
   }, // Actions
   mutations: {
@@ -133,13 +136,16 @@ export default new Vuex.Store({
         statusText: res.statusText || 'Error'
       }
     },
-    [SET_CATCH]({ state, getters }, error) {
+    [SET_CATCH](state, error) {
       if (!error.response) {
         console.log(error)
         return
       }
       if (error.response.status === 401) {
         this.dispatch('auth/logout')
+        let text = state.$languages.auth && state.$languages.auth.msg_err_expired ?
+          state.$languages.auth.msg_err_expired :
+          error.response ? error.response.statusText : error
         state._message = {
           mode: '',
           x: 'right',
@@ -147,11 +153,14 @@ export default new Vuex.Store({
           timeout: 6000,
           show: true,
           color: 'danger',
-          text: getters.languages('auth.msg_err_expired'), // error.response ? error.response.statusText : error,
+          text: text,
           status: error.response ? error.response.status : 0,
           statusText: error.response ? error.response.statusText : error
         }
       } else {
+        let text = state.$languages.messages && state.$languages.messages.err_connection ?
+          state.$languages.messages.err_connection :
+          error.response ? error.response.statusText : error
         state._message = {
           mode: '',
           x: 'right',
@@ -159,7 +168,7 @@ export default new Vuex.Store({
           timeout: 6000,
           show: true,
           color: 'danger',
-          text: getters.languages('messages.err_connection'), // error.response ? error.response.statusText : error,
+          text: text,
           status: error.response ? error.response.status : 0,
           statusText: error.response ? error.response.statusText : error
         }

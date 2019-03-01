@@ -1,5 +1,4 @@
 import { SET_CATCH, SET_ITEMS, PUSH_ITEMS, UPDATE_ITEMS, REMOVE_ITEMS, SET_ITEM, SET_MESSAGE } from '../mutation-type'
-import { FilterValue, SearchValue, SortByKey } from '@/plugins/helpers'
 import { vnptbkn } from '@/plugins/axios-config'
 // import vi from '@/plugins/vi-VN.json'
 const collection = 'language-items'
@@ -33,16 +32,12 @@ export default {
       return state.items.filter(x => x.flag === flag)
     },
     getFilter: state => pagination => {
-      let items = state.items
-      items = FilterValue(items, pagination.find)
-      items = SearchValue(items, pagination.search)
-      items = SortByKey(items, pagination.sortBy)
-      return items
+      return state.items
     }
   },
   mutations: {
     [SET_ITEMS](state, items) {
-      // state.modules.push(key)
+      state.modules = [...new Set(items.map(x => x.module_code))]
       state.items = [...items]
     },
     [SET_ITEM](state, item) {

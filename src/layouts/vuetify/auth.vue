@@ -38,7 +38,7 @@
     </v-layout>
     <v-layout wrap class="align-center justify-center">
       <v-flex xs6 sm6 md3>
-        <v-select :label="$store.getters.languages('global.languages')" :items="dataLanguages"
+        <v-select :label="$store.getters.languages('languages.title')" :items="dataLanguages"
           v-model="$store.state.$language" :hide-selected="true" item-text="title"
           item-value="code"></v-select>
       </v-flex>
