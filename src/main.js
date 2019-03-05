@@ -19,7 +19,8 @@ import router from './router'
 import filters from './plugins/filters'
 // Directive
 import directive from './plugins/directive'
-
+// VeeValidate
+// import veeValidate from './plugins/vee-validate'
 // import * as _store from '@/plugins/storage'
 // console.log(JSON.parse(_store.Get('language')))
 // Components

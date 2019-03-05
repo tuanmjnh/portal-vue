@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <template v-if="!hasLanguages">
+    <template v-if="$store.state.$loading">
       <div class="mid-center">
         <v-progress-circular :size="130" :width="10" color="primary" indeterminate></v-progress-circular>
       </div>
@@ -27,19 +27,12 @@ export default {
     'template-main': main,
     'template-auth': auth
   },
-  data: () => ({
-  }),
+  // data: () => ({}),
   beforeCreate() {
     if (!this.$store.state.$language || !this.$store.state.$languages)
       this.$store.dispatch('setLanguage')
-    if (this.$store.state.languages.items && this.$store.state.languages.items.length < 1)
-      this.$store.dispatch('languages/select')
-  },
-  created() {
-  },
-  beforeMount() {
-  },
-  mounted() {
+    if (this.$store.state.languages.items.length < 1)
+      this.$store.dispatch('languages/select', false)
   },
   computed: {
     isAuth() {
@@ -54,13 +47,7 @@ export default {
       var x = this.$store.state.auth.isAuth
       // console.log(this.$store.state._message)
       return x
-    },
-    hasLanguages() {
-      const rs = this.$store.state.$languages
-      return rs ? true : false
     }
-  },
-  methods: {
   }
 }
 </script>

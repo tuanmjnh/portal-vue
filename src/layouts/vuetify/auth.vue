@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- {{$store.getters.languages('auth.title')}} -->
+    <!-- {{$store.getters.languages(['auth.title')}} -->
     <!-- {{$store.state.$languages.auth.title}} -->
     <v-layout wrap class="align-center justify-center">
       <v-flex xs12 sm4>
@@ -8,29 +8,29 @@
           <!-- <v-img src="https://cdn.vuetifyjs.com/images/cards/desert.jpg" aspect-ratio="2.75"></v-img> -->
           <v-card-title primary-title>
             <div>
-              <h3 class="headline mb-0">{{$store.getters.languages('auth.title')}}</h3>
+              <h3 class="headline mb-0">{{$store.getters.languages(['auth.title'])}}</h3>
             </div>
           </v-card-title>
           <v-card-text>
             <v-container grid-list-md>
               <v-layout wrap>
                 <v-flex xs12 sm12 md12>
-                  <v-text-field v-model="item.username" :label="$store.getters.languages('auth.username')"
+                  <v-text-field v-model="item.username" :label="$store.getters.languages(['auth.username'])"
                     v-focus.vuetify></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm12 md12>
-                  <v-text-field type="password" v-model="item.password" :label="$store.getters.languages('auth.password')"></v-text-field>
+                  <v-text-field type="password" v-model="item.password" :label="$store.getters.languages(['auth.password'])"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm12 md12>
                   <div class="spacer"></div>
-                  <v-checkbox v-model="item.remember" :label="$store.getters.languages('auth.remember')"></v-checkbox>
+                  <v-checkbox v-model="item.remember" :label="$store.getters.languages(['auth.remember'])"></v-checkbox>
                 </v-flex>
               </v-layout>
             </v-container>
           </v-card-text>
           <v-card-actions>
             <div class="spacer"></div>
-            <v-btn flat color="primary" @click="login">{{$store.getters.languages('global.login')}}</v-btn>
+            <v-btn flat color="primary" @click="login">{{$store.getters.languages(['global.login'])}}</v-btn>
           </v-card-actions>
         </v-card>
       </v-flex>
@@ -38,9 +38,8 @@
     </v-layout>
     <v-layout wrap class="align-center justify-center">
       <v-flex xs6 sm6 md3>
-        <v-select :label="$store.getters.languages('languages.title')" :items="dataLanguages"
-          v-model="$store.state.$language" :hide-selected="true" item-text="title"
-          item-value="code"></v-select>
+        <v-select :items="dataLanguages" v-model="$store.state.$language" :hide-selected="true"
+          item-text="title" item-value="code"></v-select>
       </v-flex>
     </v-layout>
   </div>
@@ -82,7 +81,11 @@ export default {
   },
   methods: {
     login() {
-      this.$store.dispatch('auth/login').then(() => { this.$router.push('/') })
+      this.$store.state.$loading = true
+      this.$store.dispatch('auth/login').then(() => {
+        this.$router.push('/')
+        this.$store.state.$loading = false
+      })
     }
   }
 }

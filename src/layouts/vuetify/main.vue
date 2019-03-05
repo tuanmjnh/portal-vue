@@ -87,7 +87,7 @@
               <i class="material-icons">ballot</i>
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title>{{$store.getters.languages('global.profile')}}</v-list-tile-title>
+              <v-list-tile-title>{{$store.getters.languages(['global.profile'])}}</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
           <v-list-tile @click="$router.push('/setting')">
@@ -95,7 +95,7 @@
               <i class="material-icons">settings_applications</i>
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title>{{$store.getters.languages('global.setting')}}</v-list-tile-title>
+              <v-list-tile-title>{{$store.getters.languages(['global.setting'])}}</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
           <v-list-tile @click="Logout">
@@ -103,7 +103,7 @@
               <i class="material-icons">exit_to_app</i>
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title>{{$store.getters.languages('global.logout')}}</v-list-tile-title>
+              <v-list-tile-title>{{$store.getters.languages(['global.logout'])}}</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
@@ -136,15 +136,15 @@
     </v-navigation-drawer>
     <v-footer :fixed="fixed" app>
       <!-- <v-layout wrap class="pl-3"> -->
-        <v-flex xs3 sm3 md2 class="pl-3">
-          <v-select :items="dataLanguages" v-model="$store.state.$language"
-            :hide-selected="true" item-text="title" item-value="code"></v-select>
-        </v-flex>
-        <v-spacer></v-spacer>
-        <!-- <v-flex xs9 sm9 md10></v-flex> -->
-        <v-flex xs3 sm3 md2 class="text-lg-right">
-          <span>Coppyright &copy; 2019</span>
-        </v-flex>
+      <v-flex xs3 sm3 md2 class="pl-3">
+        <v-select :items="dataLanguages" v-model="$store.state.$language" :hide-selected="true"
+          item-text="title" item-value="code"></v-select>
+      </v-flex>
+      <v-spacer></v-spacer>
+      <!-- <v-flex xs9 sm9 md10></v-flex> -->
+      <v-flex xs3 sm3 md2 class="text-lg-right">
+        <span>Coppyright &copy; 2019</span>
+      </v-flex>
       <!-- </v-layout> -->
     </v-footer>
   </div>
@@ -208,7 +208,7 @@ export default {
   },
   computed: {
     snackbar() {
-      var rs = this.$store.state._message
+      var rs = this.$store.state.$message
       return rs
     },
     clipped() {
@@ -238,7 +238,13 @@ export default {
       this.$store.dispatch('message', { text: 'Hello, I\'m a snackbar' })
     },
     Logout() {
-      this.$store.dispatch('auth/logout').then(() => { this.$router.push('/auth') })
+      this.$store.state.$loading = true
+      this.$store.dispatch('auth/logout').then(() => {
+        setTimeout(() => {
+          this.$router.push('/auth')
+          this.$store.state.$loading = false
+        }, 200)
+      })
     },
     getAuth(key) {
       return _auth.GetStorage(key)

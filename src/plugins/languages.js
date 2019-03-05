@@ -12,13 +12,17 @@ const GetLanguage = function() {
   return _store.Get('language')
 }
 const SetLanguage = function(language) {
-  _store.Set('language', language)
+  return new Promise(function(resolve, reject) {
+    _store.Set('language', language)
+  });
 }
 const GetLanguages = function() {
   const rs = _store.Get('languages')
   return rs && rs !== 'undefined' ? JSON.parse(rs) : null
 }
 const SetLanguages = function(languages) {
-  _store.Set('languages', JSON.stringify(languages))
+  return new Promise(function(resolve, reject) {
+    _store.Set('languages', JSON.stringify(languages))
+  });
 }
 export { GetLanguage, SetLanguage, GetLanguages, SetLanguages };

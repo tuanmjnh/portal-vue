@@ -26,8 +26,8 @@
           </v-tooltip>
         </v-btn-toggle>
       </v-card-title>
-      <v-data-table class="elevation-1" v-model="selected" select-all item-key="id"
-        :headers="headers" :items="items" :rows-per-page-items="rowPerPage"
+      <v-data-table class="elevation-1" v-model="$store.state.languages.selected"
+        select-all item-key="id" :headers="headers" :items="items" :rows-per-page-items="rowPerPage"
         :rows-per-page-text="$store.getters.languages('global.rows_per_page')"
         :pagination.sync="pagination" :search="pagination.search">
         <!--:loading="loading" :pagination.sync="pagination" :total-items="totalItems" -->
@@ -91,8 +91,6 @@ export default {
     itemsDialog: { type: Boolean, default: false },
   },
   data: () => ({
-    loading: true,
-    selected: [],
     toggle_one: 0,
     localDialog: false,
     localItemsDialog: false,
@@ -109,15 +107,9 @@ export default {
       { text: '#', value: '#', sortable: false }
     ]
   }),
-  beforeCreate() {
-  },
   created() {
     this.headers.forEach(e => { e.text = this.$store.getters.languages(e.text) });
-    this.$store.dispatch('languages/select').then(this.loading = false)
-  },
-  beforeMount() {
-  },
-  mounted() {
+    if (this.$store.state.languages.items.length < 1) this.$store.dispatch('languages/select', true)
   },
   computed: {
     items() {
@@ -127,10 +119,7 @@ export default {
   },
   watch: {
     dialog(val) { this.localDialog = val },
-    localDialog(val) {
-      this.$emit('handleDialog', val)
-      if (!val) this.$store.dispatch('languages/item')
-    },
+    localDialog(val) { this.$emit('handleDialog', val) },
     itemsDialog(val) { this.localItemsDialog = val },
     localItemsDialog(val) { this.$emit('handleItemsDialog', val) }
   },
@@ -145,13 +134,13 @@ export default {
     },
     onDelete(item) {
       this.confirmDialog = !this.confirmDialog
-      this.selected.push(item);
+      this.$store.state.languages.selected.push(item);
     },
     onCFMAccept() {
-      this.$store.dispatch('languages/delete', this.selected).then(this.selected = [])
+      this.$store.dispatch('languages/delete')
     },
     onCFMCancel() {
-      this.selected = []
+      this.$store.state.languages.selected = []
     }
   }
 }

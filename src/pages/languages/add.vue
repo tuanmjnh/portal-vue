@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="localDialog" max-width="1024px">
+  <v-dialog v-model="localDialog" :persistent="loading" max-width="1024px">
     <!-- <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn> -->
     <v-card>
       <v-card-title class="headline grey lighten-2">
@@ -11,35 +11,35 @@
         <v-form v-model="valid" ref="form">
           <v-container grid-list-md>
             <v-tabs v-model="tabActive" color="secondary" dark>
-              <v-tab>Thông tin</v-tab>
-              <v-tab>Ghi chú</v-tab>
+              <v-tab>{{$store.getters.languages('global.main_info')}}</v-tab>
+              <v-tab>{{$store.getters.languages('global.note')}}</v-tab>
               <v-tab-item>
                 <v-layout wrap class="pt-2">
                   <v-flex xs12 sm8 md8>
-                    <v-text-field v-model.trim="item.title" :rules="[rules.required.title]"
-                      :label="$store.getters.languages('languages.title')"></v-text-field>
+                    <v-text-field v-model.trim="item.title" :label="$store.getters.languages('languages.title')"
+                      :rules="[v => !!v || $store.getters.languages('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field v-model.trim="item.code" :rules="[rules.required.code,rules.exist.code]"
-                      :label="$store.getters.languages('global.code')" v-on:keyup="checkExistCode(item.code)"></v-text-field>
+                    <v-text-field v-model.trim="item.code" :label="$store.getters.languages('global.code')"
+                      :rules="[v => !!v  || $store.getters.languages('error.required'),isExist||$store.getters.languages('error.exist')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6 class="text-append-icon">
                     <v-text-field v-model.trim="item.icon" label="Icon"></v-text-field>
                     <div class="icon" v-html="item.icon"></div>
                   </v-flex>
                   <v-flex xs12 sm3 md3>
-                    <v-text-field type="number" v-model.trim="item.orders" :rules="[rules.required.orders]"
-                      :label="$store.getters.languages('global.orders')"></v-text-field>
+                    <v-text-field type="number" v-model.trim="item.orders" :label="$store.getters.languages('global.orders')"
+                      :rules="[v => !!v  || $store.getters.languages('error.required')]"></v-text-field>
                   </v-flex>
-                  <v-flex xs12 sm3 md3>
+                  <v-flex xs6 sm3 md3>
                     <v-switch color="primary" :label="item.flag===1?$store.getters.languages('global.show'):$store.getters.languages('global.hide')"
                       :true-value="1" :false-value="0" v-model.number="item.flag"></v-switch>
                   </v-flex>
-                  <v-flex xs12 sm6 md6>
+                  <v-flex xs6 sm6 md6>
                     <v-text-field v-model.trim="item.attach_file" :disabled="true" class="text-color-initial"
                       :label="$store.getters.languages('global.attach')"></v-text-field>
                   </v-flex>
-                  <v-flex xs12 sm6 md4>
+                  <v-flex xs6 sm6 md4>
                     <display-files :files="uploadFiles.files" :baseUrl="vnptbkn.defaults.host"
                       :isShowName="false" classes="w-x"></display-files>
                   </v-flex>
@@ -64,12 +64,10 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" flat @click.native="onSave" :disabled="!valid" :loading="submitLoading">
-          <!-- <i class="material-icons">check</i> -->
+        <v-btn color="primary" flat @click.native="onSave" :disabled="!valid" :loading="loading">
           {{$store.getters.languages('global.update')}}
         </v-btn>
-        <v-btn color="secondary" flat @click.native="localDialog=false" :disabled="submitLoading">
-          <!-- <i class="material-icons">close</i>  -->
+        <v-btn color="secondary" flat @click.native="localDialog=false" :disabled="loading">
           {{$store.getters.languages('global.back')}}
         </v-btn>
       </v-card-actions>
@@ -95,45 +93,21 @@ export default {
     dialog: { type: Boolean, default: false }
   },
   data: () => ({
+    loading: false,
+    valid: false,
+    isExist: true,
     localDialog: false,
     tabActive: null,
-    valid: false,
-    submitLoading: false,
     vnptbkn: vnptbkn,
     uploadFiles: { files: [], basePath: 'Languages' },
-    rules: {
-      required: {
-        title: val => !!val || 'Required.',
-        code: val => !!val || 'Required.',
-        orders: val => !!val || 'Required.'
-      },
-      exist: {
-        code: val => true || 'Exist.' //{
-        //console.log(val)
-        //var check = this.$store.dispatch('languages/existCode')
-        //true || 'Exist.'
-        //},
-      },
-      length: {
-        counter: val => val.length <= 20 || 'Max 20 characters',
-      },
-      regex: {
-        email: val => {
-          const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-          return pattern.test(val) || 'Invalid e-mail.'
-        }
-      }
-    }
+    rules: { code: val => true || 'Exist.' }
   }),
-  mounted() {
-    this.$store.dispatch('languages/item')
-  },
   created() {
+    this.$store.dispatch('languages/item')
   },
   computed: {
     item() {
       var item = this.$store.state.languages.item
-      if (item.attach) item.attach_file = item.attach.replace('Languages/', '')
       return item
     }
   },
@@ -141,7 +115,10 @@ export default {
     dialog(val) { this.localDialog = val },
     localDialog(val) {
       this.$emit('handleDialog', val)
-      if (!val) this.$store.dispatch('languages/item')
+      if (!val) {
+        this.$store.dispatch('languages/item')
+        this.$refs.form.resetValidation()
+      }
     },
     uploadFiles: {
       handler(val) {
@@ -149,28 +126,26 @@ export default {
           this.item.attach = val.files[0].full_name
       },
       deep: true
+    },
+    item: {
+      handler(val) {
+        if (this.item.attach) this.item.attach_file = this.item.attach.replace('Languages/', '')
+        if (this.item.code && !this.item.id) this.$store.dispatch('languages/existCode').then((rs) => { this.isExist = rs })
+      },
+      deep: true
     }
   },
   methods: {
     onSave() {
-      this.submitLoading = true
+      this.loading = true
       if (this.valid) {
-        if (this.item.id) this.$store.dispatch('languages/update').then(this.submitLoading = false)
+        if (this.item.id) this.$store.dispatch('languages/update').then(this.loading = false)
         else this.$store.dispatch('languages/insert').then((result) => {
           this.$store.dispatch('languages/item')
-          this.submitLoading = false
+          this.$refs.form.resetValidation()
+          this.loading = false
         })
       }
-    },
-    checkExistCode(code) {
-      var $this = this;
-      if (code && !this.item.id)
-        //setTimeout(function () {
-        $this.$store.dispatch('languages/existCode', code).then(rs => {
-          if (rs) $this.rules.exist.code = true
-          else $this.rules.exist.code = 'Exist'
-        })
-      //}, 1000);
     }
   }
 }

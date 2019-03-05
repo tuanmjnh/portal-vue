@@ -7,6 +7,7 @@ export default {
   state: {
     items: [],
     item: { module_code: 'global' },
+    selected: [],
     module_code: [],
     current_language: '',
     lang_code: 'vi-VN',
@@ -67,17 +68,28 @@ export default {
     }
   },
   actions: {
-    async select({ commit, state }) {
+    async select({ commit, state, rootGetters, rootState }, loading = false) {
+      // Loading
+      if (loading) rootState.$loading = true
+      // http
       await vnptbkn
         .get(collection)
         .then(function(res) {
           if (res.status === 200) {
+            if (res.data.msg === 'danger') {
+              commit(SET_MESSAGE, { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+              return
+            }
             if (res.data.data) commit(SET_ITEMS, res.data.data)
           } else commit(SET_CATCH, null, { root: true })
         })
-        .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
+        .catch((error) => { commit(SET_CATCH, error, { root: true }) })
+        .finally(() => { rootState.$loading = false })
     },
-    async selectByLang({ commit, state }) {
+    async selectByLang({ commit, state, rootState }, loading = false) {
+      // Loading
+      if (loading) rootState.$loading = true
+      // http
       state.lang_code = state.lang_code || state.default.lang_code
       await vnptbkn
         .get(`${collection}/getlang/${state.lang_code}`)
@@ -86,84 +98,78 @@ export default {
             if (res.data.data) commit(SET_ITEMS, res.data.data)
           } else commit(SET_CATCH, null, { root: true })
         })
-        .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
+        .catch((error) => { commit(SET_CATCH, error, { root: true }) })
+        .finally(() => { rootState.$loading = false })
     },
-    async insert({ commit, state, rootGetters }) {
-      // state.item.created_by = vnptbkn.defaults.headers.Author
-      // state.item.created_at = new Date()
+    async insert({ commit, state, rootGetters, rootState }, loading = false) {
+      // Loading
+      if (loading) rootState.$loading = true
+      // http
       const data = { ...state.item, ...{ lang_code: state.lang_code } }
       await vnptbkn
         .post(collection, data)
         .then(function(res) {
           if (res.status == 200) {
             if (res.data.msg === 'exist') {
-              commit(SET_MESSAGE, { text: rootGetters.languages('messages.err_exist'), color: 'warning' }, { root: true })
+              commit(SET_MESSAGE, { text: rootGetters.languages('error.exist'), color: 'warning' }, { root: true })
               return
             }
             if (res.data.msg === 'danger') {
-              commit(SET_MESSAGE, { text: rootGetters.languages('messages.err_data'), color: res.data.msg }, { root: true })
+              commit(SET_MESSAGE, { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
               return
             }
             // Success
             state.item.key = ''
             state.item.value = ''
             commit(PUSH_ITEMS, data)
-            commit(SET_MESSAGE, { text: rootGetters.languages('messages.suc_add'), color: res.data.msg }, { root: true })
+            commit(SET_MESSAGE, { text: rootGetters.languages('success.add'), color: res.data.msg }, { root: true })
           } else commit(SET_CATCH, null, { root: true })
         })
-        .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
+        .catch((error) => { commit(SET_CATCH, error, { root: true }) })
+        .finally(() => { rootState.$loading = false })
     },
-    async update({ commit, state, rootGetters }) {
+    async update({ commit, state, rootGetters, rootState }, loading = false) {
+      // Loading
+      if (loading) rootState.$loading = true
+      // http
       const data = { ...state.item, ...{ lang_code: state.lang_code } }
       await vnptbkn
         .put(collection, data)
         .then(function(res) {
           if (res.status == 200) {
             if (res.data.msg === 'danger') {
-              commit(SET_MESSAGE, { text: rootGetters.languages('messages.err_data'), color: res.data.msg }, { root: true })
+              commit(SET_MESSAGE, { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
               return
             }
             // Success
             commit(UPDATE_ITEMS, data)
-            commit(SET_MESSAGE, { text: rootGetters.languages('messages.suc_update'), color: res.data.msg }, { root: true })
+            commit(SET_MESSAGE, { text: rootGetters.languages('success.update'), color: res.data.msg }, { root: true })
           } else commit(SET_CATCH, null, { root: true })
         })
-        .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
+        .catch((error) => { commit(SET_CATCH, error, { root: true }) })
+        .finally(() => { rootState.$loading = false })
     },
-    async delete({ commit, state, rootGetters }, selected) {
-      var _selected = [...selected]
+    async delete({ commit, state, rootGetters, rootState }, loading = false) {
+      // Loading
+      if (loading) rootState.$loading = true
+      // http
       await vnptbkn
-        .put(`${collection}/delete`, _selected)
+        .put(`${collection}/delete`, state.selected)
         .then(function(res) {
           if (res.status == 200) {
             if (res.data.msg === 'danger') {
-              commit(SET_MESSAGE, { text: rootGetters.languages('messages.err_data'), color: res.data.msg }, { root: true })
+              commit(SET_MESSAGE, { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
               return
             }
             // Success
             // commit(REMOVE_ITEMS, data)
-            _selected.forEach(e => { commit(REMOVE_ITEMS, e) });
-            commit(SET_MESSAGE, { text: rootGetters.languages('messages.suc_delete'), color: res.data.msg }, { root: true })
+            state.selected.forEach(e => { commit(REMOVE_ITEMS, e) });
+            state.selected = []
+            commit(SET_MESSAGE, { text: rootGetters.languages('success.delete'), color: res.data.msg }, { root: true })
           } else commit(SET_CATCH, null, { root: true })
         })
-        .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
-    },
-    async remove({ commit, state, rootGetters }, selected) {
-      var _selected = [...selected]
-      await vnptbkn
-        .delete(collection, _selected)
-        .then(function(res) {
-          if (res.status == 200) {
-            if (res.data.msg === 'danger') {
-              commit(SET_MESSAGE, { text: rootGetters.languages('messages.err_data'), color: res.data.msg }, { root: true })
-              return
-            }
-            // Success
-            _selected.forEach(e => { commit(REMOVE_ITEMS, e) });
-            commit(SET_MESSAGE, { text: rootGetters.languages('messages.suc_delete'), color: res.data.msg }, { root: true })
-          } else commit(SET_CATCH, null, { root: true })
-        })
-        .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
+        .catch((error) => { commit(SET_CATCH, error, { root: true }) })
+        .finally(() => { rootState.$loading = false })
     },
     async item({ commit, state }, item) {
       if (item) commit(SET_ITEM, item)

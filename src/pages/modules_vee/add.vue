@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="localDialog" :persistent="loading" max-width="1024px">
+  <v-dialog v-model="localDialog" :persistent="isLoading" max-width="1024px">
     <!-- <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn> -->
     <v-card>
       <v-card-title class="headline grey lighten-2">
@@ -8,7 +8,7 @@
         $store.getters.languages(['global.add']) }}
       </v-card-title>
       <v-card-text>
-        <v-form v-model="valid" ref="form">
+        <form>
           <v-container grid-list-md>
             <v-tabs v-model="tabActive" color="secondary" dark>
               <v-tab>{{$store.getters.languages(['global.main_info'])}}</v-tab>
@@ -18,17 +18,20 @@
                   <v-flex xs12 sm8 md8>
                     <!-- <v-text-field v-model.trim="item.title" :label="$store.getters.languages(['modules.title'])"
                       :rules="[!!item.title || $store.getters.languages(['messages.err_required')]"></v-text-field> -->
-                    <v-text-field v-model.trim="item.title" :rules="[v => !!v || $store.getters.languages('error.required')]"
+                    <v-text-field v-model.trim="item.title" v-validate="'required'" name="title"
+                      :error-messages="$store.getters.languages(errors.items.getRule('title'))"
                       :label="$store.getters.languages(['modules.title'])"></v-text-field>
                     <!-- <span>{{errors.items.getRule('title')}}</span> -->
                     <!-- <span v-show="errors.has('title')">{{ errors.first('title') }}</span> -->
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field v-model.trim="item.code" :label="$store.getters.languages(['global.code'])"
-                      :rules="[v => !!v || $store.getters.languages('error.required'), isExist||$store.getters.languages('error.exist')]"></v-text-field>
+                    <v-text-field v-model.trim="item.code" v-validate="'required|exist'"
+                      name="code" :error-messages="$store.getters.languages(errors.items.getRule('code'))"
+                      :label="$store.getters.languages(['global.code'])"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field v-model.trim="item.urls" :rules="[v => !!v || $store.getters.languages('error.required')]"
+                    <v-text-field v-model.trim="item.urls" v-validate="'required'" name="urls"
+                      :error-messages="$store.getters.languages(errors.items.getRule('urls'))"
                       :label="$store.getters.languages(['global.url'])"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6 class="text-append-icon">
@@ -39,12 +42,12 @@
                     <v-select :items="permissions" v-model="permissions_selected"
                       multiple :menu-props="{ maxHeight: '400' }" item-text="title"
                       item-value="code" :label="$store.getters.languages(['permissions.title'])"
-                      persistent-hint :hint="$store.getters.languages(['permissions.select'])"
-                      :rules="[v => v.length>0 || $store.getters.languages(['error.required_select'])]"></v-select>
+                      persistent-hint :hint="$store.getters.languages(['permissions.select'])"></v-select>
                   </v-flex>
                   <v-flex xs6 sm3 md3>
-                    <v-text-field type="number" v-model.trim="item.orders" :label="$store.getters.languages(['global.orders'])"
-                      :rules="[v => !!v || $store.getters.languages('error.required')]"></v-text-field>
+                    <v-text-field type="number" v-model.trim="item.orders" v-validate="'required|numeric'"
+                      name="orders" :label="$store.getters.languages(['global.orders'])"
+                      :error-messages="$store.getters.languages(errors.items.getRule('orders'))"></v-text-field>
                   </v-flex>
                   <v-flex xs6 sm3 md3>
                     <v-switch color="primary" :label="item.flag===1?$store.getters.languages(['global.show']):$store.getters.languages(['global.hide'])"
@@ -79,14 +82,14 @@
               </v-tab-item>
             </v-tabs>
           </v-container>
-        </v-form>
+        </form>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" flat @click.native="onSave" :loading="loading">
+        <v-btn color="primary" flat @click.native="onSave" :disabled="isValid" :loading="isLoading">
           {{$store.getters.languages(['global.update'])}}
         </v-btn>
-        <v-btn color="secondary" flat @click.native="localDialog=false" :disabled="loading">
+        <v-btn color="secondary" flat @click.native="localDialog=false" :disabled="isLoading">
           {{$store.getters.languages(['global.back'])}}
         </v-btn>
       </v-card-actions>
@@ -112,38 +115,53 @@ export default {
     dialog: { type: Boolean, default: false }
   },
   data: () => ({
-    loading: false,
-    valid: false,
-    isExist: true,
+    $this: this,
     localDialog: false,
     tabActive: null,
+    isLoading: false,
     vnptbkn: vnptbkn,
     permissions_selected: [],
     uploadFiles: { files: [], basePath: 'modules' },
+    rules: { code: val => true || false }
   }),
+  beforeCreate() { },
   created() {
-    this.$store.dispatch('modules/item')
-    if (this.$store.state.permissions.items.length < 1) this.$store.dispatch('permissions/select')
+    let self = this
+    self.$store.dispatch('modules/item')
+    if (self.$store.state.permissions.items.length < 1) self.$store.dispatch('permissions/select')
+    self.$validator.extend('exist', {
+      getMessage(field, val) { return 'error.exist' },
+      validate: value => {
+        if (value) {
+          value = value.toString().toLowerCase()
+          return self.$store.dispatch('modules/existCode')
+        }
+      }
+    })
   },
+  beforeMount() { },
+  mounted() { },
   computed: {
     item() {
       var item = this.$store.state.modules.item
+      if (item.attach) item.attach_file = item.attach.replace('modules/', '')
+      if (item.code) item.code = item.code.toString().toLowerCase()
       return item
     },
     permissions() {
       var filter = { sortBy: 'orders', find: { flag: 1 } };
       var item = this.$store.getters['permissions/getFilter'](filter)
       return item
+    },
+    isValid() {
+      return Object.keys(this.fields).some(key => this.fields[key].invalid);
     }
   },
   watch: {
     dialog(val) { this.localDialog = val },
     localDialog(val) {
       this.$emit('handleDialog', val)
-      if (!val) {
-        this.$store.dispatch('modules/item')
-        this.$refs.form.resetValidation()
-      }
+      if (!val) this.$store.dispatch('modules/item')
     },
     uploadFiles: {
       handler(val) {
@@ -152,36 +170,29 @@ export default {
       },
       deep: true
     },
-    item: {
-      handler(val) {
-        if (this.permissions && this.permissions.length > 0) {
-          this.permissions_selected = []
-          this.permissions.forEach(e => {
-            if (val.permissions.indexOf(`,${e.code},`) > -1) this.permissions_selected.push(e.code)
-          });
-        }
-        if (this.item.attach) this.item.attach_file = this.item.attach.replace('modules/', '')
-        if (this.item.code) {
-          this.item.code = this.item.code.toString().toLowerCase()
-          if (!this.item.id) this.$store.dispatch('modules/existCode').then((rs) => { this.isExist = rs })
-        }
-      },
-      deep: true
+    item(val) {
+      if (this.permissions && this.permissions.length > 0) {
+        this.permissions_selected = []
+        this.permissions.forEach(e => {
+          if (val.permissions.indexOf(`,${e.code},`) > -1) this.permissions_selected.push(e.code)
+        });
+      }
     }
   },
   methods: {
     onSave() {
-      this.loading = true
-      if (this.valid) {
-        this.item.permissions = `,${this.permissions_selected.join(',')},`
-        if (this.item.id) this.$store.dispatch('modules/update').then(this.loading = false)
-        else this.$store.dispatch('modules/insert').then((result) => {
-          this.$store.dispatch('modules/item')
-          this.loading = false
-        })
-      }
+      this.isLoading = true
+      this.$validator.validateAll().then(result => {
+        if (result) {
+          this.item.permissions = `,${this.permissions_selected.join(',')},`
+          if (this.item.id) this.$store.dispatch('modules/update').then(this.isLoading = false)
+          else this.$store.dispatch('modules/insert').then((result) => {
+            this.$store.dispatch('modules/item')
+            this.isLoading = false
+          })
+        }
+      })
     }
-
   }
 }
 </script>

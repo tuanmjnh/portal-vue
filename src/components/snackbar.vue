@@ -9,26 +9,26 @@
 
 <script>
 export default {
-    data: () => ({
-        // snackbar: false,
-        // y: 'top',
-        // x: 'right',
-        // mode: '',
-        // timeout: 6000,
-        // text: 'Hello, I\'m a snackbar'
-    }),
-    watch: {
-        // show(val) {
-        //     console.log(this.$store.state._message.show)
-        //     // this.$store.dispatch('messageClose', val)
-        // }
-    },
-    computed: {
-        snackbar() {
-            var x = this.$store.state._message
-            return x
-        }
+  data: () => ({
+    // snackbar: false,
+    // y: 'top',
+    // x: 'right',
+    // mode: '',
+    // timeout: 6000,
+    // text: 'Hello, I\'m a snackbar'
+  }),
+  watch: {
+    // show(val) {
+    //     console.log(this.$store.state._message.show)
+    //     // this.$store.dispatch('messageClose', val)
+    // }
+  },
+  computed: {
+    snackbar() {
+      var x = this.$store.state.$message
+      return x
     }
+  }
 }
 </script>
 

@@ -32,8 +32,9 @@ export default new Vuex.Store({
     contract_enterprise: contract_enterprise
   },
   state: {
-    _noimage: `Uploads/noimage.jpg`,
-    _message: { show: false },
+    $loading: false,
+    $noimage: `Uploads/noimage.jpg`,
+    $message: { show: false },
     $language_def: 'vi-VN',
     $language: _languages.GetLanguage(),
     $languages: _languages.GetLanguages(),
@@ -45,12 +46,44 @@ export default new Vuex.Store({
   }, // State
   getters: {
     languages: state => key => {
-      const _key = key.toLowerCase().split('.')
-      if (!state.$languages[_key[0]]) return key
-      var rs = _key.length > 0 ? state.$languages[_key[0]] : key
-      //
-      if (!state.$languages[_key[0]][_key[1]]) return key
-      rs = _key.length > 1 ? state.$languages[_key[0]][_key[1]] : key
+      if (!key || key.length < 1) return
+      // console.log(key)
+      // const _key = key.toLowerCase().split('|') //.split('.')
+      if (typeof key === 'string') key = [key]
+      var regx = /:([^"]+)/g
+      let rs = ''
+      for (let index = 0; index < key.length; index++) {
+        const e = key[index].toLowerCase().split('.')
+        if (e.length < 2) {
+          const e0 = e[0].split(':')
+          if (!state.$languages[e0[0]]) rs += key[index]
+          else rs += (index > 0 ? state.$languages[e0[0]].toLowerCaseFirst() : state.$languages[e0[0]])
+          if (e0.length > 1) rs = rs.format(e0[1])
+        } else if (e.length < 3) {
+          const e1 = e[1].split(':')
+          // if (e1.length > 1) e[1] = e1[0]
+          if (!state.$languages[e[0]][e1[0]]) rs += key[index]
+          else rs += (index > 0 ? state.$languages[e[0]][e1[0]].toLowerCaseFirst() : state.$languages[e[0]][e1[0]])
+          if (e1.length > 1) rs = rs.format(e1[1].split(','), 'ff')
+        }
+        // if (regx.exec(key[index])) 
+        // regx.exec(key[index])[1].forEach(element => {
+
+        // });
+        // if (regx.exec(key[index])) {
+        //   rs = rs.format(regx.exec(key[index])[1].split(','))
+        // }
+      }
+      // _key.forEach(e => {
+      //   const _tmp = e.split('.')
+      //   if (_tmp.length < 2) {
+      //     if (!state.$languages[_tmp[0]]) rs += e
+      //     else rs += state.$languages[_tmp[0]]
+      //   } else if (_tmp.length < 3) {
+      //     if (!state.$languages[_tmp[0]][_tmp[1]]) rs += e
+      //     else rs += state.$languages[_tmp[0]][_tmp[1]]
+      //   }
+      // });
       return rs
     }
     // languages: state => key => {
@@ -68,10 +101,11 @@ export default new Vuex.Store({
       commit(SET_MESSAGE, data)
     },
     messageClose({ state }, data) {
-      state._message.show = data
+      state.$message.show = data
     },
     async setLanguage({ commit, state }) {
       // Data Items
+      state.$loading = true
       let lang_data = {}
       commit('SET_LANGUAGE', state.$language)
       // commit('SET_LANGUAGES', lang_data)
@@ -85,7 +119,7 @@ export default new Vuex.Store({
               });
               commit('SET_LANGUAGES', lang_data)
               // state.$languages = _languages.GetLanguages()
-              _languages.SetLanguages(lang_data)
+              _languages.SetLanguages(lang_data).then(state.$loading = false)
             }
           } else commit(SET_CATCH, null)
         })
@@ -124,7 +158,7 @@ export default new Vuex.Store({
   }, // Actions
   mutations: {
     [SET_MESSAGE](state, res) {
-      state._message = {
+      state.$message = {
         mode: '',
         x: 'right',
         y: 'top',
@@ -146,7 +180,7 @@ export default new Vuex.Store({
         let text = state.$languages.auth && state.$languages.auth.msg_err_expired ?
           state.$languages.auth.msg_err_expired :
           error.response ? error.response.statusText : error
-        state._message = {
+        state.$message = {
           mode: '',
           x: 'right',
           y: 'top',
@@ -161,7 +195,7 @@ export default new Vuex.Store({
         let text = state.$languages.messages && state.$languages.messages.err_connection ?
           state.$languages.messages.err_connection :
           error.response ? error.response.statusText : error
-        state._message = {
+        state.$message = {
           mode: '',
           x: 'right',
           y: 'top',
@@ -173,8 +207,8 @@ export default new Vuex.Store({
           statusText: error.response ? error.response.statusText : error
         }
       }
-      // state._message.show = true
-      // console.log(state._message)
+      // state.$message.show = true
+      // console.log(state.$message)
     },
     ['SET_LANGUAGE'](state, data) {
       state.$language = data ? data : state.$language_def

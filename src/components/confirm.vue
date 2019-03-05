@@ -31,11 +31,9 @@ export default {
     btnAcceptText: { type: String, default: 'I accept' },
     btnCancelText: { type: String, default: 'Cancel' },
   },
-  data: () => {
-    return {
-      localDialog: false
-    }
-  },
+  data: () => ({
+    localDialog: false
+  }),
   watch: {
     dialog(val) {
       this.localDialog = true

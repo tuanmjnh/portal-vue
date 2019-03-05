@@ -66,11 +66,12 @@ export default {
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) }) // commit catch
     },
     async logout({ commit, rootGetters }) {
+      // commit('REMOVE_AUTH', {}, { root: true })
       _auth.RemoveAuth()
       commit('SET_ISAUTH')
-      // commit('REMOVE_AUTH', {}, { root: true })
       var res = {
-        data: { message: { type: 'danger', text: rootGetters.languages('auth.msg_suc_logout') } },
+        color: 'success',
+        text: rootGetters.languages('auth.msg_suc_logout'),
         status: 200,
         statusText: 'OK'
       }
