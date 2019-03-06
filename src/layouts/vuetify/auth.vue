@@ -47,11 +47,7 @@
 
 <script>
 export default {
-  data: () => ({
-    loading: false,
-  }),
-  beforeCreate() {
-  },
+  data: () => ({}),
   created() {
     this.$store.dispatch('auth/item')
     // this.$store.dispatch('TEST')
@@ -81,11 +77,7 @@ export default {
   },
   methods: {
     login() {
-      this.$store.state.$loading = true
-      this.$store.dispatch('auth/login').then(() => {
-        this.$router.push('/')
-        this.$store.state.$loading = false
-      })
+      this.$store.dispatch('auth/login', true).then(() => { this.$router.push('/') })
     }
   }
 }

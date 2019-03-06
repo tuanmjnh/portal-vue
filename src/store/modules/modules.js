@@ -78,7 +78,7 @@ export default {
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
-        .finally(() => { rootState.$loading = false })
+        .finally(() => { if (loading) rootState.$loading = false })
     },
     async insert({ commit, state, rootGetters, rootState }, loading = false) {
       // Loading
@@ -102,7 +102,7 @@ export default {
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
-        .finally(() => { rootState.$loading = false })
+        .finally(() => { if (loading) rootState.$loading = false })
     },
     async update({ commit, state, rootGetters, rootState }, loading = false) {
       // Loading
@@ -122,7 +122,7 @@ export default {
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
-        .finally(() => { rootState.$loading = false })
+        .finally(() => { if (loading) rootState.$loading = false })
     },
     async delete({ commit, state, rootGetters, rootState }, loading = false) {
       // Loading
@@ -142,7 +142,7 @@ export default {
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
-        .finally(() => { rootState.$loading = false })
+        .finally(() => { if (loading) rootState.$loading = false })
     },
     async remove({ commit, state, rootGetters, rootState }, loading = false) {
       // Loading
@@ -160,7 +160,7 @@ export default {
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
-        .finally(() => { rootState.$loading = false })
+        .finally(() => { if (loading) rootState.$loading = false })
     },
     async item({ commit, state }, item) {
       if (item) commit(SET_ITEM, item)
@@ -180,7 +180,7 @@ export default {
           commit(SET_CATCH, error, { root: true })
           return Promise.reject(error)
         })
-        .finally(() => { rootState.$loading = false })
+        .finally(() => { if (loading) rootState.$loading = false })
     }
   }
 }

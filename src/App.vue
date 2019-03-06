@@ -1,10 +1,8 @@
 <template>
   <v-app>
-    <template v-if="$store.state.$loading">
-      <div class="mid-center">
-        <v-progress-circular :size="130" :width="10" color="primary" indeterminate></v-progress-circular>
-      </div>
-    </template>
+    <div class="mid-center" v-if="$store.state.$loadingApp">
+      <v-progress-circular :size="130" :width="10" color="primary" indeterminate></v-progress-circular>
+    </div>
     <template v-else>
       <template-snackbar></template-snackbar>
       <template-main v-if="isAuth"></template-main>

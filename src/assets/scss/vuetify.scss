@@ -1,3 +1,7 @@
+// .container {
+//   min-height: 500px
+// }
+
 .v-navigation-drawer--mini-variant {
   .v-list__group__header__prepend-icon {
     justify-content: center;
@@ -51,6 +55,7 @@
 
 .mid-center {
   text-align: center !important;
-  position: relative;
-  top: 39%;
+  // position: relative;
+  // top: 39%;
+  margin-top: 15%
 }

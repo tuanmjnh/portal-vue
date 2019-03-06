@@ -238,13 +238,7 @@ export default {
       this.$store.dispatch('message', { text: 'Hello, I\'m a snackbar' })
     },
     Logout() {
-      this.$store.state.$loading = true
-      this.$store.dispatch('auth/logout').then(() => {
-        setTimeout(() => {
-          this.$router.push('/auth')
-          this.$store.state.$loading = false
-        }, 200)
-      })
+      this.$store.dispatch('auth/logout', true).then(() => { this.$router.push('/auth') })
     },
     getAuth(key) {
       return _auth.GetStorage(key)

@@ -28,7 +28,10 @@ export default {
     }
   },
   actions: {
-    async login({ commit, state, rootGetters }) {
+    async login({ commit, state, rootGetters, rootState }, loading = false) {
+      // Loading
+      if (loading) rootState.$loadingApp = true
+      // http
       await vnptbkn
         .post(collection, state.item)
         .then(function(res) {
@@ -64,8 +67,12 @@ export default {
           setHeaderAuth()
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) }) // commit catch
+        .finally(() => { setTimeout(() => { rootState.$loadingApp = false }, 200) })
     },
-    async logout({ commit, rootGetters }) {
+    async logout({ commit, rootGetters, rootState }, loading = false) {
+      // Loading
+      if (loading) rootState.$loadingApp = true
+      // Action
       // commit('REMOVE_AUTH', {}, { root: true })
       _auth.RemoveAuth()
       commit('SET_ISAUTH')
@@ -76,6 +83,7 @@ export default {
         statusText: 'OK'
       }
       commit(SET_MESSAGE, res, { root: true })
+      setTimeout(() => { rootState.$loadingApp = false }, 200)
     },
     async setIsAuth({ commit }, val = false) {
       commit('SET_ISAUTH', val)

@@ -32,6 +32,7 @@ export default new Vuex.Store({
     contract_enterprise: contract_enterprise
   },
   state: {
+    $loadingApp: false,
     $loading: false,
     $noimage: `Uploads/noimage.jpg`,
     $message: { show: false },
@@ -105,7 +106,7 @@ export default new Vuex.Store({
     },
     async setLanguage({ commit, state }) {
       // Data Items
-      state.$loading = true
+      state.$loadingApp = true
       let lang_data = {}
       commit('SET_LANGUAGE', state.$language)
       // commit('SET_LANGUAGES', lang_data)
@@ -119,7 +120,7 @@ export default new Vuex.Store({
               });
               commit('SET_LANGUAGES', lang_data)
               // state.$languages = _languages.GetLanguages()
-              _languages.SetLanguages(lang_data).then(state.$loading = false)
+              _languages.SetLanguages(lang_data).then(state.$loadingApp = false)
             }
           } else commit(SET_CATCH, null)
         })
