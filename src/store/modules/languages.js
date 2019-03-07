@@ -7,6 +7,7 @@ export default {
     items: [],
     item: {},
     selected: [],
+    isGetFirst: true,
     languages_default: 'vi-VN',
     default: {
       id: '',
@@ -126,7 +127,7 @@ export default {
         })
       commit(SET_ITEMS, items)
     },
-    async select({ commit, state, rootGetters, rootState }, loading = false) {
+    async select({ commit,state, rootGetters, rootState }, loading = false) {
       // Loading
       if (loading) rootState.$loading = true
       // http
@@ -140,7 +141,10 @@ export default {
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch((error) => { commit(SET_CATCH, error, { root: true }) })
-        .finally(() => { if (loading) rootState.$loading = false })
+        .finally(() => {
+          state.isGetFirst = false
+          if (loading) rootState.$loading = false
+        })
     },
     async insert({ commit, state, rootGetters, rootState }, loading = false) {
       // Loading

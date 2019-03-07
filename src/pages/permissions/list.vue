@@ -97,7 +97,7 @@ export default {
   }),
   created() {
     this.headers.forEach(e => { e.text = this.$store.getters.languages(e.text) });
-    if (this.$store.state.permissions.items.length < 1) this.$store.dispatch('permissions/select', true)
+    if (this.$store.state.permissions.isGetFirst) this.$store.dispatch('permissions/select', true)
   },
   computed: {
     items() {

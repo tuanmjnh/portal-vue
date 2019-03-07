@@ -29,7 +29,7 @@ export default {
   beforeCreate() {
     if (!this.$store.state.$language || !this.$store.state.$languages)
       this.$store.dispatch('setLanguage')
-    if (this.$store.state.languages.items.length < 1)
+    if (this.$store.state.languages.isGetFirst)
       this.$store.dispatch('languages/select', false)
   },
   computed: {

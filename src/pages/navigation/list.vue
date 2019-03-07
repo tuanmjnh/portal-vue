@@ -27,8 +27,8 @@
         </v-btn-toggle>
       </v-card-title>
       <!-- <v-form ref="form" v-model="valid" lazy-validation> -->
-      <v-data-table class="elevation-1" v-model="selected" select-all item-key="id"
-        :headers="headers" :items="items" :rows-per-page-items="rowPerPage"
+      <v-data-table class="elevation-1" v-model="$store.state.languages.selected"
+        select-all item-key="id" :headers="headers" :items="items" :rows-per-page-items="rowPerPage"
         :rows-per-page-text="$store.getters.languages(['global.rows_per_page'])"
         :pagination.sync="pagination" :search="pagination.search">
         <!--:loading="loading" :pagination.sync="pagination" :total-items="totalItems" -->
@@ -39,9 +39,10 @@
             </td>
             <!-- <td>{{ props.item.id }}</td> -->
             <td>{{ props.item.title }}</td>
-            <td>{{ props.item.code }}</td>
+            <td>{{ props.item.parent_id }}</td>
+            <td>{{ props.item.url }}</td>
             <td>{{ props.item.orders }}</td>
-            <td>{{ props.item.created_at|formatDate('DD/MM/YYYY hh:mm') }}</td>
+            <!-- <td>{{ props.item.created_at|formatDate('DD/MM/YYYY hh:mm') }}</td> -->
             <td v-html="props.item.icon"></td>
             <td class="justify-center layout px-0">
               <v-tooltip bottom>
@@ -83,79 +84,57 @@ export default {
     itemsDialog: { type: Boolean, default: false },
   },
   data: () => ({
-    loading: true,
-    selected: [],
-    valid: false,
     toggle_one: 0,
     localDialog: false,
     localItemsDialog: false,
     confirmDialog: false,
     rowPerPage: [10, 25, 50, 100, 200, 500], //  { text: "All", value: -1 }
-    pagination: { search: '', sortBy: 'orders', find: { flag: 1 } },
+    pagination: { search: '', sortBy: 'parent_id', find: { flag: 1 } },
     headers: [
       // { text: 'ID', value: 'id', align: 'left' },
-      { text: 'modules.title', value: 'title', align: 'left' },
-      { text: 'global.code', value: 'code', align: 'left' },
+      { text: 'navigation.title', value: 'title', align: 'left' },
+      { text: 'global.dependent', value: 'parent_id', align: 'left' },
+      { text: 'global.url', value: 'url', sortable: true },
       { text: 'global.orders', value: 'orders', sortable: true },
-      { text: 'global.created_at', value: 'created_at' },
+      // { text: 'global.created_at', value: 'created_at' },
       { text: 'Icon', value: 'icon' },
       { text: '#', value: '#', sortable: false }
     ]
   }),
-  beforeCreate() { },
   created() {
     this.headers.forEach(e => { e.text = this.$store.getters.languages([e.text]) });
-    if (this.$store.state.modules.isGetFirst) this.$store.dispatch('modules/select').then(this.loading = false)
+    if (this.$store.state.navigation.isGetFirst) this.$store.dispatch('navigation/select', true)
   },
-  beforeMount() { },
-  mounted() { },
   computed: {
     items() {
-      var rs = JSON.parse(JSON.stringify(this.$store.getters['modules/getFilter'](this.pagination)))
-      // var rs = this.$store.getters['modules/getFilter'](this.pagination)
+      var rs = this.$store.getters['navigation/getFilter'](this.pagination)
       return rs
     }
   },
   watch: {
     dialog(val) { this.localDialog = val },
-    localDialog(val) {
-      this.$emit('handleDialog', val)
-      if (!val) this.$store.dispatch('modules/item')
-    },
+    localDialog(val) { this.$emit('handleDialog', val) },
     itemsDialog(val) { this.localItemsDialog = val },
     localItemsDialog(val) { this.$emit('handleItemsDialog', val) }
   },
   methods: {
     onItems(item) {
-      this.$store.dispatch('modules/item', item)
+      this.$store.dispatch('navigation/item', item)
       this.localItemsDialog = !this.localItemsDialog
     },
     onEdit(item) {
-      this.$store.dispatch('modules/item', item)
+      this.$store.dispatch('navigation/item', item)
       this.localDialog = true
     },
     onDelete(item) {
       this.confirmDialog = !this.confirmDialog
-      this.selected.push(item);
+      this.$store.state.navigation.selected.push(item);
     },
     onCFMAccept() {
-      this.$store.dispatch('modules/delete', this.selected).then(this.selected = [])
+      this.$store.dispatch('navigation/delete')
     },
     onCFMCancel() {
-      this.selected = []
-    },
-    onQuickSave(item) {
-      // if (this.valid) {
-      //   this.$store.dispatch('modules/item', item).then(() => {
-      //     this.$store.dispatch('modules/update')
-      //   })
-      // }
-      this.$validator.validate().then(result => {
-        if (!result) {
-          console.log(this.errors)
-        }
-        console.log(result)
-      });
+      this.$store.state.navigation.selected = []
     }
   }
 }

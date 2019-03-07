@@ -4,60 +4,56 @@
     <v-card>
       <v-card-title class="headline grey lighten-2">
         {{ item.id ?
-        $store.getters.languages(['global.details']) :
-        $store.getters.languages(['global.add']) }}
+        $store.getters.languages('global.details') :
+        $store.getters.languages('global.add') }}
       </v-card-title>
       <v-card-text>
         <v-form v-model="valid" ref="form">
           <v-container grid-list-md>
             <v-tabs v-model="tabActive" color="secondary" dark>
-              <v-tab>{{$store.getters.languages(['global.main_info'])}}</v-tab>
-              <v-tab>{{$store.getters.languages(['global.note'])}}</v-tab>
+              <v-tab>{{$store.getters.languages('global.main_info')}}</v-tab>
+              <v-tab>{{$store.getters.languages('global.note')}}</v-tab>
               <v-tab-item>
                 <v-layout wrap class="pt-2">
-                  <v-flex xs12 sm8 md8>
-                    <!-- <v-text-field v-model.trim="item.title" :label="$store.getters.languages(['modules.title'])"
-                      :rules="[!!item.title || $store.getters.languages(['messages.err_required')]"></v-text-field> -->
+                  <v-flex xs12 sm6 md6>
                     <v-text-field v-model.trim="item.title" :rules="[v => !!v || $store.getters.languages('error.required')]"
-                      :label="$store.getters.languages(['modules.title'])"></v-text-field>
-                    <!-- <span>{{errors.items.getRule('title')}}</span> -->
-                    <!-- <span v-show="errors.has('title')">{{ errors.first('title') }}</span> -->
+                      :label="$store.getters.languages('navigation.title')"></v-text-field>
                   </v-flex>
-                  <v-flex xs12 sm4 md4>
-                    <v-text-field v-model.trim="item.code" :label="$store.getters.languages(['global.code'])"
-                      :rules="[v => !!v || $store.getters.languages('error.required'), isExist||$store.getters.languages('error.exist')]"></v-text-field>
+                  <v-flex xs12 sm6 md6>
+                    <v-select :items="items" v-model="dependent_selected" multiple
+                      :menu-props="{ maxHeight: '400' }" item-text="title" item-value="dependent"
+                      persistent-hint :hint="$store.getters.languages(['global.dependent_select'])"
+                      :label="$store.getters.languages('global.dependent')" :rules="[v => v.length>0 || $store.getters.languages('error.required_select')]"></v-select>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
                     <v-text-field v-model.trim="item.url" :rules="[v => !!v || $store.getters.languages('error.required')]"
-                      :label="$store.getters.languages(['global.url'])"></v-text-field>
+                      :label="$store.getters.languages('global.url')"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6 class="text-append-icon">
                     <v-text-field v-model.trim="item.icon" label="Icon"></v-text-field>
                     <div class="icon" v-html="item.icon"></div>
                   </v-flex>
-                  <v-flex xs12 md6 sm6>
+                  <!-- <v-flex xs12 md6 sm6>
                     <v-select :items="permissions" v-model="permissions_selected"
                       multiple :menu-props="{ maxHeight: '400' }" item-text="title"
-                      item-value="code" :label="$store.getters.languages(['permissions.title'])"
-                      persistent-hint :hint="$store.getters.languages(['permissions.select'])"
-                      :rules="[v => v.length>0 || $store.getters.languages(['error.required_select'])]"></v-select>
-                  </v-flex>
+                      item-value="code" :label="$store.getters.languages('permissions.title'])"
+                      persistent-hint :hint="$store.getters.languages('permissions.select'])"
+                      :rules="[v => v.length>0 || $store.getters.languages('error.required_select'])]"></v-select>
+                  </v-flex> -->
                   <v-flex xs6 sm3 md3>
-                    <v-text-field type="number" v-model.trim="item.orders" :label="$store.getters.languages(['global.orders'])"
+                    <v-text-field type="number" v-model.trim="item.orders" :label="$store.getters.languages('global.orders')"
                       :rules="[v => !!v || $store.getters.languages('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs6 sm3 md3>
-                    <v-switch color="primary" :label="item.flag===1?$store.getters.languages(['global.show']):$store.getters.languages(['global.hide'])"
+                    <v-switch color="primary" :label="item.flag===1?$store.getters.languages('global.show'):$store.getters.languages('global.hide')"
                       :true-value="1" :false-value="0" v-model.number="item.flag"></v-switch>
                   </v-flex>
-                  <!-- <v-flex xs12 sm6 md6>
-                  <v-text-field v-model.trim="item.attach_file" label="Tệp dữ liệu"
-                    :disabled="true" class="text-color-initial"></v-text-field>
-                </v-flex> -->
+                  <v-flex xs12 sm6 md6>
+                  </v-flex>
                   <v-flex xs12 sm6 md4>
                     <upload-files @handleUpload="uploadFiles=$event" :buttonUse="false"
                       :multiple="false" :http="vnptbkn" extension="image/*" :basePath="uploadFiles.basePath"
-                      :autoName="true" :buttonText="$store.getters.languages(['global.upload_drag'])"></upload-files>
+                      :autoName="true" :buttonText="$store.getters.languages('global.upload_drag')"></upload-files>
                   </v-flex>
                   <v-flex xs12 sm6 md8>
                     <display-files :files="uploadFiles.files" :baseUrl="vnptbkn.defaults.host"
@@ -70,11 +66,6 @@
                   <v-flex xs12 sm12 md12>
                     <v-textarea v-model.trim="item.descs" auto-grow box :placeholder="$store.getters.languages(['global.input',' ','global.descs'])"></v-textarea>
                   </v-flex>
-                  <v-flex xs12 sm12 md12>
-                    <vue-quill-editor v-model.trim="item.contents" ref="Content"
-                      :placeholder="$store.getters.languages(['global.contents'])"></vue-quill-editor>
-                    <!-- <tinymce id="desc" v-model="item.desc"></tinymce> -->
-                  </v-flex>
                 </v-layout>
               </v-tab-item>
             </v-tabs>
@@ -84,10 +75,10 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="primary" flat @click.native="onSave" :loading="loading">
-          {{$store.getters.languages(['global.update'])}}
+          {{$store.getters.languages('global.update')}}
         </v-btn>
         <v-btn color="secondary" flat @click.native="localDialog=false" :disabled="loading">
-          {{$store.getters.languages(['global.back'])}}
+          {{$store.getters.languages('global.back')}}
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -95,16 +86,11 @@
 </template>
 
 <script>
-import 'quill/dist/quill.core.css'
-import 'quill/dist/quill.snow.css'
-import 'quill/dist/quill.bubble.css'
-import { quillEditor } from 'vue-quill-editor'
 import { vnptbkn } from '@/plugins/axios-config'
 import uploadFiles from '@/components/upload-files'
 import displayFiles from '@/components/display-files'
 export default {
   components: {
-    'vue-quill-editor': quillEditor,
     'upload-files': uploadFiles,
     'display-files': displayFiles
   },
@@ -118,31 +104,37 @@ export default {
     localDialog: false,
     tabActive: null,
     vnptbkn: vnptbkn,
-    permissions_selected: [],
-    uploadFiles: { files: [], basePath: 'modules' },
+    dependent_selected: [],
+    uploadFiles: { files: [], basePath: 'navigation' },
   }),
   created() {
-    this.$store.dispatch('modules/item')
-    if (this.$store.state.permissions.isGetFirst) this.$store.dispatch('permissions/select')
+    this.$store.dispatch('navigation/item')
+    // if (this.$store.state.permissions.isGetFirst) this.$store.dispatch('permissions/select')
   },
   computed: {
     item() {
-      var item = this.$store.state.modules.item
+      var item = this.$store.state.navigation.item
       return item
     },
-    permissions() {
-      var filter = { sortBy: 'orders', find: { flag: 1 } };
-      var item = this.$store.getters['permissions/getFilter'](filter)
+    items() {
+      var item = [{ id: 0, title: this.$store.getters.languages('navigation.main') }]
+      this.dependent_selected.pushIfNotExist(item)
+      item = [...item, ...this.$store.getters['navigation/getFilter']({ sortBy: 'parent_id', find: { flag: 1 } })]
       return item
     }
+    // permissions() {
+    //   var filter = { sortBy: 'orders', find: { flag: 1 } };
+    //   var item = this.$store.getters['permissions/getFilter'](filter)
+    //   return item
+    // }
   },
   watch: {
     dialog(val) { this.localDialog = val },
     localDialog(val) {
       this.$emit('handleDialog', val)
       if (!val) {
-        this.$store.dispatch('modules/item')
-        this.permissions_selected = []
+        this.$store.dispatch('navigation/item')
+        // this.dependent_selected = []
         this.$refs.form.resetValidation()
       }
     },
@@ -155,15 +147,15 @@ export default {
     },
     item: {
       handler(val) {
-        if (this.permissions && this.permissions.length > 0) {
-          this.permissions_selected = []
-          this.permissions.forEach(e => {
-            if (val.permissions.indexOf(`,${e.code},`) > -1) this.permissions_selected.push(e.code)
-          });
-        }
+        // if (this.permissions && this.permissions.length > 0) {
+        //   this.permissions_selected = []
+        //   this.permissions.forEach(e => {
+        //     if (val.permissions.indexOf(`,${e.code},`) > -1) this.permissions_selected.push(e.code)
+        //   });
+        // }
         if (this.item.code) {
           this.item.code = this.item.code.toString().toLowerCase()
-          if (!this.item.id) this.$store.dispatch('modules/existCode').then((rs) => { this.isExist = rs })
+          if (!this.item.id) this.$store.dispatch('navigation/existCode').then((rs) => { this.isExist = rs })
         }
       },
       deep: true
@@ -174,9 +166,9 @@ export default {
       this.loading = true
       if (this.valid) {
         this.item.permissions = `,${this.permissions_selected.join(',')},`
-        if (this.item.id) this.$store.dispatch('modules/update').then(this.loading = false)
-        else this.$store.dispatch('modules/insert').then((result) => {
-          this.$store.dispatch('modules/item')
+        if (this.item.id) this.$store.dispatch('navigation/update').then(this.loading = false)
+        else this.$store.dispatch('navigation/insert').then((result) => {
+          this.$store.dispatch('navigation/item')
           this.loading = false
         })
       }

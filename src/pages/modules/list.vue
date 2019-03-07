@@ -40,8 +40,9 @@
             <!-- <td>{{ props.item.id }}</td> -->
             <td>{{ props.item.title }}</td>
             <td>{{ props.item.code }}</td>
+            <td>{{ props.item.url }}</td>
             <td>{{ props.item.orders }}</td>
-            <td>{{ props.item.created_at|formatDate('DD/MM/YYYY hh:mm') }}</td>
+            <!-- <td>{{ props.item.created_at|formatDate('DD/MM/YYYY hh:mm') }}</td> -->
             <td v-html="props.item.icon"></td>
             <td class="justify-center layout px-0">
               <v-tooltip bottom>
@@ -93,15 +94,15 @@ export default {
       // { text: 'ID', value: 'id', align: 'left' },
       { text: 'modules.title', value: 'title', align: 'left' },
       { text: 'global.code', value: 'code', align: 'left' },
+      { text: 'global.url', value: 'url', sortable: true },
       { text: 'global.orders', value: 'orders', sortable: true },
-      { text: 'global.created_at', value: 'created_at' },
       { text: 'Icon', value: 'icon' },
       { text: '#', value: '#', sortable: false }
     ]
   }),
   created() {
     this.headers.forEach(e => { e.text = this.$store.getters.languages([e.text]) });
-    if (this.$store.state.modules.items.length < 1) this.$store.dispatch('modules/select', true)
+    if (this.$store.state.modules.isGetFirst) this.$store.dispatch('modules/select', true)
   },
   computed: {
     items() {
@@ -127,13 +128,13 @@ export default {
     },
     onDelete(item) {
       this.confirmDialog = !this.confirmDialog
-      this.$store.state.languages.selected.push(item);
+      this.$store.state.modules.selected.push(item);
     },
     onCFMAccept() {
       this.$store.dispatch('modules/delete')
     },
     onCFMCancel() {
-      this.$store.state.languages.selected = []
+      this.$store.state.modules.selected = []
     },
     onQuickSave(item) {
       // if (this.valid) {

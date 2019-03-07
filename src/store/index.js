@@ -13,8 +13,9 @@ import auth from './modules/auth'
 import users from './modules/users'
 import setting from './modules/setting'
 import modules from './modules/modules'
-import permissions from './modules/permissions'
 import languages from './modules/languages'
+import navigation from './modules/navigation'
+import permissions from './modules/permissions'
 import language_items from './modules/language_items'
 import contract_customer from './modules/contract_customer'
 import contract_enterprise from './modules/contract_enterprise'
@@ -25,8 +26,9 @@ export default new Vuex.Store({
     users: users,
     setting: setting,
     modules: modules,
-    permissions: permissions,
     languages: languages,
+    navigation: navigation,
+    permissions: permissions,
     language_items: language_items,
     contract_customer: contract_customer,
     contract_enterprise: contract_enterprise
@@ -63,7 +65,7 @@ export default new Vuex.Store({
         } else if (e.length < 3) {
           const e1 = e[1].split(':')
           // if (e1.length > 1) e[1] = e1[0]
-          if (!state.$languages[e[0]][e1[0]]) rs += key[index]
+          if (!state.$languages[e[0]] || !state.$languages[e[0]][e1[0]]) rs += key[index]
           else rs += (index > 0 ? state.$languages[e[0]][e1[0]].toLowerCaseFirst() : state.$languages[e[0]][e1[0]])
           if (e1.length > 1) rs = rs.format(e1[1].split(','), 'ff')
         }

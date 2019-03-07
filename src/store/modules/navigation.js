@@ -1,6 +1,6 @@
 import { SET_CATCH, SET_ITEMS, PUSH_ITEMS, UPDATE_ITEMS, REMOVE_ITEMS, SET_ITEM, SET_MESSAGE } from '../mutation-type'
 import { vnptbkn } from '@/plugins/axios-config'
-const collection = 'modules'
+const collection = 'navigation'
 export default {
   namespaced: true,
   state: {
@@ -9,13 +9,14 @@ export default {
     selected: [],
     isGetFirst: true,
     default: {
-      id: '',
-      code: '',
+      id: 0,
+      dependent: '',
+      // parents: '',
+      levels: 0,
       title: '',
       icon: '<i class="material-icons">view_module</i>',
       image: '',
       url: '',
-      permissions: '',
       orders: 1,
       descs: '',
       contents: '',
@@ -41,9 +42,6 @@ export default {
     getFilter: state => pagination => {
       return state.items.filterValue(pagination.find)
     },
-    getCodeFilter(state) {
-      return state.items.map(e => e.code)
-    }
   },
   mutations: {
     [SET_ITEMS](state, items) {
@@ -65,7 +63,7 @@ export default {
     }
   },
   actions: {
-    async select({ commit,state, rootGetters, rootState }, loading = false) {
+    async select({ commit, rootGetters, state, rootState }, loading = false) {
       // Loading
       if (loading) rootState.$loading = true
       // http
@@ -75,7 +73,7 @@ export default {
               commit(SET_MESSAGE, { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
               return
             }
-            if (res.data.data) commit(SET_ITEMS, res.data.data)
+            if (res.data.data) commit(SET_ITEMS, res.data.data.sortByKey('orders').sortByKey('parent_id'))
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
@@ -169,22 +167,6 @@ export default {
     async item({ commit, state }, item) {
       if (item) commit(SET_ITEM, item)
       else commit(SET_ITEM, state.default)
-    },
-    existCode({ commit, state, rootState }, loading = false) {
-      // Loading
-      if (loading) rootState.$loading = true
-      // http
-      return vnptbkn.get(collection + '/ExistCode/' + state.item.code, { timeout: 1000 }).then(function(res) { //, { timeout: 3000 }
-          if (res.status === 200) {
-            if (res.data.msg === 'exist') return false
-            else return true
-          } else commit(SET_CATCH, null, { root: true })
-        })
-        .catch(function(error) {
-          commit(SET_CATCH, error, { root: true })
-          return Promise.reject(error)
-        })
-        .finally(() => { if (loading) rootState.$loading = false })
     }
   }
 }

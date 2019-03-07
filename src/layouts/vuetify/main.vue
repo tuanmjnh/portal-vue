@@ -181,6 +181,7 @@ export default {
         children: [
           { icon: 'account_circle', title: 'Users', push: 'users' },
           { icon: 'vpn_key', title: 'Roles', push: 'roles' },
+          { icon: 'navigation', title: 'Navigation', push: 'navigation' },
           { icon: 'apps', title: 'Modules', push: 'modules' },
           { icon: 'low_priority', title: 'Permissions', push: 'permissions' },
         ]

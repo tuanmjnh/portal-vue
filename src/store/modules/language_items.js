@@ -14,6 +14,7 @@ export default {
     lang_data: '',
     modules: ['global'],
     modules_default: ['global'],
+    isGetFirst: true,
     default: {
       id: 0,
       lang_code: 'vi-VN',
@@ -84,9 +85,12 @@ export default {
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch((error) => { commit(SET_CATCH, error, { root: true }) })
-        .finally(() => { if (loading) rootState.$loading = false })
+        .finally(() => {
+          state.isGetFirst = false
+          if (loading) rootState.$loading = false
+        })
     },
-    async selectByLang({ commit, state, rootState }, loading = false) {
+    async selectByLang({ commit, state, rootGetters, rootState }, loading = false) {
       // Loading
       if (loading) rootState.$loading = true
       // http
@@ -95,11 +99,18 @@ export default {
         .get(`${collection}/getlang/${state.lang_code}`)
         .then(function(res) {
           if (res.status === 200) {
+            if (res.data.msg === 'danger') {
+              commit(SET_MESSAGE, { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+              return
+            }
             if (res.data.data) commit(SET_ITEMS, res.data.data)
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch((error) => { commit(SET_CATCH, error, { root: true }) })
-        .finally(() => { if (loading) rootState.$loading = false })
+        .finally(() => {
+          state.isGetFirst = false
+          if (loading) rootState.$loading = false
+        })
     },
     async insert({ commit, state, rootGetters, rootState }, loading = false) {
       // Loading

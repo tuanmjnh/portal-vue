@@ -21,22 +21,6 @@ const routes = [
       import ('../pages/dashboard/index')
   },
   {
-    path: '/contract-customer',
-    name: 'contract-customer',
-    alias: '',
-    meta: { description: 'Overview of environment', requiresAuth: true },
-    component: () =>
-      import ('../pages/contract-customer/index')
-  },
-  {
-    path: '/contract-enterprise',
-    name: 'contract-enterprise',
-    alias: '',
-    meta: { description: 'Overview of environment', requiresAuth: true },
-    component: () =>
-      import ('../pages/contract-enterprise/index')
-  },
-  {
     path: '/users',
     name: 'users',
     alias: '',
@@ -85,6 +69,14 @@ const routes = [
     meta: { description: 'Overview of environment', requiresAuth: true }
   },
   {
+    path: '/navigation',
+    name: 'navigation',
+    alias: '',
+    component: () =>
+      import ('../pages/navigation/index'),
+    meta: { description: 'Overview of environment', requiresAuth: true }
+  },
+  {
     path: '/informations',
     name: 'informations',
     alias: '',
@@ -99,6 +91,22 @@ const routes = [
     component: () =>
       import ('../pages/setting/index'),
     meta: { description: 'Overview of environment', requiresAuth: true }
+  },
+  {
+    path: '/contract-customer',
+    name: 'contract-customer',
+    alias: '',
+    meta: { description: 'Overview of environment', requiresAuth: true },
+    component: () =>
+      import ('../pages/contract-customer/index')
+  },
+  {
+    path: '/contract-enterprise',
+    name: 'contract-enterprise',
+    alias: '',
+    meta: { description: 'Overview of environment', requiresAuth: true },
+    component: () =>
+      import ('../pages/contract-enterprise/index')
   },
   // {
   //   path: '/languages',

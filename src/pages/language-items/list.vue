@@ -108,10 +108,10 @@ export default {
     ]
   }),
   created() {
-    if (this.$store.state.language_items.items.length < 1)
+    if (this.$store.state.language_items.isGetFirst)
       this.$store.dispatch('language_items/selectByLang', true).then(() => {
-        if (this.$store.state.languages.items.length < 1) this.$store.dispatch('languages/select')
-        if (this.$store.state.modules.items.length < 1) this.$store.dispatch('modules/select')
+        if (this.$store.state.languages.isGetFirst) this.$store.dispatch('languages/select')
+        if (this.$store.state.modules.isGetFirst) this.$store.dispatch('modules/select')
       })
   },
   computed: {

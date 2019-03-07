@@ -109,7 +109,7 @@ export default {
   }),
   created() {
     this.headers.forEach(e => { e.text = this.$store.getters.languages(e.text) });
-    if (this.$store.state.languages.items.length < 1) this.$store.dispatch('languages/select', true)
+    if (this.$store.state.languages.isGetFirst) this.$store.dispatch('languages/select', true)
   },
   computed: {
     items() {

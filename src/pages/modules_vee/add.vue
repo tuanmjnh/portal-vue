@@ -128,7 +128,7 @@ export default {
   created() {
     let self = this
     self.$store.dispatch('modules/item')
-    if (self.$store.state.permissions.items.length < 1) self.$store.dispatch('permissions/select')
+    if (self.$store.state.permissions.isGetFirst) self.$store.dispatch('permissions/select')
     self.$validator.extend('exist', {
       getMessage(field, val) { return 'error.exist' },
       validate: value => {

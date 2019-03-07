@@ -7,6 +7,7 @@ export default {
     items: [],
     item: {},
     selected: [],
+    isGetFirst: true,
     default: {
       id: 0,
       code: '',
@@ -73,7 +74,10 @@ export default {
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
-        .finally(() => { if (loading) rootState.$loading = false })
+        .finally(() => {
+          state.isGetFirst = false
+          if (loading) rootState.$loading = false
+        })
     },
     async insert({ commit, state, rootGetters, rootState }, loading = false) {
       // Loading
