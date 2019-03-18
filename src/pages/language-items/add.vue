@@ -60,12 +60,11 @@ export default {
     localDialog: false,
   }),
   created() {
-    this.$store.dispatch('language_items/item')
+    // this.$store.dispatch('language_items/item')
   },
   computed: {
     item() {
       const rs = this.$store.state.language_items.item
-      if (rs.attach) rs.attach_file = rs.attach.replace('language_items/', '')
       return rs
     },
     modules() {
@@ -84,16 +83,12 @@ export default {
   watch: {
     dialog(val) { this.localDialog = val },
     localDialog(val) {
+      this.reset()
       this.$emit('handleDialog', val)
-      if (!val) {
-        this.$store.dispatch('language_items/item')
-        this.$refs.form.resetValidation()
-      }
     },
-    uploadFiles: {
+    item: {
       handler(val) {
-        if (val.files && val.files.length > 0)
-          this.item.attach = val.files[0].full_name
+        if (this.item.key) this.item.key = this.item.key.toString().toLowerCase()
       },
       deep: true
     }
@@ -105,12 +100,13 @@ export default {
       this.loading = true
       if (this.valid) {
         if (this.item.id) this.$store.dispatch('language_items/update').then(this.loading = false)
-        else this.$store.dispatch('language_items/insert').then(() => {
-          this.$store.dispatch('languages/item')
-          this.$refs.form.resetValidation()
-          this.loading = false
-        })
+        else this.$store.dispatch('language_items/insert').then(rs => { this.reset() })
       }
+    },
+    reset() {
+      this.loading = false
+      if (!this.item.id || !this.localDialog) this.$store.dispatch('language_items/item')
+      this.$refs.form.resetValidation()
     }
   }
 }

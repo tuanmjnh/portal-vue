@@ -59,3 +59,16 @@
   // top: 39%;
   margin-top: 15%
 }
+
+// List max-hight
+.list-max-hight {
+  max-height: 250px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+.list-title {
+  font-weight: bold;
+  font-size: 14px;
+  padding: 8px 0px 8px 20px;
+}

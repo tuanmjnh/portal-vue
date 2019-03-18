@@ -1,5 +1,5 @@
 import axios from 'axios'
-import * as _auth from './storage-auth'
+import * as storageAuth from './storage-auth'
 let host = 'http://localhost:5000/'
 let api = 'api/'
 const source = axios.CancelToken.source();
@@ -10,9 +10,9 @@ const vnptbkn = axios.create({
   baseURL: host + api,
   // timeout: 5000,
   headers: {
-    Authorization: _auth.GetToken() || '',
-    Author: _auth.GetUser() || '',
-    Remember: _auth.GetRemember()
+    Authorization: storageAuth.GetToken() || '',
+    Author: storageAuth.GetUser() || '',
+    Remember: storageAuth.GetRemember()
   }
 })
 // vnptbkn.CancelToken = axios.CancelToken;
@@ -26,15 +26,15 @@ const localhost = axios.create({
   baseURL: host + api,
   // timeout: 1000,
   headers: {
-    Authorization: _auth.GetToken() || '',
-    Author: _auth.GetUser() || '',
-    Remember: _auth.GetRemember()
+    Authorization: storageAuth.GetToken() || '',
+    Author: storageAuth.GetUser() || '',
+    Remember: storageAuth.GetRemember()
   }
 })
 const setHeaderAuth = function() {
-  vnptbkn.defaults.headers.Author = _auth.GetUser() || ''
-  vnptbkn.defaults.headers.Authorization = _auth.GetToken() || ''
-  vnptbkn.defaults.headers.Remember = _auth.GetRemember()
+  vnptbkn.defaults.headers.Author = storageAuth.GetUser() || ''
+  vnptbkn.defaults.headers.Authorization = storageAuth.GetToken() || ''
+  vnptbkn.defaults.headers.Remember = storageAuth.GetRemember()
 }
 // another api service
 // const amazonApi = axios.create({

@@ -2,288 +2,135 @@
   <div>
     <v-card>
       <v-card-title>
-        <v-text-field v-model="search" append-icon="search" label="Search" single-line hide-details></v-text-field>
+        <v-text-field v-model="pagination.search" append-icon="search" :label="$store.getters.languages(['global.search'])"
+          single-line hide-details></v-text-field>
         <v-spacer></v-spacer>
-        <v-tooltip right>
-          <v-btn slot="activator" color="primary" small fab flat @click="localDialog=!localDialog">
-            <i class="material-icons">add</i>
+        <v-tooltip bottom>
+          <v-btn flat icon slot="activator" color="primary" @click="localDialog=!localDialog">
+            <v-icon>add</v-icon>
           </v-btn>
-          <span>Add</span>
+          <span>{{$store.getters.languages(['global.add'])}}</span>
         </v-tooltip>
+        <v-btn-toggle v-model="toggle_one" mandatory>
+          <v-tooltip bottom>
+            <v-btn slot="activator" flat @click="pagination.find.flag=1">
+              <v-icon>view_list</v-icon>
+            </v-btn>
+            <span>{{$store.getters.languages(['global.using'])}}</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <v-btn slot="activator" flat @click="pagination.find.flag=0">
+              <v-icon>delete</v-icon>
+            </v-btn>
+            <span>{{$store.getters.languages(['global.deleted'])}}</span>
+          </v-tooltip>
+        </v-btn-toggle>
       </v-card-title>
-      <v-data-table v-model="selected" select-all item-key="name" :headers="headers" :items="desserts"
-        :pagination.sync="pagination" :total-items="totalDesserts" :loading="loading" :rows-per-page-items="rowPerPage"
-        class="elevation-1">
-        <!-- <template slot="headers" slot-scope="props">
-          <tr>
-            <th>
-              <v-checkbox :input-value="props.all" :indeterminate="props.indeterminate" primary hide-details
-                @click.native="toggleAll"></v-checkbox>
-            </th>
-            <template v-for="header in props.headers">
-              <th v-if="header.value!=='checkbox'" :key="header.text" :class="['column sortable', pagination.descending ? 'desc' : 'asc', header.value === pagination.sortBy ? 'active' : '']"
-                @click="changeSort(header.value)">
-                <v-icon small>arrow_upward</v-icon>
-                {{ header.text }}
-              </th>
-            </template>
-          </tr>
-        </template> -->
+      <!-- <v-form ref="form" v-model="valid" lazy-validation> -->
+      <v-data-table class="elevation-1" v-model="$store.state.languages.selected" select-all item-key="id"
+        :headers="headers" :items="items" :rows-per-page-items="rowPerPage"
+        :rows-per-page-text="$store.getters.languages(['global.rows_per_page'])"
+        :pagination.sync="pagination" :search="pagination.search">
+        <!--:loading="loading" :pagination.sync="pagination" :total-items="totalItems" -->
         <template slot="items" slot-scope="props">
           <tr>
             <td>
               <v-checkbox v-model="props.selected" primary hide-details></v-checkbox>
             </td>
+            <!-- <td>{{ props.item.id }}</td> -->
             <td>{{ props.item.name }}</td>
-            <td class="text-xs-right">{{ props.item.calories }}</td>
-            <td class="text-xs-right">{{ props.item.fat }}</td>
-            <td class="text-xs-right">{{ props.item.carbs }}</td>
-            <td class="text-xs-right">{{ props.item.protein }}</td>
-            <td class="text-xs-right">{{ props.item.iron }}</td>
+            <td>{{ props.item.orders }}</td>
+            <td>{{ props.item.created_at|formatDate('DD/MM/YYYY hh:mm') }}</td>
             <td class="justify-center layout px-0">
-              <v-btn icon class="mx-0" @click="editItem(props.item)">
-                <v-icon color="teal">edit</v-icon>
-              </v-btn>
-              <v-btn icon class="mx-0" @click="deleteItem(props.item)">
-                <v-icon color="pink">delete</v-icon>
-              </v-btn>
+              <v-tooltip bottom>
+                <v-btn flat icon slot="activator" color="teal" class="mx-0" @click="onEdit(props.item)">
+                  <v-icon>edit</v-icon>
+                </v-btn>
+                <span>{{$store.getters.languages(['global.edit'])}}</span>
+              </v-tooltip>
+              <v-tooltip bottom v-if="pagination.find.flag===1">
+                <v-btn flat icon slot="activator" color="error" class="mx-0" @click="onDelete(props.item)">
+                  <v-icon>delete</v-icon>
+                </v-btn>
+                <span>{{$store.getters.languages(['global.delete'])}}</span>
+              </v-tooltip>
+              <v-tooltip bottom v-else>
+                <v-btn flat icon slot="activator" color="info" class="mx-0" @click="onDelete(props.item)">
+                  <v-icon>refresh</v-icon>
+                </v-btn>
+                <span>{{$store.getters.languages(['global.recover'])}}</span>
+              </v-tooltip>
             </td>
           </tr>
         </template>
       </v-data-table>
+      <!-- </v-form> -->
     </v-card>
+    <tpl-confirm :dialog="confirmDialog" @onAccept="onCFMAccept" @onCancel="onCFMCancel"
+      :title="$store.getters.languages(['global.message'])" :content="$store.getters.languages(['messages.confirm_content'])"
+      :btnAcceptText="$store.getters.languages(['global.accept'])" :btnCancelText="$store.getters.languages(['global.cancel'])"></tpl-confirm>
   </div>
 </template>
 
 <script>
+import confirm from '@/components/confirm'
 export default {
-    props: {
-        dialog: { type: Boolean, default: false }
-    },
-    data: () => {
-        return {
-            localDialog: false,
-            loading: true,
-            desserts: [],
-            totalDesserts: 0,
-            selected: [],
-            search: '',
-            pagination: {},
-            rowPerPage: [5, 10, 25, 50, 100, { text: "All", value: -1 }],
-            headers: [
-                { text: 'Dessert (100g serving)', align: 'left', value: 'name' },
-                { text: 'Calories', value: 'calories' },
-                { text: 'Fat (g)', value: 'fat' },
-                { text: 'Carbs (g)', value: 'carbs' },
-                { text: 'Protein (g)', value: 'protein' },
-                { text: 'Iron (%)', value: 'iron' },
-                { text: '#', value: '#', sortable: false }
-            ],
-            editedIndex: -1,
-            defaultItem: {
-                name: '',
-                calories: 0,
-                fat: 0,
-                carbs: 0,
-                protein: 0
-            }
-        }
-    },
-    computed: {
-        formTitle() {
-            return this.editedIndex === -1 ? 'New Item' : 'Edit Item'
-        }
-    },
-    watch: {
-        pagination: {
-            handler() {
-                this.getDataFromApi().then(data => {
-                    this.desserts = data.items
-                    this.totalDesserts = data.total
-                })
-            },
-            deep: true
-        },
-        search: {
-            handler() {
-                this.getDataFromApi().then(data => {
-                    this.desserts = data.items
-                    this.totalDesserts = data.total
-                })
-            },
-            deep: true
-        },
-        dialog(val) { this.localDialog = val },
-        localDialog(val) { this.$emit('handleDialog', val) }
-    },
-    mounted() {
-        this.getDataFromApi().then(data => {
-            this.desserts = data.items
-            this.totalDesserts = data.total
-        })
-    },
-    methods: {
-        getDataFromApi() {
-            this.loading = true
-            return new Promise((resolve, reject) => {
-                const { sortBy, descending, page, rowsPerPage } = this.pagination
-                let items = this.getDesserts()
-                const total = items.length
-                // Filter key
-                let filterKey = this.search
-                if (filterKey) {
-                    items = items.filter(function (row) {
-                        return Object.keys(row).some(function (key) {
-                            return String(row[key]).toLowerCase().indexOf(filterKey) > -1
-                        })
-                    })
-                }
-                if (this.pagination.sortBy) {
-                    items = items.sort((a, b) => {
-                        const sortA = a[sortBy]
-                        const sortB = b[sortBy]
-                        if (descending) {
-                            if (sortA < sortB) return 1
-                            if (sortA > sortB) return -1
-                            return 0
-                        } else {
-                            if (sortA < sortB) return -1
-                            if (sortA > sortB) return 1
-                            return 0
-                        }
-                    })
-                }
-                if (rowsPerPage > 0) {
-                    items = items.slice((page - 1) * rowsPerPage, page * rowsPerPage)
-                }
-                setTimeout(() => {
-                    this.loading = false
-                    resolve({
-                        items,
-                        total
-                    })
-                }, 1000)
-            })
-        },
-        editItem(item) {
-            this.editedIndex = this.desserts.indexOf(item)
-            this.editedItem = Object.assign({}, item)
-            this.dialog = true
-        },
-        deleteItem(item) {
-            const index = this.desserts.indexOf(item)
-            confirm('Are you sure you want to delete this item?') && this.desserts.splice(index, 1)
-        },
-        close() {
-            this.dialog = false
-            setTimeout(() => {
-                this.editedItem = Object.assign({}, this.defaultItem)
-                this.editedIndex = -1
-            }, 300)
-        },
-        save() {
-            if (this.editedIndex > -1) {
-                Object.assign(this.desserts[this.editedIndex], this.editedItem)
-            } else {
-                this.desserts.push(this.editedItem)
-            }
-            this.close()
-        },
-        getDesserts() {
-            return [
-                {
-                    value: false,
-                    name: 'Frozen Yogurt',
-                    calories: 159,
-                    fat: 6.0,
-                    carbs: 24,
-                    protein: 4.0,
-                    iron: '1%'
-                },
-                {
-                    value: false,
-                    name: 'Ice cream sandwich',
-                    calories: 237,
-                    fat: 9.0,
-                    carbs: 37,
-                    protein: 4.3,
-                    iron: '1%'
-                },
-                {
-                    value: false,
-                    name: 'Eclair',
-                    calories: 262,
-                    fat: 16.0,
-                    carbs: 23,
-                    protein: 6.0,
-                    iron: '7%'
-                },
-                {
-                    value: false,
-                    name: 'Cupcake',
-                    calories: 305,
-                    fat: 3.7,
-                    carbs: 67,
-                    protein: 4.3,
-                    iron: '8%'
-                },
-                {
-                    value: false,
-                    name: 'Gingerbread',
-                    calories: 356,
-                    fat: 16.0,
-                    carbs: 49,
-                    protein: 3.9,
-                    iron: '16%'
-                },
-                {
-                    value: false,
-                    name: 'Jelly bean',
-                    calories: 375,
-                    fat: 0.0,
-                    carbs: 94,
-                    protein: 0.0,
-                    iron: '0%'
-                },
-                {
-                    value: false,
-                    name: 'Lollipop',
-                    calories: 392,
-                    fat: 0.2,
-                    carbs: 98,
-                    protein: 0,
-                    iron: '2%'
-                },
-                {
-                    value: false,
-                    name: 'Honeycomb',
-                    calories: 408,
-                    fat: 3.2,
-                    carbs: 87,
-                    protein: 6.5,
-                    iron: '45%'
-                },
-                {
-                    value: false,
-                    name: 'Donut',
-                    calories: 452,
-                    fat: 25.0,
-                    carbs: 51,
-                    protein: 4.9,
-                    iron: '22%'
-                },
-                {
-                    value: false,
-                    name: 'KitKat',
-                    calories: 518,
-                    fat: 26.0,
-                    carbs: 65,
-                    protein: 7,
-                    iron: '6%'
-                }
-            ]
-        }
+  components: { 'tpl-confirm': confirm },
+  props: {
+    dialog: { type: Boolean, default: false },
+    itemsDialog: { type: Boolean, default: false },
+  },
+  data: () => ({
+    toggle_one: 0,
+    localDialog: false,
+    localItemsDialog: false,
+    confirmDialog: false,
+    rowPerPage: [10, 25, 50, 100, 200, 500], //  { text: "All", value: -1 }
+    pagination: { search: '', sortBy: 'orders', find: { flag: 1 } },
+    headers: [
+      // { text: 'ID', value: 'id', align: 'left' },
+      { text: 'roles.name', value: 'name', align: 'left' },
+      { text: 'global.orders', value: 'orders', sortable: true },
+      { text: 'global.created_at', value: 'created_at', sortable: true },
+      { text: '#', value: '#', sortable: false }
+    ]
+  }),
+  created() {
+    this.headers.forEach(e => { e.text = this.$store.getters.languages([e.text]) });
+    if (this.$store.state.roles.isGetFirst) this.$store.dispatch('roles/select', true)
+  },
+  computed: {
+    items() {
+      var rs = JSON.parse(JSON.stringify(this.$store.getters['roles/getFilter'](this.pagination)))
+      return rs
     }
+  },
+  watch: {
+    dialog(val) { this.localDialog = val },
+    localDialog(val) { this.$emit('handleDialog', val) },
+    itemsDialog(val) { this.localItemsDialog = val },
+    localItemsDialog(val) { this.$emit('handleItemsDialog', val) }
+  },
+  methods: {
+    onItems(item) {
+      this.$store.dispatch('roles/item', item)
+      this.localItemsDialog = !this.localItemsDialog
+    },
+    onEdit(item) {
+      this.$store.dispatch('roles/item', item)
+      this.localDialog = true
+    },
+    onDelete(item) {
+      this.confirmDialog = !this.confirmDialog
+      this.$store.state.roles.selected.push(item);
+    },
+    onCFMAccept() {
+      this.$store.dispatch('roles/delete')
+    },
+    onCFMCancel() {
+      this.$store.state.roles.selected = []
+    }
+  }
 }
 </script>
 

@@ -11,11 +11,13 @@ import * as _languages from '@/plugins/languages'
 // import nav from './modules/nav'
 import auth from './modules/auth'
 import users from './modules/users'
+import roles from './modules/roles'
 import setting from './modules/setting'
 import modules from './modules/modules'
 import languages from './modules/languages'
 import navigation from './modules/navigation'
 import permissions from './modules/permissions'
+import notification from './modules/notification'
 import language_items from './modules/language_items'
 import contract_customer from './modules/contract_customer'
 import contract_enterprise from './modules/contract_enterprise'
@@ -24,11 +26,13 @@ export default new Vuex.Store({
   modules: {
     auth: auth,
     users: users,
+    roles: roles,
     setting: setting,
     modules: modules,
     languages: languages,
     navigation: navigation,
     permissions: permissions,
+    notification: notification,
     language_items: language_items,
     contract_customer: contract_customer,
     contract_enterprise: contract_enterprise
@@ -41,6 +45,7 @@ export default new Vuex.Store({
     $language_def: 'vi-VN',
     $language: _languages.GetLanguage(),
     $languages: _languages.GetLanguages(),
+    $notification: false
     // _language: 'vi-VN',
     // _language_items: JSON.parse(_store.Get('language'))
     // _axios: {
@@ -152,6 +157,9 @@ export default new Vuex.Store({
       //   })
       //   .catch(function(error) { commit(SET_CATCH, error) })
     },
+    notification({ state }) {
+      state.$notification = !state.$notification
+    },
     async ['TEST']({ commit, state, getters }) {
       var error = {}
       error.response = { status: 401 }
@@ -179,7 +187,7 @@ export default new Vuex.Store({
         return
       }
       if (error.response.status === 401) {
-        this.dispatch('auth/logout')
+        this.dispatch('auth/signOut')
         let text = state.$languages.auth && state.$languages.auth.msg_err_expired ?
           state.$languages.auth.msg_err_expired :
           error.response ? error.response.statusText : error

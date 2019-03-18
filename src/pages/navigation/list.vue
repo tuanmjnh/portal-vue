@@ -39,7 +39,8 @@
             </td>
             <!-- <td>{{ props.item.id }}</td> -->
             <td>{{ props.item.title }}</td>
-            <td>{{ props.item.parent_id }}</td>
+            <td>{{ props.item.code }}</td>
+            <!-- <td>{{ props.item.dependent }}</td> -->
             <td>{{ props.item.url }}</td>
             <td>{{ props.item.orders }}</td>
             <!-- <td>{{ props.item.created_at|formatDate('DD/MM/YYYY hh:mm') }}</td> -->
@@ -89,13 +90,14 @@ export default {
     localItemsDialog: false,
     confirmDialog: false,
     rowPerPage: [10, 25, 50, 100, 200, 500], //  { text: "All", value: -1 }
-    pagination: { search: '', sortBy: 'parent_id', find: { flag: 1 } },
+    pagination: { search: '', sortBy: 'dependent', find: { flag: 1 } },
     headers: [
       // { text: 'ID', value: 'id', align: 'left' },
-      { text: 'navigation.title', value: 'title', align: 'left' },
-      { text: 'global.dependent', value: 'parent_id', align: 'left' },
-      { text: 'global.url', value: 'url', sortable: true },
-      { text: 'global.orders', value: 'orders', sortable: true },
+      { text: 'global.navigation_title', value: 'title', align: 'left' },
+      { text: 'global.code', value: 'code' },
+      // { text: 'global.dependent', value: 'dependent', align: 'left' },
+      { text: 'global.url', value: 'url' },
+      { text: 'global.orders', value: 'orders' },
       // { text: 'global.created_at', value: 'created_at' },
       { text: 'Icon', value: 'icon' },
       { text: '#', value: '#', sortable: false }

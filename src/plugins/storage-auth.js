@@ -1,45 +1,58 @@
 import * as Storage from './storage'
+import { json } from 'body-parser';
+const auth = 'authentication'
 const header = {
-  user: 'auth_user',
-  token: 'auth_token',
-  remember: 'auth_remember',
+  uid: null,
+  token: null,
+  username: null,
+  remember: false,
 }
-const SetAuth = function(model, extras = null) {
-  Storage.Set(header.user, model.username, model.remember);
-  Storage.Set(header.remember, model.remember, model.remember);
-  Storage.Set(header.token, `Bearer ${ model.token}`, model.remember);
-  Storage.Set('full_name', model.full_name, model.remember);
-  if (extras)
-    Object.keys(extras).forEach(function(key, index) {
-      Storage.Set(key, extras[key], model.remember);
-    });
+const signIn = function(model) {
+  // Storage.Set(header.user, model.username, model.remember);
+  // Storage.Set(header.remember, model.remember, model.remember);
+  // //Storage.Set(header.token, `Bearer ${ model.token}`, model.remember);
+  // Storage.Set(header.token, model.token, model.remember);
+  // Storage.Set('full_name', model.full_name, model.remember);
+  // if (extras)
+  // Object.keys(extras).forEach(function(key, index) {
+  //   Storage.Set(key, extras[key], model.remember);
+  // });
+  // Object.keys(model).forEach(function(key, index) {
+  //   Storage.Set(key, model[key], model.remember);
+  // });
+  Storage.Set(auth, JSON.stringify(model), model.remember);
 }
-const RemoveAuth = function(extras = null) {
-  Storage.Remove(header.user, this.GetRemember());
-  Storage.Remove(header.remember, this.GetRemember());
-  Storage.Remove(header.token, this.GetRemember());
-  if (extras)
-    Object.keys(extras).forEach(function(key, index) {
-      Storage.Remove(key, this.GetRemember());
-    });
+const signOut = function(extras = null) {
+  // Storage.Remove(header.user, this.GetRemember());
+  // Storage.Remove(header.remember, this.GetRemember());
+  // Storage.Remove(header.token, this.GetRemember());
+  // if (extras)
+  // Object.keys(extras).forEach(function(key, index) {
+  //   Storage.Remove(key, $this.GetRemember());
+  // });
+  // let $this = this
+  // Object.keys(header).forEach(function(key, index) {
+  //   Storage.Remove(key, $this.GetRemember());
+  // });
+  Storage.Remove(auth, this.GetRemember());
+}
+const GetStorage = function() {
+  const rs = Storage.Get(auth, true) || Storage.Get(auth, false)
+  return rs ? JSON.parse(rs) : header;
 }
 const GetRemember = function() {
-  const remember = Storage.Get(header.remember, true);
-  if (remember) return true;
-  else return false;
-}
-const GetStorage = function(key) {
-  return Storage.Get(key, this.GetRemember());
+  return this.GetStorage().remember
 }
 const GetUser = function() {
-  return Storage.Get(header.user, this.GetRemember());
+  return this.GetStorage().username
 }
 const GetToken = function() {
-  return Storage.Get(header.token, this.GetRemember());
+  return this.GetStorage().token
 }
-const isAuth = function() {
-  const token = this.GetStorage(header.token);
-  if (token) return true;
-  return false;
+const GetUid = function() {
+  return this.GetStorage().uid
 }
-export { header, SetAuth, RemoveAuth, GetRemember, GetStorage, GetUser, GetToken, isAuth };
+const Authenticated = function() {
+  return this.GetStorage().token ? true : false;
+}
+export { signIn, signOut, GetStorage, GetUid, GetUser, GetToken, GetRemember, Authenticated };

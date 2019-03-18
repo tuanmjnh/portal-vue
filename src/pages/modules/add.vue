@@ -24,7 +24,8 @@
                     <!-- <span v-show="errors.has('title')">{{ errors.first('title') }}</span> -->
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field v-model.trim="item.code" :label="$store.getters.languages(['global.code'])"
+                    <v-text-field v-model.trim="item.code" class="text-color-initial"
+                      :disabled="item.id?true:false" :label="$store.getters.languages(['global.code'])"
                       :rules="[v => !!v || $store.getters.languages('error.required'), isExist||$store.getters.languages('error.exist')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
@@ -139,12 +140,8 @@ export default {
   watch: {
     dialog(val) { this.localDialog = val },
     localDialog(val) {
+      this.reset()
       this.$emit('handleDialog', val)
-      if (!val) {
-        this.$store.dispatch('modules/item')
-        this.permissions_selected = []
-        this.$refs.form.resetValidation()
-      }
     },
     uploadFiles: {
       handler(val) {
@@ -175,13 +172,15 @@ export default {
       if (this.valid) {
         this.item.permissions = `,${this.permissions_selected.join(',')},`
         if (this.item.id) this.$store.dispatch('modules/update').then(this.loading = false)
-        else this.$store.dispatch('modules/insert').then((result) => {
-          this.$store.dispatch('modules/item')
-          this.loading = false
-        })
+        else this.$store.dispatch('modules/insert').then((rs) => { this.reset() })
       }
+    },
+    reset() {
+      this.loading = false
+      if (!this.item.id || !this.localDialog) this.$store.dispatch('modules/item')
+      this.$refs.form.resetValidation()
+      this.permissions_selected = []
     }
-
   }
 }
 </script>

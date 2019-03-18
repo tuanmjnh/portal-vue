@@ -17,7 +17,7 @@ import auth from './layouts/vuetify/auth'
 import main from './layouts/vuetify/main'
 import * as _store from './plugins/storage'
 // import * as _languages from '@/plugins/languages'
-import * as _auth from './plugins/storage-auth'
+import * as storageAuth from './plugins/storage-auth'
 export default {
   name: 'App',
   components: {
@@ -27,21 +27,23 @@ export default {
   },
   // data: () => ({}),
   beforeCreate() {
-    if (!this.$store.state.$language || !this.$store.state.$languages)
-      this.$store.dispatch('setLanguage')
-    if (this.$store.state.languages.isGetFirst)
-      this.$store.dispatch('languages/select', false)
+    // Get Languages
+    if (this.$store.state.languages.isGetFirst) this.$store.dispatch('languages/select')
+    // Get Language Items
+    if (!this.$store.state.$language || !this.$store.state.$languages) this.$store.dispatch('setLanguage')
+    // Get Navigation
+    if (this.$store.state.navigation.isGetFirst) this.$store.dispatch('navigation/select')
+    this.$store.dispatch('auth/setIsAuth', storageAuth.Authenticated())
   },
   computed: {
     isAuth() {
       // if (_auth.GetRemember()) 
-      this.$store.dispatch('auth/setIsAuth', _auth.isAuth())
-      this.$store.dispatch('auth/item', {
-        username: _auth.GetUser(),
-        password: '',
-        token: _auth.GetToken(),
-        remember: _auth.GetRemember()
-      })
+      // this.$store.dispatch('auth/item', {
+      //   username: _auth.GetUser(),
+      //   password: '',
+      //   token: _auth.GetToken(),
+      //   remember: _auth.GetRemember()
+      // })
       var x = this.$store.state.auth.isAuth
       // console.log(this.$store.state._message)
       return x

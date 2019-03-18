@@ -20,7 +20,8 @@
                       :rules="[!!item.title || $store.getters.languages('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field v-model.trim="item.code" :label="$store.getters.languages('global.code')"
+                    <v-text-field v-model.trim="item.code" class="text-color-initial"
+                      :disabled="item.id?true:false" :label="$store.getters.languages('global.code')"
                       :rules="[v => !!v  || $store.getters.languages('error.required'),isExist||$store.getters.languages('error.exist')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
@@ -88,11 +89,8 @@ export default {
   watch: {
     dialog(val) { this.localDialog = val },
     localDialog(val) {
+      this.reset()
       this.$emit('handleDialog', val)
-      if (!val) {
-        this.$store.dispatch('permissions/item')
-        this.$refs.form.resetValidation()
-      }
     },
     item: {
       handler(val) {
@@ -109,12 +107,13 @@ export default {
       this.loading = true
       if (this.valid) {
         if (this.item.id) this.$store.dispatch('permissions/update').then(this.loading = false)
-        else this.$store.dispatch('permissions/insert').then((result) => {
-          this.$store.dispatch('permissions/item')
-          this.$refs.form.resetValidation()
-          this.loading = false
-        })
+        else this.$store.dispatch('permissions/insert').then((rs) => { this.reset() })
       }
+    },
+    reset() {
+      this.loading = false
+      if (!this.item.id || !this.localDialog) this.$store.dispatch('permissions/item')
+      this.$refs.form.resetValidation()
     }
   }
 }

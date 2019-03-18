@@ -30,7 +30,7 @@
           </v-card-text>
           <v-card-actions>
             <div class="spacer"></div>
-            <v-btn flat color="primary" @click="login">{{$store.getters.languages(['global.login'])}}</v-btn>
+            <v-btn flat color="primary" @click="signIn">{{$store.getters.languages(['global.signin'])}}</v-btn>
           </v-card-actions>
         </v-card>
       </v-flex>
@@ -76,8 +76,8 @@ export default {
     }
   },
   methods: {
-    login() {
-      this.$store.dispatch('auth/login', true).then(() => { this.$router.push('/') })
+    signIn() {
+      this.$store.dispatch('auth/signIn', true).then(() => { this.$router.push('/') })
     }
   }
 }

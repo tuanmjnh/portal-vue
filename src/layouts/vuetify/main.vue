@@ -5,12 +5,11 @@
       enable-resize-watcher fixed app>
       <v-toolbar flat>
         <v-list>
-          <v-list-tile>
-            <v-list-tile-action>
-              <v-icon>dashboard</v-icon>
+          <v-list-tile @click="$router.push(navHeadLeft.push)">
+            <v-list-tile-action v-html="navHeadLeft.icon">
             </v-list-tile-action>
             <v-list-tile-content class="title">
-              <v-list-tile-title>Portal</v-list-tile-title>
+              <v-list-tile-title>{{navHeadLeft.title}}</v-list-tile-title>
             </v-list-tile-content>
             <!-- <v-list-tile-title class="title">
               TM Store
@@ -20,24 +19,27 @@
       </v-toolbar>
       <v-divider></v-divider>
       <v-list>
-        <template v-for="(item, i) in items">
-          <v-list-tile v-if="!item.children" :key="i" @click="MenuAction(item)">
-            <v-list-tile-action>
-              <v-icon v-html="item.icon"></v-icon>
+        <template v-for="(item, i) in $store.getters['navigation/getRender']('content-left')">
+          <v-list-tile v-if="item.children.length<1" :key="i" @click="MenuAction(item)">
+            <v-list-tile-action v-html="item.icon">
+              <!-- <v-icon v-html="item.icon"></v-icon> -->
             </v-list-tile-action>
             <v-list-tile-content>
-              <v-list-tile-title v-text="item.title"></v-list-tile-title>
+              <v-list-tile-title v-text="$store.getters.languages(`navigation.${item.code}`)"></v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
-          <v-list-group v-else :key="i" :prepend-icon="item.icon" no-action>
+          <v-list-group v-else :key="i" no-action>
             <v-list-tile slot="activator">
-              <v-list-tile-title v-text="item.title"></v-list-tile-title>
+              <v-list-tile-action v-html="item.icon"></v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title v-text="$store.getters.languages(`navigation.${item.code}`)"></v-list-tile-title>
+              </v-list-tile-content>
             </v-list-tile>
             <template v-if="item.children">
               <v-list-tile v-for="(children, ii) in item.children" :key="ii" @click="MenuAction(children)">
-                <v-list-tile-title v-text="children.title"></v-list-tile-title>
-                <v-list-tile-action>
-                  <v-icon v-text="children.icon"></v-icon>
+                <v-list-tile-title v-text="$store.getters.languages(`navigation.${children.code}`)"></v-list-tile-title>
+                <v-list-tile-action v-html="children.icon">
+                  <!-- <v-icon v-text="children.icon"></v-icon> -->
                 </v-list-tile-action>
               </v-list-tile>
             </template>
@@ -61,26 +63,57 @@
       <!-- <v-btn icon @click.stop="ShowSnackbar">
         <v-icon>notifications</v-icon>
       </v-btn> -->
-      <v-btn icon @click.stop="rightDrawer = !rightDrawer">
+      <!-- <v-btn icon @click.stop="rightDrawer = !rightDrawer">
         <v-icon>notifications</v-icon>
-      </v-btn>
-      <v-btn icon @click.stop="rightDrawer = !rightDrawer">
+      </v-btn>-->
+      <!-- <v-btn icon @click.stop="rightDrawer = !rightDrawer">
         <v-icon>apps</v-icon>
-      </v-btn>
-      <v-menu bottom :min-width="166">
+      </v-btn> -->
+      <template v-for="(item, index) in $store.getters['navigation/getRender']('head-right')">
+        <template v-if="item.children.length>0">
+          <v-menu :key="item.id" bottom :min-width="166">
+            <v-tooltip slot="activator" bottom :key="index" v-if="item.icon">
+              <v-btn flat icon slot="activator" color="primary">
+                <div class="v-btn__content" v-html="item.icon"></div>
+              </v-btn>
+              <span>{{$store.getters.languages(`navigation.${item.code}`)}}</span>
+            </v-tooltip>
+            <v-btn slot="activator" :key="index" flat v-else>
+              <div class="v-btn__content" v-if="item.code=='userlogged'">{{getAuth('fullname')}}
+                <v-icon>arrow_drop_down</v-icon>
+              </div>
+              <div class="v-btn__content" v-else>{{$store.getters.languages(`navigation.${children.code}`)}}</div>
+            </v-btn>
+
+            <v-list>
+              <v-list-tile :key="index" v-for="(children, index) in item.children" @click="MenuAction(children)">
+                <v-list-tile-action v-html="children.icon"></v-list-tile-action>
+                <v-list-tile-content>
+                  <v-list-tile-title>{{$store.getters.languages(`navigation.${children.code}`)}}</v-list-tile-title>
+                </v-list-tile-content>
+              </v-list-tile>
+            </v-list>
+          </v-menu>
+        </template>
+        <template v-else>
+          <v-tooltip bottom :key="index" v-if="item.icon">
+            <v-btn flat icon slot="activator" @click="MenuAction(item)">
+              <div class="v-btn__content" v-html="item.icon"></div>
+            </v-btn>
+            <span>{{$store.getters.languages(`navigation.${item.code}`)}}</span>
+          </v-tooltip>
+          <!-- <v-btn :key="index" icon v-if="item.icon">
+            <div class="v-btn__content" v-html="item.icon"></div>
+          </v-btn> -->
+          <v-btn :key="index" flat v-else>
+            <div class="v-btn__content">{{$store.getters.languages(`navigation.${children.code}`)}}</div>
+          </v-btn>
+        </template>
+      </template>
+      <!-- <v-menu bottom :min-width="166">
         <v-btn slot="activator" flat class="text-transform-initial">
           {{getAuth('full_name')}} <v-icon>arrow_drop_down</v-icon>
         </v-btn>
-        <!-- <v-list>
-          <v-list-tile v-for="(item, i) in menuUser" :key="i" @click="MenuAction(item)">
-            <v-list-tile-action>
-              <v-icon v-html="item.icon"></v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title>{{item.title}}</v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
-        </v-list> -->
         <v-list>
           <v-list-tile @click="$router.push('/profile')">
             <v-list-tile-action>
@@ -107,7 +140,7 @@
             </v-list-tile-content>
           </v-list-tile>
         </v-list>
-      </v-menu>
+      </v-menu> -->
     </v-toolbar>
     <v-content>
       <!-- <HelloWorld/> -->
@@ -124,15 +157,39 @@
         <router-view></router-view>
       </div>
     </v-content>
-    <v-navigation-drawer temporary :right="right" v-model="rightDrawer" fixed app>
-      <v-list>
+    <v-navigation-drawer temporary :right="right" v-model="$store.state.$notification"
+      fixed app>
+      <!-- {{$store.getters.languages('navigation.notification')}} -->
+      <v-layout row v-if="notification.length<1">
+        <v-flex xs12 sm12>
+          <p class="text-md-center mt-3 primary--text">{{$store.getters.languages('messages.no_notification')}}</p>
+        </v-flex>
+      </v-layout>
+      <v-list two-line v-else>
+        <template v-for="(item, index) in notification">
+          <v-subheader v-if="item.header" :key="item.header">
+            {{ item.header }}
+          </v-subheader>
+          <v-divider v-else-if="item.divider" :key="index" :inset="item.inset"></v-divider>
+          <v-list-tile v-else :key="item.title" avatar>
+            <v-list-tile-avatar>
+              <img :src="item.avatar">
+            </v-list-tile-avatar>
+            <v-list-tile-content>
+              <v-list-tile-title v-html="item.title"></v-list-tile-title>
+              <v-list-tile-sub-title v-html="item.subtitle"></v-list-tile-sub-title>
+            </v-list-tile-content>
+          </v-list-tile>
+        </template>
+      </v-list>
+      <!-- <v-list>
         <v-list-tile @click="right = !right">
           <v-list-tile-action>
             <v-icon>compare_arrows</v-icon>
           </v-list-tile-action>
           <v-list-tile-title>Switch drawer (click me)</v-list-tile-title>
         </v-list-tile>
-      </v-list>
+      </v-list> -->
     </v-navigation-drawer>
     <v-footer :fixed="fixed" app>
       <!-- <v-layout wrap class="pl-3"> -->
@@ -151,9 +208,8 @@
 </template>
 
 <script>
-import * as _auth from '@/plugins/storage-auth'
+import * as storageAuth from '@/plugins/storage-auth'
 export default {
-  // name: 'vuetify',
   components: {
   },
   data: () => ({
@@ -162,13 +218,13 @@ export default {
     fixed: false,
     right: true,
     miniVariant: false,
-    rightDrawer: false,
+    // rightDrawer: false,
     items: [
       { icon: 'home', title: 'Trang chủ', push: 'dashboard' },
       {
         icon: 'description',
         title: 'Hợp đồng',
-        push: 'ContractCustomer',
+        push: 'contract-customer',
         children: [
           { icon: 'contacts', title: 'Khách hàng', push: 'contract-customer' },
           { icon: 'supervisor_account', title: 'DV CNTT', push: 'contract-enterprise' },
@@ -227,22 +283,39 @@ export default {
     language() {
       const rs = this.$store.state.$language
       return rs
+    },
+    notification() {
+      const rs = this.$store.state.notification.items
+      return rs
+    },
+    navHeadLeft() {
+      const rs = this.$store.getters['navigation/getRender']('head-left')
+      if (rs.length > 0) return rs[0]
+      else return {
+        title: 'Portal',
+        icon: 'dashboard',
+        url: '/',
+        push: '/'
+      }
     }
   },
   methods: {
     MenuAction(item) {
-      if (item.store) this.$store.commit(item.store);
-      if (item.go) this.$router.go('/' + item.go);
-      else this.$router.push('/' + item.push);
+      if (item.store) this.$store.dispatch(item.store, true)
+      if (item.go) this.$router.go('/' + item.go)
+      if (item.push) this.$router.push('/' + item.push)
+      // if (item.store) this.$store.commit(item.url_plus.store)
+      // if (item.go) this.$router.go('/' + item.url_plus.go)
+      // else this.$router.push('/' + item.url_plus.push)
     },
     ShowSnackbar() {
       this.$store.dispatch('message', { text: 'Hello, I\'m a snackbar' })
     },
-    Logout() {
-      this.$store.dispatch('auth/logout', true).then(() => { this.$router.push('/auth') })
+    signOut() {
+      this.$store.dispatch('auth/signOut', true).then(() => { this.$router.push('/auth') })
     },
     getAuth(key) {
-      return _auth.GetStorage(key)
+      return storageAuth.GetStorage()[key]
     }
   },
   watch: {

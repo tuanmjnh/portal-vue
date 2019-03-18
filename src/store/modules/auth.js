@@ -1,6 +1,7 @@
 import { SET_CATCH, SET_MESSAGE } from '../mutation-type'
 import { vnptbkn, setHeaderAuth } from '@/plugins/axios-config'
-import * as _auth from '@/plugins/storage-auth'
+import * as storageAuth from '@/plugins/storage-auth'
+import router from '@/router'
 const collection = 'auth'
 export default {
   namespaced: true,
@@ -28,7 +29,7 @@ export default {
     }
   },
   actions: {
-    async login({ commit, state, rootGetters, rootState }, loading = false) {
+    async signIn({ commit, state, rootGetters, rootState }, loading = false) {
       // Loading
       if (loading) rootState.$loadingApp = true
       // http
@@ -38,9 +39,13 @@ export default {
           // commit auth
           if (res.data.data && res.data.token) {
             state.user = { ...res.data.data }
-            state.item.token = res.data.token
-            state.item.full_name = res.data.data.full_name
-            _auth.SetAuth(state.item)
+            storageAuth.signIn({
+              uid: res.data.data.id,
+              token: `Bearer ${res.data.token}`,
+              username: res.data.data.username,
+              remember: state.item.remember,
+              fullname: res.data.data.full_name
+            })
             commit('SET_ISAUTH', true)
           }
           // commit('SET_AUTH', { token: res.data.token, user: data.username, remember: data.remember })
@@ -69,12 +74,12 @@ export default {
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) }) // commit catch
         .finally(() => { setTimeout(() => { rootState.$loadingApp = false }, 200) })
     },
-    async logout({ commit, rootGetters, rootState }, loading = false) {
+    async signOut({ commit, rootGetters, rootState }, loading = false) {
       // Loading
       if (loading) rootState.$loadingApp = true
       // Action
       // commit('REMOVE_AUTH', {}, { root: true })
-      _auth.RemoveAuth()
+      storageAuth.signOut()
       commit('SET_ISAUTH')
       var res = {
         color: 'success',
@@ -83,7 +88,10 @@ export default {
         statusText: 'OK'
       }
       commit(SET_MESSAGE, res, { root: true })
-      setTimeout(() => { rootState.$loadingApp = false }, 200)
+      setTimeout(() => {
+        rootState.$loadingApp = false
+        router.push('/auth')
+      }, 200)
     },
     async setIsAuth({ commit }, val = false) {
       commit('SET_ISAUTH', val)

@@ -121,7 +121,7 @@ export default {
               return
             }
             // Success
-            commit(UPDATE_ITEMS, rootGetters, state.item)
+            commit(UPDATE_ITEMS, state.item)
             commit(SET_MESSAGE, { text: rootGetters.languages('success.update'), color: res.data.msg }, { root: true })
           } else commit(SET_CATCH, null, { root: true })
         })

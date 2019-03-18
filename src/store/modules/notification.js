@@ -1,7 +1,6 @@
 import { SET_CATCH, SET_ITEMS, PUSH_ITEMS, UPDATE_ITEMS, REMOVE_ITEMS, SET_ITEM, SET_MESSAGE } from '../mutation-type'
 import { vnptbkn } from '@/plugins/axios-config'
-import { join } from 'path';
-const collection = 'navigation'
+const collection = 'notification'
 export default {
   namespaced: true,
   state: {
@@ -9,22 +8,14 @@ export default {
     item: {},
     selected: [],
     isGetFirst: true,
-    url_plus: { push: '', go: '', store: '' },
     default: {
-      id: 0,
-      app_key: 'content-left',
+      id: '',
       code: '',
-      dependent: '',
-      // parents: '',
-      levels: 0,
       title: '',
       icon: '<i class="material-icons">view_module</i>',
       image: '',
       url: '',
-      url_plus: '',
-      push: '',
-      go: '',
-      store: '',
+      permissions: '',
       orders: 1,
       descs: '',
       contents: '',
@@ -35,40 +26,7 @@ export default {
       deleted_by: '',
       deleted_at: null,
       flag: 1
-    },
-    app_key: [{
-        id: 'head-left',
-        title: 'Trên trái'
-      },
-      {
-        id: 'head-mid',
-        title: 'Trên trung tâm'
-      },
-      {
-        id: 'head-right',
-        title: 'Trên phải'
-      },
-      {
-        id: 'content-left',
-        title: 'Nội dung trái'
-      },
-      {
-        id: 'content-right',
-        title: 'Nội dung phải'
-      },
-      {
-        id: 'bottom-left',
-        title: 'Dưới trái'
-      },
-      {
-        id: 'bottom-mid',
-        title: 'Dưới trung tâm'
-      },
-      {
-        id: 'bottom-right',
-        title: 'Dưới phải'
-      }
-    ]
+    }
   },
   getters: {
     getAll(state) {
@@ -83,22 +41,8 @@ export default {
     getFilter: state => pagination => {
       return state.items.filterValue(pagination.find)
     },
-    getDependent: state => pagination => {
-      var rs = state.items
-        .filterValue(pagination.find)
-        .filter(e => { return e.id != state.item.id })
-        .sortByKey('dependent')
-        .map(e => ({ 'id': e.id, 'title': e.title }))
-      return rs
-    },
-    getRender: state => position => {
-      var items = state.items.filterValue({ flag: 1, app_key: position })
-      var rs = items
-        .filter(row => { return row.dependent.indexOf(',0,') > -1 })
-        .sortByKey('orders')
-      // get children
-      rs.forEach(e => { e.children = items.filter(row => { return row.dependent.indexOf(`,${e.id},`) > -1 }) });
-      return rs
+    getCodeFilter(state) {
+      return state.items.map(e => e.code)
     }
   },
   mutations: {
@@ -106,10 +50,6 @@ export default {
       state.items = items
     },
     [SET_ITEM](state, item) {
-      if (item) {
-        if (item.url_plus) state.url_plus = JSON.parse(item.url_plus)
-        else state.url_plus = { push: '', go: '', store: '' }
-      }
       state.item = { ...item }
     },
     [PUSH_ITEMS](state, item) {
@@ -125,7 +65,7 @@ export default {
     }
   },
   actions: {
-    async select({ commit, rootGetters, state, rootState }, loading = false) {
+    async select({ commit,state, rootGetters, rootState }, loading = false) {
       // Loading
       if (loading) rootState.$loading = true
       // http
@@ -135,10 +75,7 @@ export default {
               commit(SET_MESSAGE, { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
               return
             }
-            if (res.data.data) {
-              // res.data.data.forEach(e => { e.url_plus = e.url_plus ? JSON.parse(e.url_plus) : state.url_plus });
-              commit(SET_ITEMS, res.data.data.sortByKey('orders').sortByKey('parent_id'))
-            }
+            if (res.data.data) commit(SET_ITEMS, res.data.data)
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
@@ -153,11 +90,10 @@ export default {
       // http
       state.item.created_by = vnptbkn.defaults.headers.Author
       state.item.created_at = new Date()
-      //state.item.url_plus = JSON.stringify(state.url_plus)
       await vnptbkn.post(collection, state.item).then(function(res) {
           if (res.status == 200) {
             if (res.data.msg === 'exist') {
-              commit(SET_MESSAGE, { text: rootGetters.languages('modules.err_exist'), color: 'warning' }, { root: true })
+              commit(SET_MESSAGE, { text: rootGetters.languages('notification.err_exist'), color: 'warning' }, { root: true })
               return
             }
             if (res.data.msg === 'danger') {
@@ -167,8 +103,6 @@ export default {
             // Success
             commit(PUSH_ITEMS, res.data.data)
             commit(SET_MESSAGE, { text: rootGetters.languages('success.add'), color: res.data.msg }, { root: true })
-            commit(SET_ITEM)
-            state.url_plus = { push: '', go: '', store: '' }
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
@@ -180,7 +114,6 @@ export default {
       // http
       state.item.updated_by = vnptbkn.defaults.headers.Author
       state.item.updated_at = new Date()
-      state.item.url_plus = JSON.stringify(state.url_plus)
       await vnptbkn.put(collection, state.item).then(function(res) {
           if (res.status == 200) {
             if (res.data.msg === 'danger') {

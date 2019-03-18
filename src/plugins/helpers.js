@@ -196,9 +196,7 @@ Array.prototype.filterValue = function(obj) {
   if ($this.length < 1 || !obj) return $this
   Object.keys(obj).forEach(function(key, index) {
     let _key = key.toLowerCase()
-    $this = $this.filter(function(row) {
-      return row[_key] === obj[_key]
-    })
+    $this = $this.filter(row => { return row[_key] === obj[_key] })
   })
   return $this
 }

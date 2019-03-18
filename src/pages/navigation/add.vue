@@ -17,17 +17,36 @@
                 <v-layout wrap class="pt-2">
                   <v-flex xs12 sm6 md6>
                     <v-text-field v-model.trim="item.title" :rules="[v => !!v || $store.getters.languages('error.required')]"
-                      :label="$store.getters.languages('navigation.title')"></v-text-field>
+                      :label="$store.getters.languages('global.navigation_title')"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
                     <v-select :items="items" v-model="dependent_selected" multiple
-                      :menu-props="{ maxHeight: '400' }" item-text="title" item-value="dependent"
+                      :menu-props="{ maxHeight: '400' }" item-value="id" item-text="title"
                       persistent-hint :hint="$store.getters.languages(['global.dependent_select'])"
                       :label="$store.getters.languages('global.dependent')" :rules="[v => v.length>0 || $store.getters.languages('error.required_select')]"></v-select>
                   </v-flex>
-                  <v-flex xs12 sm6 md6>
+                  <v-flex xs12 sm4 md4>
+                    <v-text-field v-model.trim="item.code" class="text-color-initial"
+                      :disabled="item.id?true:false" :label="$store.getters.languages(['global.code'])"
+                      :rules="[v => !!v || $store.getters.languages('error.required'), isExist||$store.getters.languages('error.exist')]"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm4 md4>
                     <v-text-field v-model.trim="item.url" :rules="[v => !!v || $store.getters.languages('error.required')]"
                       :label="$store.getters.languages('global.url')"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm4 md4>
+                    <v-select v-model.trim="item.app_key" :items="$store.state.navigation.app_key"
+                      item-value="id" item-text="title" :hide-selected="true" :label="$store.getters.languages(['global.position'])"
+                      :rules="[v => !!v || $store.getters.languages('error.required_select')]"></v-select>
+                  </v-flex>
+                  <v-flex xs12 sm4 md4>
+                    <v-text-field v-model.trim="item.push" label="Push"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm4 md4>
+                    <v-text-field v-model.trim="item.go" label="Go"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm4 md4>
+                    <v-text-field v-model.trim="item.store" label="Store"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6 class="text-append-icon">
                     <v-text-field v-model.trim="item.icon" label="Icon"></v-text-field>
@@ -48,8 +67,8 @@
                     <v-switch color="primary" :label="item.flag===1?$store.getters.languages('global.show'):$store.getters.languages('global.hide')"
                       :true-value="1" :false-value="0" v-model.number="item.flag"></v-switch>
                   </v-flex>
-                  <v-flex xs12 sm6 md6>
-                  </v-flex>
+                  <!-- <v-flex xs12 sm6 md6>
+                  </v-flex> -->
                   <v-flex xs12 sm6 md4>
                     <upload-files @handleUpload="uploadFiles=$event" :buttonUse="false"
                       :multiple="false" :http="vnptbkn" extension="image/*" :basePath="uploadFiles.basePath"
@@ -109,34 +128,23 @@ export default {
   }),
   created() {
     this.$store.dispatch('navigation/item')
-    // if (this.$store.state.permissions.isGetFirst) this.$store.dispatch('permissions/select')
   },
   computed: {
     item() {
-      var item = this.$store.state.navigation.item
-      return item
+      const rs = this.$store.state.navigation.item
+      return rs
     },
     items() {
-      var item = [{ id: 0, title: this.$store.getters.languages('navigation.main') }]
-      this.dependent_selected.pushIfNotExist(item)
-      item = [...item, ...this.$store.getters['navigation/getFilter']({ sortBy: 'parent_id', find: { flag: 1 } })]
-      return item
+      var rs = this.$store.getters['navigation/getDependent']({ sortBy: 'parent_id', find: { flag: 1 } })
+      rs = [...[{ id: 0, title: `-- ${this.$store.getters.languages('global.navigation_main')} --` }], ...rs]
+      return rs
     }
-    // permissions() {
-    //   var filter = { sortBy: 'orders', find: { flag: 1 } };
-    //   var item = this.$store.getters['permissions/getFilter'](filter)
-    //   return item
-    // }
   },
   watch: {
     dialog(val) { this.localDialog = val },
     localDialog(val) {
+      this.reset();
       this.$emit('handleDialog', val)
-      if (!val) {
-        this.$store.dispatch('navigation/item')
-        // this.dependent_selected = []
-        this.$refs.form.resetValidation()
-      }
     },
     uploadFiles: {
       handler(val) {
@@ -147,12 +155,8 @@ export default {
     },
     item: {
       handler(val) {
-        // if (this.permissions && this.permissions.length > 0) {
-        //   this.permissions_selected = []
-        //   this.permissions.forEach(e => {
-        //     if (val.permissions.indexOf(`,${e.code},`) > -1) this.permissions_selected.push(e.code)
-        //   });
-        // }
+        if (this.item.dependent)
+          this.dependent_selected = this.item.dependent.trim(',').split(',').map(e => parseInt(e))
         if (this.item.code) {
           this.item.code = this.item.code.toString().toLowerCase()
           if (!this.item.id) this.$store.dispatch('navigation/existCode').then((rs) => { this.isExist = rs })
@@ -165,15 +169,19 @@ export default {
     onSave() {
       this.loading = true
       if (this.valid) {
-        this.item.permissions = `,${this.permissions_selected.join(',')},`
+        this.item.dependent = `,${this.dependent_selected.join(',')},`
         if (this.item.id) this.$store.dispatch('navigation/update').then(this.loading = false)
-        else this.$store.dispatch('navigation/insert').then((result) => {
-          this.$store.dispatch('navigation/item')
-          this.loading = false
-        })
+        else this.$store.dispatch('navigation/insert').then(rs => { this.reset() })
+      }
+    },
+    reset() {
+      this.loading = false
+      this.$refs.form.resetValidation()
+      if (!this.item.id || !this.localDialog) {
+        this.$store.dispatch('navigation/item')
+        this.dependent_selected = [0]
       }
     }
-
   }
 }
 </script>
