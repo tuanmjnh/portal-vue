@@ -7,6 +7,7 @@ export default {
     items: [],
     item: {},
     selected: [],
+    dialog: false,
     isGetFirst: true,
     languages_default: 'vi-VN',
     default: {
@@ -194,15 +195,16 @@ export default {
       // Loading
       if (loading) rootState.$loading = true
       // http
-      for (let i = 0; i < state.selected.length; i++) state.selected[i].flag = state.selected[i].flag === 0 ? 1 : 0
-      await vnptbkn.put(collection + '/delete', state.selected).then(function(res) {
+      const data = state.selected.map(x => ({ id: x.id, flag: x.flag === 0 ? 1 : 0 }))
+      await vnptbkn.put(collection + '/delete', data).then(function(res) {
           if (res.status == 200) {
             if (res.data.msg === 'danger') {
               commit(SET_MESSAGE, { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
               return
             }
             // Success
-            state.selected.forEach(e => { commit(UPDATE_ITEMS, e) });
+            //state.selected.forEach(e => { commit(UPDATE_ITEMS, e) });
+            state.selected.update(data, 'id')
             state.selected = []
             commit(SET_MESSAGE, { text: rootGetters.languages('success.delete'), color: res.data.msg }, { root: true })
           } else commit(SET_CATCH, null, { root: true })

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="localDialog" max-width="1024px" persistent>
+  <v-dialog v-model="$store.state.contract_customer.dialog" max-width="1024px" persistent>
     <!-- <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn> -->
     <v-card>
       <v-card-title>
@@ -130,7 +130,7 @@
             {{khachhang.cc_id ? 'Cập nhật':'Thêm mới' }}
           </v-btn>
         </template>
-        <v-btn color="secondary" flat @click.native="localDialog=false">
+        <v-btn color="secondary" flat @click.native="$store.state.contract_customer.dialog=false">
           <!-- <i class="material-icons">close</i>  -->
           Hủy bỏ
         </v-btn>
@@ -153,11 +153,7 @@ export default {
     'upload-files': uploadFiles,
     'display-files': displayFiles
   },
-  props: {
-    dialog: { type: Boolean, default: false }
-  },
   data: () => ({
-    localDialog: false,
     tabActive: null,
     uploadFiles: { files: [], basePath: 'Uploads\\HopDong' },
     vnptbkn: vnptbkn,
@@ -184,15 +180,15 @@ export default {
     }
   },
   watch: {
-    dialog(val) { this.localDialog = val },
-    localDialog(val) {
-      this.$emit('handleDialog', val)
-      if (!val) {
-        this.$store.dispatch('contract_customer/khachhang')
-        this.$store.dispatch('contract_customer/thuebao')
-        this.uploadFiles.files = []
-      }
-    },
+    // dialog(val) { this.localDialog = val },
+    // localDialog(val) {
+    //   this.$emit('handleDialog', val)
+    //   if (!val) {
+    //     this.$store.dispatch('contract_customer/khachhang')
+    //     this.$store.dispatch('contract_customer/thuebao')
+    //     this.uploadFiles.files = []
+    //   }
+    // },
     uploadFiles: {
       handler(val) {
         if (val.files && val.files.length > 0)

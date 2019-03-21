@@ -6,10 +6,22 @@
           single-line hide-details></v-text-field>
         <v-spacer></v-spacer>
         <v-tooltip bottom>
-          <v-btn flat icon slot="activator" color="primary" @click="localDialog=!localDialog">
+          <v-btn flat icon slot="activator" color="primary" @click="$store.state.navigation.dialog=true">
             <v-icon>add</v-icon>
           </v-btn>
           <span>{{$store.getters.languages(['global.add'])}}</span>
+        </v-tooltip>
+        <v-tooltip bottom v-if="$store.state.navigation.selected.length>0 && pagination.find.flag===1">
+          <v-btn flat icon slot="activator" color="danger" @click="onDelete()">
+            <v-icon>delete</v-icon>
+          </v-btn>
+          <span>{{$store.getters.languages('global.delete_selected')}}</span>
+        </v-tooltip>
+        <v-tooltip bottom v-if="$store.state.navigation.selected.length>0 && pagination.find.flag===0">
+          <v-btn flat icon slot="activator" color="info" @click="onDelete()">
+            <v-icon>refresh</v-icon>
+          </v-btn>
+          <span>{{$store.getters.languages('global.recover_selected')}}</span>
         </v-tooltip>
         <v-btn-toggle v-model="toggle_one" mandatory>
           <v-tooltip bottom>
@@ -27,7 +39,7 @@
         </v-btn-toggle>
       </v-card-title>
       <!-- <v-form ref="form" v-model="valid" lazy-validation> -->
-      <v-data-table class="elevation-1" v-model="$store.state.languages.selected"
+      <v-data-table class="elevation-1" v-model="$store.state.navigation.selected"
         select-all item-key="id" :headers="headers" :items="items" :rows-per-page-items="rowPerPage"
         :rows-per-page-text="$store.getters.languages(['global.rows_per_page'])"
         :pagination.sync="pagination" :search="pagination.search">
@@ -80,14 +92,8 @@
 import confirm from '@/components/confirm'
 export default {
   components: { 'tpl-confirm': confirm },
-  props: {
-    dialog: { type: Boolean, default: false },
-    itemsDialog: { type: Boolean, default: false },
-  },
   data: () => ({
     toggle_one: 0,
-    localDialog: false,
-    localItemsDialog: false,
     confirmDialog: false,
     rowPerPage: [10, 25, 50, 100, 200, 500], //  { text: "All", value: -1 }
     pagination: { search: '', sortBy: 'dependent', find: { flag: 1 } },
@@ -113,24 +119,14 @@ export default {
       return rs
     }
   },
-  watch: {
-    dialog(val) { this.localDialog = val },
-    localDialog(val) { this.$emit('handleDialog', val) },
-    itemsDialog(val) { this.localItemsDialog = val },
-    localItemsDialog(val) { this.$emit('handleItemsDialog', val) }
-  },
   methods: {
-    onItems(item) {
-      this.$store.dispatch('navigation/item', item)
-      this.localItemsDialog = !this.localItemsDialog
-    },
     onEdit(item) {
       this.$store.dispatch('navigation/item', item)
-      this.localDialog = true
+      this.$store.state.navigation.dialog = true
     },
     onDelete(item) {
       this.confirmDialog = !this.confirmDialog
-      this.$store.state.navigation.selected.push(item);
+      if (item) this.$store.state.navigation.selected.push(item);
     },
     onCFMAccept() {
       this.$store.dispatch('navigation/delete')

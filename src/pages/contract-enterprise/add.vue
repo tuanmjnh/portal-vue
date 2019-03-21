@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="localDialog" max-width="1024px">
+  <v-dialog v-model="$store.state.contract_enterprise.dialog" max-width="1024px">
     <!-- <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn> -->
     <v-card>
       <v-card-title>
@@ -35,7 +35,7 @@
           <!-- <i class="material-icons">check</i> -->
           Update
         </v-btn>
-        <v-btn color="secondary" flat @click.native="localDialog=false">
+        <v-btn color="secondary" flat @click.native="$store.state.contract_enterprise.dialog=false">
           <!-- <i class="material-icons">close</i>  -->
           Cancel
         </v-btn>
@@ -51,11 +51,7 @@ import 'quill/dist/quill.bubble.css'
 import { quillEditor } from 'vue-quill-editor'
 export default {
   components: { quillEditor },
-  props: {
-    dialog: { type: Boolean, default: false }
-  },
   data: () => ({
-    localDialog: false,
     editedIndex: -1
   }),
   mounted() {
@@ -71,11 +67,10 @@ export default {
     }
   },
   watch: {
-    dialog(val) { this.localDialog = val },
-    localDialog(val) {
-      this.$emit('handleDialog', val)
-      if (!val) this.$store.dispatch('users/item')
-    }
+    // localDialog(val) {
+    //   this.$emit('handleDialog', val)
+    //   if (!val) this.$store.dispatch('users/item')
+    // }
   },
   methods: {
     handleSave() {

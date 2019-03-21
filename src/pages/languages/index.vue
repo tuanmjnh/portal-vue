@@ -3,9 +3,9 @@
     <v-progress-circular :size="130" :width="10" color="primary" indeterminate></v-progress-circular>
   </div>
   <div v-else>
-    <add :dialog="dialog" @handleDialog="dialog=$event"></add>
-    <items :dialog="itemsDialog" @handleDialog="itemsDialog=$event"></items>
-    <list :dialog="dialog" :itemsDialog="itemsDialog" @handleDialog="dialog=$event" @handleItemsDialog="itemsDialog=$event"></list>
+    <add></add>
+    <list></list>
+    <!-- <items></items> -->
   </div>
 </template>
 
@@ -15,12 +15,11 @@ import add from './add'
 import items from './items'
 export default {
   components: { list, add, items },
-  data: () => ({
-    dialog: false,
-    itemsDialog: false
-  })
+  data: () => ({})
 }
 </script>
 
 <style>
 </style>
+
+

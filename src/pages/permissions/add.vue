@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="localDialog" :persistent="loading" max-width="1024px">
+  <v-dialog v-model="$store.state.permissions.dialog" :persistent="loading" max-width="1024px">
     <!-- <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn> -->
     <v-card>
       <v-card-title class="headline grey lighten-2">
@@ -50,7 +50,8 @@
         <v-btn color="primary" flat @click.native="onSave" :disabled="!valid" :loading="loading">
           {{$store.getters.languages('global.update')}}
         </v-btn>
-        <v-btn color="secondary" flat @click.native="localDialog=false" :disabled="loading">
+        <v-btn color="secondary" flat @click.native="$store.state.permissions.dialog=false"
+          :disabled="loading">
           {{$store.getters.languages('global.back')}}
         </v-btn>
       </v-card-actions>
@@ -67,14 +68,10 @@ export default {
   components: {
     'vue-quill-editor': quillEditor,
   },
-  props: {
-    dialog: { type: Boolean, default: false }
-  },
   data: () => ({
     loading: false,
     valid: false,
     isExist: true,
-    localDialog: false,
     tabActive: null
   }),
   created() {
@@ -87,11 +84,6 @@ export default {
     }
   },
   watch: {
-    dialog(val) { this.localDialog = val },
-    localDialog(val) {
-      this.reset()
-      this.$emit('handleDialog', val)
-    },
     item: {
       handler(val) {
         if (this.item.code) {
@@ -112,7 +104,7 @@ export default {
     },
     reset() {
       this.loading = false
-      if (!this.item.id || !this.localDialog) this.$store.dispatch('permissions/item')
+      if (!this.item.id || !this.$store.state.permissions.dialog) this.$store.dispatch('permissions/item')
       this.$refs.form.resetValidation()
     }
   }

@@ -6,6 +6,9 @@ export default {
   state: {
     items: [],
     item: {},
+    selected: [],
+    dialog: false,
+    isGetFirst: true,
     default: {
       user_id: '',
       parent_id: '',

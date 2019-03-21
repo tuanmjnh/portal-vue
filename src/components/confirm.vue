@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="localDialog" :persistent="persistent" width="500">
+  <v-dialog v-model="dialog" :persistent="persistent" width="500">
     <v-card>
       <v-card-title class="headline grey lighten-2" primary-title>
         {{title}}
@@ -35,21 +35,21 @@ export default {
     localDialog: false
   }),
   watch: {
-    dialog(val) {
-      this.localDialog = true
-    },
-    localDialog(val) {
-      if (!val) this.$emit('onCancel')
-    }
+    // dialog(val) {
+    //   this.localDialog = true
+    // },
+    // localDialog(val) {
+    //   if (!val) this.$emit('onCancel')
+    // }
   },
   methods: {
     onAccept() {
-      this.localDialog = false
+      this.$emit('update:dialog', false)
       this.$emit('onAccept')
     },
     onCancel() {
-      this.localDialog = false
-      // this.$emit('cancel')
+      this.$emit('update:dialog', false)
+      this.$emit('onCancel')
     }
   }
 }

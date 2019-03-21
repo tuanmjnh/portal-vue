@@ -119,11 +119,11 @@ export default {
     ]
   }),
   mounted() {
-    this.$store.dispatch('language_items/item')
+    this.$store.dispatch('dictionary/item')
   },
   computed: {
     items() {
-      var rs = this.$store.getters['language_items/getFilter'](this.query)
+      var rs = this.$store.getters['dictionary/getFilter'](this.query)
       return rs
     },
     item() {
@@ -139,17 +139,17 @@ export default {
     dialog(val) { this.localDialog = val },
     localDialog(val) {
       this.$emit('handleDialog', val)
-      if (!val) this.$store.dispatch('language_items/item')
+      if (!val) this.$store.dispatch('dictionary/item')
     }
   },
   methods: {
     handleSave() {
-      if (this.item.id) this.$store.dispatch('language_items/update')
-      else this.$store.dispatch('language_items/insert')
+      if (this.item.id) this.$store.dispatch('dictionary/update')
+      else this.$store.dispatch('dictionary/insert')
     }
   },
   created() {
-    this.$store.dispatch('language_items/item')
+    this.$store.dispatch('dictionary/item')
   },
 }
 </script>

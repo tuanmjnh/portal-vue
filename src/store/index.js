@@ -18,7 +18,7 @@ import languages from './modules/languages'
 import navigation from './modules/navigation'
 import permissions from './modules/permissions'
 import notification from './modules/notification'
-import language_items from './modules/language_items'
+import dictionary from './modules/dictionary'
 import contract_customer from './modules/contract_customer'
 import contract_enterprise from './modules/contract_enterprise'
 Vue.use(Vuex)
@@ -30,10 +30,10 @@ export default new Vuex.Store({
     setting: setting,
     modules: modules,
     languages: languages,
+    dictionary: dictionary,
     navigation: navigation,
     permissions: permissions,
     notification: notification,
-    language_items: language_items,
     contract_customer: contract_customer,
     contract_enterprise: contract_enterprise
   },
@@ -44,10 +44,10 @@ export default new Vuex.Store({
     $message: { show: false },
     $language_def: 'vi-VN',
     $language: _languages.GetLanguage(),
-    $languages: _languages.GetLanguages(),
+    $dictionary: _languages.GetDictionary(),
     $notification: false
     // _language: 'vi-VN',
-    // _language_items: JSON.parse(_store.Get('language'))
+    // _dictionary: JSON.parse(_store.Get('language'))
     // _axios: {
     //   vnptbkn: { host: vnptbkn.defaults.host, api: vnptbkn.defaults.api }
     // }
@@ -64,14 +64,14 @@ export default new Vuex.Store({
         const e = key[index].toLowerCase().split('.')
         if (e.length < 2) {
           const e0 = e[0].split(':')
-          if (!state.$languages[e0[0]]) rs += key[index]
-          else rs += (index > 0 ? state.$languages[e0[0]].toLowerCaseFirst() : state.$languages[e0[0]])
+          if (!state.$dictionary[e0[0]]) rs += key[index]
+          else rs += (index > 0 ? state.$dictionary[e0[0]].toLowerCaseFirst() : state.$dictionary[e0[0]])
           if (e0.length > 1) rs = rs.format(e0[1])
         } else if (e.length < 3) {
           const e1 = e[1].split(':')
           // if (e1.length > 1) e[1] = e1[0]
-          if (!state.$languages[e[0]] || !state.$languages[e[0]][e1[0]]) rs += key[index]
-          else rs += (index > 0 ? state.$languages[e[0]][e1[0]].toLowerCaseFirst() : state.$languages[e[0]][e1[0]])
+          if (!state.$dictionary[e[0]] || !state.$dictionary[e[0]][e1[0]]) rs += key[index]
+          else rs += (index > 0 ? state.$dictionary[e[0]][e1[0]].toLowerCaseFirst() : state.$dictionary[e[0]][e1[0]])
           if (e1.length > 1) rs = rs.format(e1[1].split(','), 'ff')
         }
         // if (regx.exec(key[index])) 
@@ -85,22 +85,22 @@ export default new Vuex.Store({
       // _key.forEach(e => {
       //   const _tmp = e.split('.')
       //   if (_tmp.length < 2) {
-      //     if (!state.$languages[_tmp[0]]) rs += e
-      //     else rs += state.$languages[_tmp[0]]
+      //     if (!state.$dictionary[_tmp[0]]) rs += e
+      //     else rs += state.$dictionary[_tmp[0]]
       //   } else if (_tmp.length < 3) {
-      //     if (!state.$languages[_tmp[0]][_tmp[1]]) rs += e
-      //     else rs += state.$languages[_tmp[0]][_tmp[1]]
+      //     if (!state.$dictionary[_tmp[0]][_tmp[1]]) rs += e
+      //     else rs += state.$dictionary[_tmp[0]][_tmp[1]]
       //   }
       // });
       return rs
     }
     // languages: state => key => {
     //   const _key = key.split('.')
-    //   if (!state.$languages[_key[0]]) return key
-    //   var rs = _key.length > 0 ? state.$languages[_key[0]] : key
+    //   if (!state.$dictionary[_key[0]]) return key
+    //   var rs = _key.length > 0 ? state.$dictionary[_key[0]] : key
     //   //
-    //   if (!state.$languages[_key[0]][_key[1]]) return key
-    //   rs = _key.length > 1 ? state.$languages[_key[0]][_key[1]] : key
+    //   if (!state.$dictionary[_key[0]][_key[1]]) return key
+    //   rs = _key.length > 1 ? state.$dictionary[_key[0]][_key[1]] : key
     //   return rs
     // }
   }, // = computed properties
@@ -117,7 +117,7 @@ export default new Vuex.Store({
       let lang_data = {}
       commit('SET_LANGUAGE', state.$language)
       // commit('SET_LANGUAGES', lang_data)
-      await vnptbkn.get(`language-items/getlang/${state.$language}`).then(function(res) {
+      await vnptbkn.get(`dictionary/getlang/${state.$language}`).then(function(res) {
           if (res.status == 200) {
             _languages.SetLanguage(state.$language)
             if (res.data.data) {
@@ -126,8 +126,8 @@ export default new Vuex.Store({
                 Object.assign(lang_data[e.module_code], JSON.parse(`{"${e.key}":"${e.value}"}`))
               });
               commit('SET_LANGUAGES', lang_data)
-              // state.$languages = _languages.GetLanguages()
-              _languages.SetLanguages(lang_data).then(state.$loadingApp = false)
+              // state.$dictionary = _languages.GetDictionary()
+              _languages.SetDictionary(lang_data).then(state.$loadingApp = false)
             }
           } else commit(SET_CATCH, null)
         })
@@ -135,14 +135,14 @@ export default new Vuex.Store({
 
       // Data Json
       // commit('SET_LANGUAGE', state.$language)
-      // await vnptbkn.get(`language-items/getlang/${state.$language}`).then(function(res) {
+      // await vnptbkn.get(`dictionary/getlang/${state.$language}`).then(function(res) {
       //     if (res.status == 200) {
       //       let lang_data = ''
       //       _languages.SetLanguage(state.$language)
       //       if (res.data.data && res.data.data.length > 0)
       //         lang_data = res.data.data[0].lang_data
-      //       _languages.SetLanguages(lang_data)
-      //       state.$languages = _languages.GetLanguages()
+      //       _languages.SetDictionary(lang_data)
+      //       state.$dictionary = _languages.GetDictionary()
       //     } else commit(SET_CATCH, null)
       //   })
       //   .catch(function(error) { commit(SET_CATCH, error) })
@@ -152,7 +152,7 @@ export default new Vuex.Store({
       //     if (res.status == 200) {
       //       commit('SET_LANGUAGES', res.data)
       //       _languages.SetLanguage(state.$language)
-      //       _languages.SetLanguages(JSON.stringify(res.data))
+      //       _languages.SetDictionary(JSON.stringify(res.data))
       //     } else commit(SET_CATCH, null)
       //   })
       //   .catch(function(error) { commit(SET_CATCH, error) })
@@ -188,8 +188,8 @@ export default new Vuex.Store({
       }
       if (error.response.status === 401) {
         this.dispatch('auth/signOut')
-        let text = state.$languages.auth && state.$languages.auth.msg_err_expired ?
-          state.$languages.auth.msg_err_expired :
+        let text = state.$dictionary.auth && state.$dictionary.auth.msg_err_expired ?
+          state.$dictionary.auth.msg_err_expired :
           error.response ? error.response.statusText : error
         state.$message = {
           mode: '',
@@ -203,8 +203,8 @@ export default new Vuex.Store({
           statusText: error.response ? error.response.statusText : error
         }
       } else {
-        let text = state.$languages.messages && state.$languages.messages.err_connection ?
-          state.$languages.messages.err_connection :
+        let text = state.$dictionary.messages && state.$dictionary.messages.err_connection ?
+          state.$dictionary.messages.err_connection :
           error.response ? error.response.statusText : error
         state.$message = {
           mode: '',
@@ -225,7 +225,7 @@ export default new Vuex.Store({
       state.$language = data ? data : state.$language_def
     },
     ['SET_LANGUAGES'](state, data) {
-      state.$languages = data
+      state.$dictionary = data
     }
   } // Mutations
 })

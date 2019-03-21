@@ -5,7 +5,7 @@
         <!-- <v-container grid-list-md> -->
         <v-layout wrap class="pt-2">
           <v-flex xs12 sm3 md3 class="mr-3">
-            <v-select :items="languages" v-model="$store.state.language_items.lang_code"
+            <v-select :items="languages" v-model="$store.state.dictionary.lang_code"
               :hide-selected="true" item-text="title" item-value="code" :label="$store.getters.languages(['languages.title'])"></v-select>
           </v-flex>
           <v-flex xs12 sm4 md4>
@@ -16,15 +16,21 @@
           </v-flex>
           <v-spacer></v-spacer>
           <v-tooltip bottom>
-            <v-btn flat icon slot="activator" color="primary" @click="localDialog=!localDialog">
+            <v-btn flat icon slot="activator" color="primary" @click="$store.state.dictionary.dialog=true">
               <v-icon>add</v-icon>
             </v-btn>
             <span>{{$store.getters.languages(['global.add'])}}</span>
           </v-tooltip>
+          <v-tooltip bottom v-if="$store.state.dictionary.selected.length>0">
+            <v-btn flat icon slot="activator" color="danger" @click="onDelete()">
+              <v-icon>delete</v-icon>
+            </v-btn>
+            <span>{{$store.getters.languages('global.delete_selected')}}</span>
+          </v-tooltip>
         </v-layout>
       </v-card-title>
       <v-form v-model="valid" ref="form">
-        <v-data-table class="elevation-1" v-model="$store.state.languages.selected"
+        <v-data-table class="elevation-1" v-model="$store.state.dictionary.selected"
           select-all item-key="id" :headers="headers" :items="items" :rows-per-page-items="rowPerPage"
           :rows-per-page-text="$store.getters.languages(['global.rows_per_page'])"
           :pagination.sync="pagination" :search="pagination.search">
@@ -88,14 +94,8 @@
 import confirm from '@/components/confirm'
 export default {
   components: { 'tpl-confirm': confirm },
-  props: {
-    dialog: { type: Boolean, default: false },
-    itemsDialog: { type: Boolean, default: false },
-  },
   data: () => ({
     valid: false,
-    localDialog: false,
-    localItemsDialog: false,
     confirmDialog: false,
     rowPerPage: [25, 50, 100, 200, 500], //  { text: "All", value: -1 }
     pagination: { search: 'global', sortBy: 'key' },
@@ -108,20 +108,20 @@ export default {
     ]
   }),
   created() {
-    if (this.$store.state.language_items.isGetFirst)
-      this.$store.dispatch('language_items/selectByLang', true).then(() => {
+    if (this.$store.state.dictionary.isGetFirst)
+      this.$store.dispatch('dictionary/selectByLang', true).then(() => {
         if (this.$store.state.languages.isGetFirst) this.$store.dispatch('languages/select')
         if (this.$store.state.modules.isGetFirst) this.$store.dispatch('modules/select')
       })
   },
   computed: {
     item() {
-      const rs = this.$store.state.language_items.item
+      const rs = this.$store.state.dictionary.item
       return rs
     },
     items() {
-      const rs = JSON.parse(JSON.stringify(this.$store.getters['language_items/getFilter'](this.pagination)))
-      // const rs = this.$store.getters['language_items/getFilter'](this.pagination)
+      const rs = JSON.parse(JSON.stringify(this.$store.getters['dictionary/getFilter'](this.pagination)))
+      // const rs = this.$store.getters['dictionary/getFilter'](this.pagination)
       return rs
     },
     languages() {
@@ -129,44 +129,40 @@ export default {
       return rs
     },
     modules() {
-      const rs = this.$store.state.language_items.modules
+      const rs = this.$store.state.dictionary.modules
       const tmp = this.$store.getters['modules/getFilter']({ sortBy: 'orders', find: { flag: 1 } }).map(e => e.code)
       rs.pushIfNotExist(tmp)
       return rs
-      // const rs = this.$store.state.language_items.modules
+      // const rs = this.$store.state.dictionary.modules
       // return rs
     },
     lang_code() {
-      const rs = this.$store.state.language_items.lang_code
+      const rs = this.$store.state.dictionary.lang_code
       return rs
     }
   },
   watch: {
-    dialog(val) { this.localDialog = val },
-    localDialog(val) { this.$emit('handleDialog', val) },
-    itemsDialog(val) { this.localItemsDialog = val },
-    localItemsDialog(val) { this.$emit('handleItemsDialog', val) },
-    lang_code(val) { this.$store.dispatch('language_items/selectByLang') }
+    lang_code(val) { this.$store.dispatch('dictionary/selectByLang') }
   },
   methods: {
     onEdit(item) {
-      this.$store.dispatch('language_items/item', item)
-      this.localDialog = true
+      this.$store.dispatch('dictionary/item', item)
+      this.$store.state.dictionary.dialog = true
     },
     onDelete(item) {
       this.confirmDialog = !this.confirmDialog
-      this.$store.state.languages.selected.push(item);
+      if (item) this.$store.state.dictionary.selected.push(item);
     },
     onCFMAccept() {
-      this.$store.dispatch('language_items/delete')
+      this.$store.dispatch('dictionary/delete')
     },
     onCFMCancel() {
-      this.$store.state.languages.selected = []
+      this.$store.state.languages.dictionary = []
     },
     onQuickSave(item) {
       if (this.valid) {
-        this.$store.dispatch('language_items/item', item).then(() => {
-          this.$store.dispatch('language_items/update')
+        this.$store.dispatch('dictionary/item', item).then(() => {
+          this.$store.dispatch('dictionary/update')
         })
       }
     },

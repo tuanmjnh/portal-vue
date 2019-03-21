@@ -6,7 +6,7 @@
           single-line hide-details></v-text-field>
         <v-spacer></v-spacer>
         <v-tooltip bottom>
-          <v-btn slot="activator" color="primary" small fab flat @click="localDialog=!localDialog">
+          <v-btn slot="activator" color="primary" small fab flat @click="$store.state.contract_customer.dialog=true">
             <i class="material-icons">add</i>
           </v-btn>
           <span>Nhập mới hợp đồng</span>
@@ -68,13 +68,11 @@ import confirm from '@/components/confirm'
 import { vnptbkn } from '@/plugins/axios-config'
 export default {
   components: { 'tpl-confirm': confirm },
-  props: { dialog: { type: Boolean, default: false } },
   data: () => {
     return {
       loading: true,
       selected: [],
       toggle_one: 0,
-      localDialog: false,
       confirmDialog: false,
       rowPerPage: [10, 25, 50, 100, 200, 500], //  { text: "All", value: -1 }
       vnptbkn: vnptbkn,
@@ -97,11 +95,10 @@ export default {
     }
   },
   watch: {
-    dialog(val) { this.localDialog = val },
-    localDialog(val) {
-      this.$emit('handleDialog', val)
-      if (!val) this.$store.dispatch('contract_customer/khachhang')
-    }
+    // localDialog(val) {
+    //   this.$emit('handleDialog', val)
+    //   if (!val) this.$store.dispatch('contract_customer/khachhang')
+    // }
   },
   created() {
     this.$store.dispatch('contract_customer/select').then(this.loading = false)
@@ -110,7 +107,7 @@ export default {
     onEdit(item) {
       this.$store.dispatch('contract_customer/khachhang', item)
       this.$store.dispatch('contract_customer/getThuebao')
-      this.localDialog = true
+      this.$store.state.contract_customer.dialog = true
     },
     onDelete(item) {
       this.confirmDialog = !this.confirmDialog

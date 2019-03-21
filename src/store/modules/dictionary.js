@@ -1,7 +1,7 @@
 import { SET_CATCH, SET_ITEMS, PUSH_ITEMS, UPDATE_ITEMS, REMOVE_ITEMS, SET_ITEM, SET_MESSAGE } from '../mutation-type'
 import { vnptbkn } from '@/plugins/axios-config'
 // import vi from '@/plugins/vi-VN.json'
-const collection = 'language-items'
+const collection = 'dictionary'
 export default {
   namespaced: true,
   state: {
@@ -14,6 +14,7 @@ export default {
     lang_data: '',
     modules: ['global'],
     modules_default: ['global'],
+    dialog: false,
     isGetFirst: true,
     default: {
       id: 0,
@@ -165,7 +166,7 @@ export default {
       if (loading) rootState.$loading = true
       // http
       await vnptbkn
-        .put(`${collection}/delete`, state.selected)
+        .put(`${collection}/delete`, state.selected.map(x => ({ id: x.id, flag: x.flag === 0 ? 1 : 0 })))
         .then(function(res) {
           if (res.status == 200) {
             if (res.data.msg === 'danger') {
@@ -174,7 +175,7 @@ export default {
             }
             // Success
             // commit(REMOVE_ITEMS, data)
-            state.selected.forEach(e => { commit(REMOVE_ITEMS, e) });
+            //state.selected.forEach(e => { commit(REMOVE_ITEMS, e) });
             state.selected = []
             commit(SET_MESSAGE, { text: rootGetters.languages('success.delete'), color: res.data.msg }, { root: true })
           } else commit(SET_CATCH, null, { root: true })

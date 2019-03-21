@@ -178,6 +178,71 @@ function sprintf() {
   });
 }
 // Array prototype
+Array.prototype.update = function(element, key = null) {
+  let $this = this
+  if (key) {
+    if (Array.isArray(element)) {
+      return $this.forEach(source => {
+        var destination = element.find(x => x[key] = source[key])
+        if (destination) {
+          Object.keys(source).forEach(function(keyobj, index) {
+            // if (typeof source[keyobj] !== 'object')
+            if (destination[keyobj] !== undefined) source[keyobj] = destination[keyobj]
+          })
+        }
+      })
+    } else {
+      return $this.forEach(source => {
+        if (source[key] === element[key]) {
+          Object.keys(source).forEach(function(keyobj, index) {
+            // if (typeof source[keyobj] !== 'object')
+            if (element[keyobj] !== undefined) source[keyobj] = element[keyobj]
+          })
+        }
+      })
+    }
+  } else {
+    if (Array.isArray(element)) {
+      element.forEach(e => {
+        const index = $this.indexOf(e)
+        if (index > -1) $this.splice(index, 1, element)
+      })
+    } else {
+      const index = $this.indexOf(element)
+      if (index > -1) $this.splice(index, 1, element)
+    }
+  }
+  return $this
+};
+Array.prototype.updateKey = function(element, ) {
+  if (Array.isArray(element)) {
+    element.forEach(e => {
+      const index = this.indexOf(e)
+      if (index > -1) this.splice(index, 1, element)
+    })
+  } else {
+    this.array.forEach(e => {
+      Object.keys(e).forEach(function(key, index) {
+        if (typeof e[key] === 'object') {
+          e[key] = element[key]
+        }
+      });
+    })
+  }
+  return this
+}
+Array.prototype.remove = function(element) {
+  if (Array.isArray(element)) {
+    element.forEach(e => {
+      const index = this.indexOf(e)
+      if (index > -1) this.splice(index, 1)
+    })
+  } else {
+    const index = this.indexOf(element)
+    if (index > -1) this.splice(index, 1)
+  }
+  return this
+};
 Array.prototype.pushIfNotExist = function(element, comparer = null) {
   if (comparer) {
     if (this.indexOf(comparer) < 0) this.push(element);
@@ -190,6 +255,7 @@ Array.prototype.pushIfNotExist = function(element, comparer = null) {
       if (this.indexOf(element) < 0) this.push(element);
     }
   }
+  return this
 };
 Array.prototype.filterValue = function(obj) {
   let $this = this

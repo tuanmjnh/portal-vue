@@ -5,7 +5,7 @@
         <v-text-field v-model="pagination.search" append-icon="search" label="Search" single-line hide-details></v-text-field>
         <v-spacer></v-spacer>
         <v-tooltip bottom>
-          <v-btn slot="activator" color="primary" small fab flat @click="localDialog=!localDialog">
+          <v-btn slot="activator" color="primary" small fab flat @click="$store.state.contract_enterprise.dialog=true">
             <i class="material-icons">add</i>
           </v-btn>
           <span>Add</span>
@@ -59,13 +59,11 @@
 import confirm from '@/components/confirm'
 export default {
   components: { 'tpl-confirm': confirm },
-  props: { dialog: { type: Boolean, default: false } },
   data: () => {
     return {
       loading: true,
       selected: [],
       toggle_one: 0,
-      localDialog: false,
       confirmDialog: false,
       pagination: { search: '', sortBy: 'created_at', find: { flag: 1 } },
       rowPerPage: [5, 10, 25, 50, 100, { text: "All", value: -1 }],
@@ -85,11 +83,11 @@ export default {
     }
   },
   watch: {
-    dialog(val) { this.localDialog = val },
-    localDialog(val) {
-      this.$emit('handleDialog', val)
-      if (!val) this.$store.dispatch('users/item')
-    }
+    // dialog(val) { this.localDialog = val },
+    // localDialog(val) {
+    //   this.$emit('handleDialog', val)
+    //   if (!val) this.$store.dispatch('users/item')
+    // }
   },
   created() {
     this.$store.dispatch('users/select').then(this.loading = false)
@@ -97,7 +95,7 @@ export default {
   methods: {
     onEdit(item) {
       this.$store.dispatch('users/item', item)
-      this.localDialog = true
+      this.$store.state.contract_enterprise.dialog = true
     },
     onDelete(item) {
       this.confirmDialog = !this.confirmDialog

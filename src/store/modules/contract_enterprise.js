@@ -6,6 +6,9 @@ export default {
   state: {
     items: [],
     item: {},
+    selected: [],
+    dialog: false,
+    isGetFirst: true,
     default: {
       contract_enterprise_id: '',
       app_key: '',

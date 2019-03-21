@@ -8,6 +8,9 @@ export default {
     items: [],
     khachhang: {},
     thuebao: [],
+    selected: [],
+    dialog: false,
+    isGetFirst: true,
     df_khachhang: {
       cc_id: '',
       hdkh_id: '',

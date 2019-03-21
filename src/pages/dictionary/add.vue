@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="localDialog" :persistent="loading" max-width="1024px">
+  <v-dialog v-model="$store.state.dictionary.dialog" :persistent="loading" max-width="1024px">
     <!-- <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn> -->
     <v-card>
       <v-card-title class="headline grey lighten-2">
@@ -33,7 +33,7 @@
         <v-btn color="primary" flat @click.native="onSave" :disabled="!valid" :loading="loading">
           {{$store.getters.languages(['global.update'])}}
         </v-btn>
-        <v-btn color="secondary" flat @click.native="localDialog=false" :disabled="loading">
+        <v-btn color="secondary" flat @click.native="$store.state.dictionary.dialog=false" :disabled="loading">
           {{$store.getters.languages(['global.back'])}}
         </v-btn>
       </v-card-actions>
@@ -50,29 +50,25 @@ export default {
   components: {
     'vue-quill-editor': quillEditor,
   },
-  props: {
-    dialog: { type: Boolean, default: false }
-  },
   data: () => ({
     valid: false,
     loading: false,
     tabActive: null,
-    localDialog: false,
   }),
   created() {
-    // this.$store.dispatch('language_items/item')
+    // this.$store.dispatch('dictionary/item')
   },
   computed: {
     item() {
-      const rs = this.$store.state.language_items.item
+      const rs = this.$store.state.dictionary.item
       return rs
     },
     modules() {
-      const rs = this.$store.state.language_items.modules
+      const rs = this.$store.state.dictionary.modules
       const tmp = this.$store.getters['modules/getFilter']({ sortBy: 'orders', find: { flag: 1 } }).map(e => e.code)
       rs.pushIfNotExist(tmp)
       return rs
-      // const rs = this.$store.state.language_items.modules
+      // const rs = this.$store.state.dictionary.modules
       // return rs
     },
     languages() {
@@ -81,11 +77,6 @@ export default {
     }
   },
   watch: {
-    dialog(val) { this.localDialog = val },
-    localDialog(val) {
-      this.reset()
-      this.$emit('handleDialog', val)
-    },
     item: {
       handler(val) {
         if (this.item.key) this.item.key = this.item.key.toString().toLowerCase()
@@ -99,13 +90,13 @@ export default {
       // var data = { module_code: this.module_code, key: this.key, value: this.value }
       this.loading = true
       if (this.valid) {
-        if (this.item.id) this.$store.dispatch('language_items/update').then(this.loading = false)
-        else this.$store.dispatch('language_items/insert').then(rs => { this.reset() })
+        if (this.item.id) this.$store.dispatch('dictionary/update').then(this.loading = false)
+        else this.$store.dispatch('dictionary/insert').then(rs => { this.reset() })
       }
     },
     reset() {
       this.loading = false
-      if (!this.item.id || !this.localDialog) this.$store.dispatch('language_items/item')
+      if (!this.item.id || !this.$store.state.dictionary.dialog) this.$store.dispatch('dictionary/item')
       this.$refs.form.resetValidation()
     }
   }

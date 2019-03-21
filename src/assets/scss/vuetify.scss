@@ -60,15 +60,13 @@
   margin-top: 15%
 }
 
-// List max-hight
-.list-max-hight {
-  max-height: 250px;
-  overflow-x: hidden;
-  overflow-y: scroll;
-}
+// v-checkbox margin 0
+.custom-v-checkbox {
+  .v-input__slot {
+    margin-bottom: 0px !important
+  }
 
-.list-title {
-  font-weight: bold;
-  font-size: 14px;
-  padding: 8px 0px 8px 20px;
+  .v-input--selection-controls {
+    margin-top: 16px !important
+  }
 }

@@ -14,7 +14,10 @@ export default {
     modules: [],
     modules_default: ['global'],
     item_default: { module_code: 'global', key: '', value: '' },
-    default: { lang_code: 'vi-VN', lang_data: {} }
+    default: { lang_code: 'vi-VN', lang_data: {} },
+    selected: [],
+    dialog: false,
+    isGetFirst: true,
   },
   getters: {
     getAll(state) {

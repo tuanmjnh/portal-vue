@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="localDialog" :persistent="loading" max-width="1024px">
+  <v-dialog v-model="$store.state.roles.dialog" :persistent="loading" max-width="1024px">
     <!-- <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn> -->
     <v-card>
       <v-card-title class="headline grey lighten-2">
@@ -46,42 +46,36 @@
                 </v-layout>
               </v-tab-item>
               <v-tab-item>
+                <!-- <list-select :itemsLeft.sync="modules_items" :itemsRight.sync="modules_selected"
+                  :checkbox="true" /> -->
                 <v-layout wrap class="pt-2">
-                  <v-flex xs12 sm5 md5>
-                    <div class="list-title">Danh sách quyền</div>
-                    <v-divider></v-divider>
-                    <div class="list-max-hight">
-                      <div v-for="(item,index) in navigation" :key="index" class="v-list__tile theme--light">
-                        <v-checkbox v-model="navigation_selected" :value="item.code"
-                          :label="item.title"></v-checkbox>
-                      </div>
+                  <v-flex xs12 sm12 md12>
+                    <table class="v-datatable v-table theme--light custom-v-checkbox">
+                      <thead>
+                        <tr>
+                          <th class="column text-xs-left">#</th>
+                          <th class="column text-xs-left" v-for="(item,index) in permissions"
+                            :key="index">
+                            <v-checkbox :value="`${item.code}.all`" :label="item.code"></v-checkbox>
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr v-for="(item,index) in modules" :key="index">
+                          <td>{{$store.getters.languages(`modules.${item.code}`)}}</td>
+                          <td v-for="(per,index) in permissions" :key="index">
+                            <v-checkbox :value="`${item.code}.${per.code}`" :label="per.code"></v-checkbox>
+                          </td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </v-flex>
+                  <!-- <v-flex xs12 sm5 md5>
+                    <div v-for="(item,index) in modules" :key="index" class="v-list__tile theme--light">
+                      {{item.title}}
                     </div>
-                  </v-flex>
-                  <v-spacer></v-spacer>
-                  <v-flex xs12 sm5 md5 class="list-max-hight">
-                    {{navigation_selected}}
-                  </v-flex>
+                  </v-flex> -->
                 </v-layout>
-                <!-- <v-list>
-                  <v-list-tile v-for="(item,index) in navigation" :key="index" avatar>
-                    <v-list-tile-action>
-                      <v-checkbox></v-checkbox>
-                    </v-list-tile-action>
-                    <v-list-tile-content>
-                      <v-list-tile-title v-text="item.title"></v-list-tile-title>
-                      <v-list-tile-sub-title>Notify when receiving invites</v-list-tile-sub-title>
-                    </v-list-tile-content>
-                    <v-list-tile-avatar>
-                      <img :src="item.avatar">
-                    </v-list-tile-avatar>
-                  </v-list-tile>
-                </v-list> -->
-                <!-- <v-layout wrap class="pt-2">
-                  <v-flex xs12 sm12 md12>
-                  </v-flex>
-                  <v-flex xs12 sm12 md12>
-                  </v-flex>
-                </v-layout> -->
               </v-tab-item>
             </v-tabs>
           </v-container>
@@ -92,7 +86,8 @@
         <v-btn color="primary" flat @click.native="onSave" :loading="loading">
           {{$store.getters.languages(['global.update'])}}
         </v-btn>
-        <v-btn color="secondary" flat @click.native="localDialog=false" :disabled="loading">
+        <v-btn color="secondary" flat @click.native="$store.state.roles.dialog=false"
+          :disabled="loading">
           {{$store.getters.languages(['global.back'])}}
         </v-btn>
       </v-card-actions>
@@ -105,49 +100,64 @@ import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
 import { quillEditor } from 'vue-quill-editor'
+import listSelect from '@/components/list-select'
 export default {
   components: {
-    'vue-quill-editor': quillEditor
-  },
-  props: {
-    dialog: { type: Boolean, default: false }
+    'vue-quill-editor': quillEditor,
+    'list-select': listSelect
   },
   data: () => ({
     loading: false,
     valid: false,
     isExist: true,
-    localDialog: false,
     tabActive: null,
-    navigation_selected: [],
+    list_selected: [],
+    permissions: [],
     permissions_selected: []
   }),
   created() {
     this.$store.dispatch('roles/item')
-    if (this.$store.state.navigation.isGetFirst) this.$store.dispatch('navigation/select')
-    if (this.$store.state.permissions.isGetFirst) this.$store.dispatch('permissions/select')
+    var _modules = []
+    // modules
+    if (this.$store.state.modules.isGetFirst) this.$store.dispatch('modules/select')
+
+    // permissions
+    if (this.$store.state.permissions.isGetFirst) this.$store.dispatch('permissions/select').then(() => {
+      this.permissions = this.$store.getters['permissions/getFilter']({ sortBy: 'orders', find: { flag: 1 } })
+    })
+    else this.permissions = this.$store.getters['permissions/getFilter']({ sortBy: 'orders', find: { flag: 1 } })
+    _modules.forEach(e => {
+      this.modules.push({
+        code: e.code,
+        permissions: this.permissions.map(x => ({ code: x.code }))
+      })
+    })
   },
   computed: {
     item() {
-      var item = this.$store.state.roles.item
+      const item = this.$store.state.roles.item
       return item
     },
-    navigation() {
-      var filter = { sortBy: 'orders', find: { flag: 1 } };
-      var item = this.$store.getters['navigation/getFilter'](filter)
-      return item
-    },
-    permissions() {
-      var filter = { sortBy: 'orders', find: { flag: 1 } };
-      var item = this.$store.getters['permissions/getFilter'](filter)
-      return item
+    modules() {
+      const rs = this.$store.getters['modules/getFilter']({ sortBy: 'orders', find: { flag: 1 } })
+      return rs.map(x => ({
+        code: x.code,
+        title: x.title,
+        permissions: x.permissions.trim(',').split(',')
+      }))
     }
+    // navigation() {
+    //   var filter = { sortBy: 'orders', find: { flag: 1 } };
+    //   var item = this.$store.getters['navigation/getFilter'](filter)
+    //   return item
+    // },
+    // permissions() {
+    //   var filter = { sortBy: 'orders', find: { flag: 1 } };
+    //   var item = this.$store.getters['permissions/getFilter'](filter)
+    //   return item
+    // }
   },
   watch: {
-    dialog(val) { this.localDialog = val },
-    localDialog(val) {
-      this.reset()
-      this.$emit('handleDialog', val)
-    },
     uploadFiles: {
       handler(val) {
         if (val.files && val.files.length > 0)
@@ -178,7 +188,7 @@ export default {
     },
     reset() {
       this.loading = false
-      if (!this.item.id || !this.localDialog) this.$store.dispatch('roles/item')
+      if (!this.item.id || !this.$store.state.roles.dialog) this.$store.dispatch('roles/item')
       this.$refs.form.resetValidation()
       this.permissions_selected = []
     }

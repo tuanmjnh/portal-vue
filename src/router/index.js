@@ -53,11 +53,11 @@ const routes = [
     meta: { description: 'Overview of environment', requiresAuth: true }
   },
   {
-    path: '/language-items',
-    name: 'language-items',
+    path: '/dictionary',
+    name: 'dictionary',
     alias: '',
     component: () =>
-      import ('../pages/language-items/index'),
+      import ('../pages/dictionary/index'),
     meta: { description: 'Overview of environment', requiresAuth: true }
   },
   {
