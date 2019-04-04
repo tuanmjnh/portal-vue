@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="$store.state.users.dialog" :persistent="$store.state.$loadingCommit" max-width="1024px">
+  <v-dialog v-model="$store.state.nguoidung.dialog" :persistent="$store.state.$loadingCommit" max-width="1024px">
     <!-- <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn> -->
     <v-card>
       <v-card-title class="headline grey lighten-2">
@@ -24,28 +24,28 @@
                   <v-flex xs12 md8 sm8>
                   </v-flex>
                   <v-flex xs12 sm8 md8>
-                    <v-text-field v-model.trim="item.username" :label="$store.getters.languages('users.username')"
+                    <v-text-field v-model.trim="item.username" :label="$store.getters.languages('nguoidung.username')"
                       :disabled="item.user_id?true:false" class="text-color-initial"
                       :rules="[!!item.username||$store.getters.languages('error.required'),exist_username||$store.getters.languages('error.exist')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field v-model.trim="item.email" :label="$store.getters.languages('users.email')"
+                    <v-text-field v-model.trim="item.email" :label="$store.getters.languages('nguoidung.email')"
                       :rules="[v =>!!v||$store.getters.languages('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field v-model.trim="item.password" :label="$store.getters.languages('users.password')"
+                    <v-text-field v-model.trim="item.password" :label="$store.getters.languages('nguoidung.password')"
                       :rules="[v =>!!v||$store.getters.languages('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field v-model.trim="repassword" :label="$store.getters.languages('users.repassword')"
+                    <v-text-field v-model.trim="repassword" :label="$store.getters.languages('nguoidung.repassword')"
                       :rules="[v =>!!v||$store.getters.languages('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field v-model.trim="item.full_name" :label="$store.getters.languages('users.full_name')"
+                    <v-text-field v-model.trim="item.full_name" :label="$store.getters.languages('nguoidung.full_name')"
                       :rules="[v =>!!v||$store.getters.languages('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field v-model.trim="item.mobile" :label="$store.getters.languages('users.mobile')"
+                    <v-text-field v-model.trim="item.mobile" :label="$store.getters.languages('nguoidung.mobile')"
                       :rules="[v =>!!v||$store.getters.languages('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm3 md3>
@@ -53,7 +53,7 @@
                       :true-value="1" :false-value="0" v-model.number="item.flag"></v-switch>
                   </v-flex>
                   <v-flex xs12 sm12 md12>
-                    <v-textarea v-model.trim="item.address" auto-grow box :placeholder="$store.getters.languages(['global.input',' ','users.address'])"></v-textarea>
+                    <v-textarea v-model.trim="item.address" auto-grow box :placeholder="$store.getters.languages(['global.input',' ','nguoidung.address'])"></v-textarea>
                   </v-flex>
                   <!-- <v-flex xs12 sm6 md4>
                     <v-text-field type="number" v-model.trim="item.orders" :label="$store.getters.languages('global.orders')"
@@ -77,7 +77,7 @@
         <v-btn color="primary" flat @click.native="onSave" :disabled="!valid" :loading="$store.state.$loadingCommit">
           {{$store.getters.languages('global.update')}}
         </v-btn>
-        <v-btn color="secondary" flat @click.native="$store.state.users.dialog=false"
+        <v-btn color="secondary" flat @click.native="$store.state.nguoidung.dialog=false"
           :disabled="$store.state.$loadingCommit">
           {{$store.getters.languages('global.back')}}
         </v-btn>
@@ -102,15 +102,15 @@ export default {
     repassword: ''
   }),
   created() {
-    this.$store.dispatch('users/item')
+    this.$store.dispatch('nguoidung/item')
   },
   computed: {
     dialog() {
-      const rs = this.$store.state.users.dialog
+      const rs = this.$store.state.nguoidung.dialog
       return rs
     },
     item() {
-      var rs = this.$store.state.users.item
+      var rs = this.$store.state.nguoidung.item
       return rs
     },
     db_donvi() {
@@ -120,14 +120,14 @@ export default {
   },
   watch: {
     dialog(val) {
-      if (!val) this.$store.dispatch('users/item')
+      if (!val) this.$store.dispatch('nguoidung/item')
       this.$refs.form.resetValidation()
     },
     item: {
       handler(val) {
         if (this.item.code) {
           this.item.code = this.item.code.toString().toLowerCase()
-          if (!this.item.user_id) this.$store.dispatch('users/exist_username').then((rs) => { this.exist_username = rs })
+          if (!this.item.user_id) this.$store.dispatch('nguoidung/exist_username').then((rs) => { this.exist_username = rs })
         }
       },
       deep: true
@@ -136,8 +136,8 @@ export default {
   methods: {
     onSave() {
       if (this.valid) {
-        if (this.item.user_id) this.$store.dispatch('users/update')
-        else this.$store.dispatch('users/insert')
+        if (this.item.user_id) this.$store.dispatch('nguoidung/update')
+        else this.$store.dispatch('nguoidung/insert')
       }
     }
   }

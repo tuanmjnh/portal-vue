@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="$store.state.modules.dialog" :persistent="loading" max-width="1024px">
+  <v-dialog v-model="$store.state.modules.dialog" :persistent="$store.state.$loadingCommit" max-width="1024px">
     <!-- <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn> -->
     <v-card>
       <v-card-title class="headline grey lighten-2">
@@ -84,10 +84,11 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" flat @click.native="onSave" :loading="loading">
+        <v-btn color="primary" flat @click.native="onSave" :loading="$store.state.$loadingCommit">
           {{$store.getters.languages(['global.update'])}}
         </v-btn>
-        <v-btn color="secondary" flat @click.native="$store.state.modules.dialog=false" :disabled="loading">
+        <v-btn color="secondary" flat @click.native="$store.state.modules.dialog=false"
+          :disabled="$store.state.$loadingCommit">
           {{$store.getters.languages(['global.back'])}}
         </v-btn>
       </v-card-actions>
@@ -110,7 +111,6 @@ export default {
     'display-files': displayFiles
   },
   data: () => ({
-    loading: false,
     valid: false,
     isExist: true,
     tabActive: null,
@@ -123,17 +123,25 @@ export default {
     if (this.$store.state.permissions.isGetFirst) this.$store.dispatch('permissions/select')
   },
   computed: {
+    dialog() {
+      const rs = this.$store.state.modules.dialog
+      return rs
+    },
     item() {
-      var item = this.$store.state.modules.item
-      return item
+      var rs = this.$store.state.modules.item
+      return rs
     },
     permissions() {
-      var filter = { sortBy: 'orders', find: { flag: 1 } };
-      var item = this.$store.getters['permissions/getFilter'](filter)
-      return item
+      var rs = this.$store.getters['permissions/getFilter']({ sortBy: 'orders', find: { flag: 1 } })
+      return rs
     }
   },
   watch: {
+    dialog(val) {
+      if (!val) this.$store.dispatch('modules/item')
+      this.$refs.form.resetValidation()
+      this.permissions_selected = []
+    },
     uploadFiles: {
       handler(val) {
         if (val.files && val.files.length > 0)
@@ -159,18 +167,11 @@ export default {
   },
   methods: {
     onSave() {
-      this.loading = true
       if (this.valid) {
         this.item.permissions = `,${this.permissions_selected.join(',')},`
-        if (this.item.id) this.$store.dispatch('modules/update').then(this.loading = false)
-        else this.$store.dispatch('modules/insert').then((rs) => { this.reset() })
+        if (this.item.id) this.$store.dispatch('modules/update')
+        else this.$store.dispatch('modules/insert')
       }
-    },
-    reset() {
-      this.loading = false
-      if (!this.item.id || !this.$store.state.modules.dialog) this.$store.dispatch('modules/item')
-      this.$refs.form.resetValidation()
-      this.permissions_selected = []
     }
   }
 }

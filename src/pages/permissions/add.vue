@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="$store.state.permissions.dialog" :persistent="loading" max-width="1024px">
+  <v-dialog v-model="$store.state.permissions.dialog" :persistent="$store.state.$loadingCommit" max-width="1024px">
     <!-- <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn> -->
     <v-card>
       <v-card-title class="headline grey lighten-2">
@@ -36,7 +36,7 @@
               </v-tab-item>
               <v-tab-item>
                 <v-flex xs12 sm12 md12>
-                  <vue-quill-editor v-model.trim="item.descs" ref="descriptions"></vue-quill-editor>
+                  <vue-quill-editor v-model.trim="item.descs" ref="descs"></vue-quill-editor>
                   <!-- <tinymce id="desc" v-model="item.desc"></tinymce> -->
                 </v-flex>
               </v-tab-item>
@@ -47,11 +47,11 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" flat @click.native="onSave" :disabled="!valid" :loading="loading">
+        <v-btn color="primary" flat @click.native="onSave" :disabled="!valid" :loading="$store.state.$loadingCommit">
           {{$store.getters.languages('global.update')}}
         </v-btn>
         <v-btn color="secondary" flat @click.native="$store.state.permissions.dialog=false"
-          :disabled="loading">
+          :disabled="$store.state.$loadingCommit">
           {{$store.getters.languages('global.back')}}
         </v-btn>
       </v-card-actions>
@@ -69,7 +69,6 @@ export default {
     'vue-quill-editor': quillEditor,
   },
   data: () => ({
-    loading: false,
     valid: false,
     isExist: true,
     tabActive: null
@@ -78,12 +77,20 @@ export default {
     this.$store.dispatch('permissions/item')
   },
   computed: {
+    dialog() {
+      const rs = this.$store.state.permissions.dialog
+      return rs
+    },
     item() {
       var item = this.$store.state.permissions.item
       return item
     }
   },
   watch: {
+    dialog(val) {
+      if (!val) this.$store.dispatch('permissions/item')
+      this.$refs.form.resetValidation()
+    },
     item: {
       handler(val) {
         if (this.item.code) {
@@ -96,16 +103,10 @@ export default {
   },
   methods: {
     onSave() {
-      this.loading = true
       if (this.valid) {
-        if (this.item.id) this.$store.dispatch('permissions/update').then(this.loading = false)
-        else this.$store.dispatch('permissions/insert').then((rs) => { this.reset() })
+        if (this.item.id) this.$store.dispatch('permissions/update')
+        else this.$store.dispatch('permissions/insert')
       }
-    },
-    reset() {
-      this.loading = false
-      if (!this.item.id || !this.$store.state.permissions.dialog) this.$store.dispatch('permissions/item')
-      this.$refs.form.resetValidation()
     }
   }
 }

@@ -1,6 +1,6 @@
 import { SET_CATCH, SET_ITEMS, PUSH_ITEMS, UPDATE_ITEMS, REMOVE_ITEMS, SET_ITEM, SET_MESSAGE } from '../mutation-type'
 import { vnptbkn } from '@/plugins/axios-config'
-const collection = 'users'
+const collection = 'nguoidung'
 export default {
   namespaced: true,
   state: {
@@ -11,29 +11,27 @@ export default {
     dialog: false,
     isGetFirst: true,
     default: {
-      user_id: '',
-      parent_id: '',
-      group_id: '',
-      username: '',
-      password: '',
-      salt: '',
-      full_name: '',
-      email: '',
-      mobile: '',
-      address: '',
-      descs: '',
-      images: '',
-      created_by: '',
-      created_at: new Date(),
-      updated_by: '',
-      updated_at: null,
-      deleted_by: '',
-      deleted_at: null,
-      last_login: null,
-      last_change_password: null,
+      nguoidung_id: '',
       donvi_id: 5588,
+      ma_nd: '',
+      matkhau: '',
+      ten_nd: '',
+      quantri: 0,
+      nhom_nd_id: 1,
+      trangthai: 1,
+      nhanvien_id: 0,
+      ma_nv: '',
+      ten_nv: '',
+      ten_tn: '',
+      diachi_nv: '',
+      gioitinh: 1,
+      chucdanh: '',
+      so_dt: 0,
+      email: '',
+      ngay_sn: null,
+      loaidv_id: 2,
       roles_id: '',
-      flag: 1
+      roles_name: ''
     }
   },
   getters: {
@@ -93,6 +91,25 @@ export default {
         commit(SET_CATCH, error, { root: true })
       }).finally(() => { if (loading) rootState.$loadingGet = false })
     },
+    // async GetRoles({ commit, state, rootGetters, rootState }, loading = true) {
+    //   // Loading
+    //   if (loading) rootState.$loadingCommit = true
+    //   // http
+    //   await vnptbkn.get(collection + '/GetRoles').then(function(res) {
+    //     if (res.status === 200) {
+    //       if (res.data.msg === 'danger') {
+    //         commit(SET_MESSAGE, { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+    //         return
+    //       }
+    //       if (res.data.data) commit(SET_ITEMS, res.data.data)
+    //     } else commit(SET_CATCH, null, { root: true })
+    //   }).catch(function(error) {
+    //     commit(SET_CATCH, error, { root: true })
+    //   }).finally(() => {
+    //     // state.isGetFirst = false
+    //     if (loading) rootState.$loadingCommit = false
+    //   })
+    // },
     async insert({ commit, state, rootGetters, rootState }, loading = true) {
       // Loading
       if (loading) rootState.$loadingCommit = true
@@ -142,7 +159,11 @@ export default {
       // Loading
       if (loading) rootState.$loadingCommit = true
       // http
-      const data = state.selected.map(x => ({ id: x.user_id, flag: x.flag === 0 ? 1 : 0 }))
+      if (state.selected.length < 1) {
+        commit(SET_MESSAGE, { text: rootGetters.languages('error.required_select'), color: 'error' }, { root: true })
+        return
+      }
+      const data = state.selected.map(x => ({ nguoidung_id: x.nguoidung_id, flag: x.flag === 0 ? 1 : 0 }))
       await vnptbkn.put(collection + '/delete', data).then(function(res) {
         if (res.status == 200) {
           if (res.data.msg === 'danger') {
@@ -151,7 +172,7 @@ export default {
           }
           // Success
           //state.selected.forEach(e => { commit(UPDATE_ITEMS, e) });
-          state.selected.update(data, 'id')
+          state.selected.update(data, 'nguoidung_id')
           state.selected = []
           commit(SET_ITEM)
           commit(SET_MESSAGE, { text: rootGetters.languages('success.delete'), color: res.data.msg }, { root: true })
@@ -189,6 +210,56 @@ export default {
         reject(Error('Error'));
       });
       return promise.catch(function(error) {
+        commit(SET_CATCH, error, { root: true })
+      }).finally(() => { if (loading) rootState.$loadingCommit = false })
+    },
+    async reset_password({ commit, state, rootGetters, rootState }, loading = true) {
+      // Loading
+      if (loading) rootState.$loadingCommit = true
+      // http
+      if (state.selected.length < 1) {
+        commit(SET_MESSAGE, { text: rootGetters.languages('error.required_select'), color: 'error' }, { root: true })
+        if (loading) rootState.$loadingCommit = false
+        return
+      }
+      await vnptbkn.put(`${collection}/ResetPassword/${state.selected[0].nguoidung_id}`).then(function(res) {
+        if (res.status == 200) {
+          if (res.data.msg === 'danger') {
+            commit(SET_MESSAGE, { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            return
+          }
+          // Success
+          state.selected = []
+          commit(SET_ITEM)
+          commit(SET_MESSAGE, { text: rootGetters.languages('success.reset_password:' + res.data.data), color: res.data.msg }, { root: true })
+        } else commit(SET_CATCH, null, { root: true })
+      }).catch(function(error) {
+        commit(SET_CATCH, error, { root: true })
+      }).finally(() => { if (loading) rootState.$loadingCommit = false })
+    },
+    async set_roles({ commit, state, rootGetters, rootState }, roles, loading = true) {
+      // Loading
+      if (loading) rootState.$loadingCommit = true
+      // http
+      if (state.selected.length < 1) {
+        commit(SET_MESSAGE, { text: rootGetters.languages('error.required_select'), color: 'error' }, { root: true })
+        if (loading) rootState.$loadingCommit = false
+        return
+      }
+      const data = state.selected.map(x => ({ nguoidung_id: x.nguoidung_id, roles_id: roles.id, roles_name: roles.name }))
+      await vnptbkn.post(`${collection}/SetRoles`, data).then(function(res) {
+        if (res.status == 200) {
+          if (res.data.msg === 'danger') {
+            commit(SET_MESSAGE, { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            if (loading) rootState.$loadingCommit = false
+            return
+          }
+          // Success
+          state.selected.update(data, 'nguoidung_id')
+          state.selected = []
+          commit(SET_MESSAGE, { text: rootGetters.languages('success.roles:' + res.data.data), color: res.data.msg }, { root: true })
+        } else commit(SET_CATCH, null, { root: true })
+      }).catch(function(error) {
         commit(SET_CATCH, error, { root: true })
       }).finally(() => { if (loading) rootState.$loadingCommit = false })
     },

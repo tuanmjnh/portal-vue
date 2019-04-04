@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="$store.state.languages.dialog" :persistent="loading" max-width="1024px">
+  <v-dialog v-model="$store.state.languages.dialog" :persistent="$store.state.$loadingCommit" max-width="1024px">
     <!-- <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn> -->
     <v-card>
       <v-card-title class="headline grey lighten-2">
@@ -65,10 +65,11 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" flat @click.native="onSave" :disabled="!valid" :loading="loading">
+        <v-btn color="primary" flat @click.native="onSave" :disabled="!valid" :loading="$store.state.$loadingCommit">
           {{$store.getters.languages('global.update')}}
         </v-btn>
-        <v-btn color="secondary" flat @click.native="$store.state.languages.dialog=false" :disabled="loading">
+        <v-btn color="secondary" flat @click.native="$store.state.languages.dialog=false"
+          :disabled="$store.state.$loadingCommit">
           {{$store.getters.languages('global.back')}}
         </v-btn>
       </v-card-actions>
@@ -91,7 +92,6 @@ export default {
     'display-files': displayFiles
   },
   data: () => ({
-    loading: false,
     valid: false,
     isExist: true,
     tabActive: null,
@@ -103,12 +103,20 @@ export default {
     this.$store.dispatch('languages/item')
   },
   computed: {
+    dialog() {
+      const rs = this.$store.state.languages.dialog
+      return rs
+    },
     item() {
       var item = this.$store.state.languages.item
       return item
     }
   },
   watch: {
+    dialog(val) {
+      if (!val) this.$store.dispatch('languages/item')
+      this.$refs.form.resetValidation()
+    },
     uploadFiles: {
       handler(val) {
         if (val.files && val.files.length > 0)
@@ -126,16 +134,10 @@ export default {
   },
   methods: {
     onSave() {
-      this.loading = true
       if (this.valid) {
-        if (this.item.id) this.$store.dispatch('languages/update').then(this.loading = false)
-        else this.$store.dispatch('languages/insert').then((rs) => { this.reset() })
+        if (this.item.id) this.$store.dispatch('languages/update')
+        else this.$store.dispatch('languages/insert')
       }
-    },
-    reset() {
-      this.loading = false
-      if (!this.item.id || !this.$store.state.languages.dialog) this.$store.dispatch('languages/item')
-      this.$refs.form.resetValidation()
     }
   }
 }

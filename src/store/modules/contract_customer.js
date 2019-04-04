@@ -1,5 +1,5 @@
 import { SET_CATCH, SET_ITEMS, PUSH_ITEMS, UPDATE_ITEMS, REMOVE_ITEMS, SET_ITEM, SET_MESSAGE } from '../mutation-type'
-import {ObjectToLowerKey } from '@/plugins/helpers'
+import { ObjectToLowerKey } from '@/plugins/helpers'
 import { vnptbkn } from '@/plugins/axios-config'
 const collection = 'contract-customer'
 export default {
@@ -75,10 +75,10 @@ export default {
       state.items = items
     },
     SET_KHACHHANG(state, khachhang) {
-      state.khachhang = { ...khachhang } // Object.assign({}, item)
+      state.khachhang = khachhang ? { ...khachhang } : { ...state.df_khachhang }
     },
     SET_THUEBAO(state, thuebao) {
-      state.thuebao = thuebao // Object.assign({}, item)
+      state.thuebao = thuebao ? { ...thuebao } : { ...state.df_thuebao }
     },
     [PUSH_ITEMS](state, khachhang) {
       state.items.push(khachhang)
@@ -178,14 +178,6 @@ export default {
       //   .then(() => { commit(SET_KHACHHANG, state.default) })
       //   .catch(error => { commit(SET_CATCH, error, { root: true }) })
     },
-    async khachhang({ commit, state }, khachhang) {
-      if (khachhang) commit('SET_KHACHHANG', khachhang)
-      else commit('SET_KHACHHANG', state.df_khachhang)
-    },
-    async thuebao({ commit, state }, thuebao) {
-      if (thuebao) commit('SET_THUEBAO', thuebao)
-      else commit('SET_THUEBAO', [])
-    },
     async getContract({ commit, state, rootGetters }) {
       await vnptbkn
         .get(collection + '/getContract?key=' + state.khachhang.ma_gd)
@@ -213,6 +205,12 @@ export default {
           } else commit(SET_CATCH, null, { root: true })
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
+    },
+    async khachhang({ commit }, khachhang) {
+      commit('SET_KHACHHANG', khachhang)
+    },
+    async thuebao({ commit }, thuebao) {
+      commit('SET_THUEBAO', thuebao)
     }
   }
 }

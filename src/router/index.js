@@ -21,11 +21,19 @@ const routes = [
       import ('../pages/dashboard/index')
   },
   {
-    path: '/users',
-    name: 'users',
+    path: '/nguoidung',
+    name: 'nguoidung',
     alias: '',
     component: () =>
-      import ('../pages/users/index'),
+      import ('../pages/nguoidung/index'),
+    meta: { description: 'Overview of environment', requiresAuth: true }
+  },
+  {
+    path: '/user-role',
+    name: 'user-roles',
+    alias: '',
+    component: () =>
+      import ('../pages/nguoidung/set-roles'),
     meta: { description: 'Overview of environment', requiresAuth: true }
   },
   {

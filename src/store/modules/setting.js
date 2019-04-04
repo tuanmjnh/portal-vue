@@ -43,7 +43,7 @@ export default {
       state.items = items
     },
     [SET_ITEM](state, item) {
-      state.item = { ...item }
+      state.item = item ? { ...item } : { ...state.default }
     },
     [PUSH_ITEMS](state, item) {
       state.items.push(item)
@@ -180,9 +180,8 @@ export default {
         })
         .catch(function(error) { commit(SET_CATCH, error, { root: true }) })
     },
-    async item({ commit, state }, item) {
-      if (item) commit(SET_ITEM, item)
-      else commit(SET_ITEM, state.default)
+    async item({ commit }, item) {
+      commit(SET_ITEM, item)
     },
     existCode({ commit, state }) {
       return vnptbkn.get(collection + '/ExistCode/' + state.item.code, { timeout: 1000 }).then(function(res) { //, { timeout: 3000 }

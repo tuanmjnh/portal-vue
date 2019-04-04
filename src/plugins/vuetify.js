@@ -30,6 +30,7 @@ import {
   VDialog,
   VSnackbar,
   transitions,
+  VChip,
   VProgressCircular
 } from 'vuetify'
 Vue.use(Vuetify, {
@@ -62,6 +63,7 @@ Vue.use(Vuetify, {
     VDialog,
     VSnackbar,
     transitions,
+    VChip,
     VProgressCircular
   },
   theme: {

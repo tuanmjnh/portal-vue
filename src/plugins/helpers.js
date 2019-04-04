@@ -187,7 +187,9 @@ Array.prototype.update = function(element, key = null) {
         if (destination) {
           Object.keys(source).forEach(function(keyobj, index) {
             // if (typeof source[keyobj] !== 'object')
-            if (destination[keyobj] !== undefined) source[keyobj] = destination[keyobj]
+            if (destination[keyobj] !== undefined) {
+              source[keyobj] = destination[keyobj]
+            }
           })
         }
       })

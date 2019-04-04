@@ -43,8 +43,8 @@ const GetStorage = function() {
 const GetRemember = function() {
   return this.GetStorage().remember
 }
-const GetUser = function() {
-  return this.GetStorage().username
+const GetAccount = function() {
+  return this.GetStorage().account
 }
 const GetToken = function() {
   return this.GetStorage().token
@@ -53,6 +53,6 @@ const GetUid = function() {
   return this.GetStorage().uid
 }
 const Authenticated = function() {
-  return this.GetStorage().token ? true : false;
+  return this.GetStorage().token && this.GetStorage().uid ? true : false;
 }
-export { signIn, signOut, GetStorage, GetUid, GetUser, GetToken, GetRemember, Authenticated };
+export { signIn, signOut, GetStorage, GetUid, GetAccount, GetToken, GetRemember, Authenticated };

@@ -11,7 +11,7 @@ const vnptbkn = axios.create({
   // timeout: 5000,
   headers: {
     Authorization: storageAuth.GetToken() || '',
-    Author: storageAuth.GetUser() || '',
+    Author: storageAuth.GetUid() || '',
     Remember: storageAuth.GetRemember()
   }
 })
@@ -27,12 +27,12 @@ const localhost = axios.create({
   // timeout: 1000,
   headers: {
     Authorization: storageAuth.GetToken() || '',
-    Author: storageAuth.GetUser() || '',
+    Author: storageAuth.GetUid() || '',
     Remember: storageAuth.GetRemember()
   }
 })
 const setHeaderAuth = function() {
-  vnptbkn.defaults.headers.Author = storageAuth.GetUser() || ''
+  vnptbkn.defaults.headers.Author = storageAuth.GetUid() || ''
   vnptbkn.defaults.headers.Authorization = storageAuth.GetToken() || ''
   vnptbkn.defaults.headers.Remember = storageAuth.GetRemember()
 }

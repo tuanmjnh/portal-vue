@@ -54,7 +54,7 @@ export default {
       state.items = items
     },
     [SET_ITEM](state, item) {
-      state.item = Object.assign({}, item)
+      state.item = item ? { ...item } : { ...state.default }
     },
     [PUSH_ITEMS](state, item) {
       state.items.push(item)
@@ -128,9 +128,8 @@ export default {
       //   .then(() => { commit(SET_ITEM, state.default) })
       //   .catch(error => { commit(SET_CATCH, error, { root: true }) })
     },
-    item({ commit, state }, item) {
-      if (item) commit(SET_ITEM, item)
-      else commit(SET_ITEM, state.default)
+    item({ commit }, item) {
+      commit(SET_ITEM, item)
     }
   }
 }

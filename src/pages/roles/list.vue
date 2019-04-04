@@ -102,7 +102,7 @@ export default {
     ]
   }),
   created() {
-    this.headers.forEach(e => { e.text = this.$store.getters.languages([e.text]) });
+    this.headers.forEach(e => { e.text = this.$store.getters.languages([e.text]) })
     if (this.$store.state.roles.isGetFirst) this.$store.dispatch('roles/select', true)
   },
   computed: {
@@ -118,11 +118,11 @@ export default {
     },
     onEdit(item) {
       this.$store.dispatch('roles/item', item)
-      this.$store.state.roles.dialog=true
+      this.$store.state.roles.dialog = true
     },
     onDelete(item) {
       this.confirmDialog = !this.confirmDialog
-      if (item) this.$store.state.roles.selected.push(item);
+      if (item) this.$store.state.roles.selected.push(item)
     },
     onCFMAccept() {
       this.$store.dispatch('roles/delete')

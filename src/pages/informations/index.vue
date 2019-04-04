@@ -1,5 +1,5 @@
 <template>
-  <div class="mid-center" v-if="$store.state.$loading">
+  <div class="mid-center" v-if="$store.state.$loadingGet">
     <v-progress-circular :size="130" :width="10" color="primary" indeterminate></v-progress-circular>
   </div>
   <div v-else>

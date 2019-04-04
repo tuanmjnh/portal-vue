@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="$store.state.dictionary.dialog" :persistent="loading" max-width="1024px">
+  <v-dialog v-model="$store.state.dictionary.dialog" :persistent="$store.state.$loadingCommit" max-width="1024px">
     <!-- <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn> -->
     <v-card>
       <v-card-title class="headline grey lighten-2">
@@ -30,10 +30,11 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" flat @click.native="onSave" :disabled="!valid" :loading="loading">
+        <v-btn color="primary" flat @click.native="onSave" :disabled="!valid" :loading="$store.state.$loadingCommit">
           {{$store.getters.languages(['global.update'])}}
         </v-btn>
-        <v-btn color="secondary" flat @click.native="$store.state.dictionary.dialog=false" :disabled="loading">
+        <v-btn color="secondary" flat @click.native="$store.state.dictionary.dialog=false"
+          :disabled="$store.state.$loadingCommit">
           {{$store.getters.languages(['global.back'])}}
         </v-btn>
       </v-card-actions>
@@ -52,13 +53,16 @@ export default {
   },
   data: () => ({
     valid: false,
-    loading: false,
     tabActive: null,
   }),
   created() {
     // this.$store.dispatch('dictionary/item')
   },
   computed: {
+    dialog() {
+      const rs = this.$store.state.dictionary.dialog
+      return rs
+    },
     item() {
       const rs = this.$store.state.dictionary.item
       return rs
@@ -77,6 +81,10 @@ export default {
     }
   },
   watch: {
+    dialog(val) {
+      if (!val) this.$store.dispatch('dictionary/item')
+      this.$refs.form.resetValidation()
+    },
     item: {
       handler(val) {
         if (this.item.key) this.item.key = this.item.key.toString().toLowerCase()
@@ -88,16 +96,10 @@ export default {
     onSave() {
       // var data = JSON.parse(`{"${this.module}":{"${this.key}":"${this.value}"}}`)
       // var data = { module_code: this.module_code, key: this.key, value: this.value }
-      this.loading = true
       if (this.valid) {
-        if (this.item.id) this.$store.dispatch('dictionary/update').then(this.loading = false)
-        else this.$store.dispatch('dictionary/insert').then(rs => { this.reset() })
+        if (this.item.id) this.$store.dispatch('dictionary/update')
+        else this.$store.dispatch('dictionary/insert')
       }
-    },
-    reset() {
-      this.loading = false
-      if (!this.item.id || !this.$store.state.dictionary.dialog) this.$store.dispatch('dictionary/item')
-      this.$refs.form.resetValidation()
     }
   }
 }

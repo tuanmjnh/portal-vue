@@ -10,8 +10,10 @@ import * as _languages from '@/plugins/languages'
 // modules
 // import nav from './modules/nav'
 import auth from './modules/auth'
-import users from './modules/users'
 import roles from './modules/roles'
+// import users from './modules/users'
+import nguoidung from './modules/nguoidung'
+import db_donvi from './modules/db_donvi'
 import setting from './modules/setting'
 import modules from './modules/modules'
 import languages from './modules/languages'
@@ -25,8 +27,9 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   modules: {
     auth: auth,
-    users: users,
     roles: roles,
+    nguoidung: nguoidung,
+    db_donvi: db_donvi,
     setting: setting,
     modules: modules,
     languages: languages,
@@ -39,7 +42,8 @@ export default new Vuex.Store({
   },
   state: {
     $loadingApp: false,
-    $loading: false,
+    $loadingGet: false,
+    $loadingCommit: false,
     $noimage: `Uploads/noimage.jpg`,
     $message: { show: false },
     $language_def: 'vi-VN',

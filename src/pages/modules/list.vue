@@ -50,7 +50,7 @@
               <v-checkbox v-model="props.selected" primary hide-details></v-checkbox>
             </td>
             <!-- <td>{{ props.item.id }}</td> -->
-            <td>{{ props.item.title }}</td>
+            <td>{{ $store.getters.languages(`modules.${props.item.code}`) }}</td>
             <td>{{ props.item.code }}</td>
             <td>{{ props.item.url }}</td>
             <td>{{ props.item.orders }}</td>

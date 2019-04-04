@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="$store.state.navigation.dialog" :persistent="loading" max-width="1024px">
+  <v-dialog v-model="$store.state.navigation.dialog" :persistent="$store.state.$loadingCommit" max-width="1024px">
     <!-- <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn> -->
     <v-card>
       <v-card-title class="headline grey lighten-2">
@@ -93,10 +93,11 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" flat @click.native="onSave" :loading="loading">
+        <v-btn color="primary" flat @click.native="onSave" :loading="$store.state.$loadingCommit">
           {{$store.getters.languages('global.update')}}
         </v-btn>
-        <v-btn color="secondary" flat @click.native="$store.state.navigation.dialog=false" :disabled="loading">
+        <v-btn color="secondary" flat @click.native="$store.state.navigation.dialog=false"
+          :disabled="$store.state.$loadingCommit">
           {{$store.getters.languages('global.back')}}
         </v-btn>
       </v-card-actions>
@@ -115,7 +116,6 @@ export default {
   },
 
   data: () => ({
-    loading: false,
     valid: false,
     isExist: true,
     tabActive: null,
@@ -127,6 +127,10 @@ export default {
     this.$store.dispatch('navigation/item')
   },
   computed: {
+    dialog() {
+      const rs = this.$store.state.navigation.dialog
+      return rs
+    },
     item() {
       const rs = this.$store.state.navigation.item
       return rs
@@ -138,6 +142,13 @@ export default {
     }
   },
   watch: {
+    dialog(val) {
+      this.$refs.form.resetValidation()
+      if (!val) {
+        this.$store.dispatch('navigation/item')
+        this.dependent_selected = [0]
+      }
+    },
     uploadFiles: {
       handler(val) {
         if (val.files && val.files.length > 0)
@@ -159,19 +170,10 @@ export default {
   },
   methods: {
     onSave() {
-      this.loading = true
       if (this.valid) {
         this.item.dependent = `,${this.dependent_selected.join(',')},`
-        if (this.item.id) this.$store.dispatch('navigation/update').then(this.loading = false)
-        else this.$store.dispatch('navigation/insert').then(rs => { this.reset() })
-      }
-    },
-    reset() {
-      this.loading = false
-      this.$refs.form.resetValidation()
-      if (!this.item.id || !this.$store.state.navigation.dialog) {
-        this.$store.dispatch('navigation/item')
-        this.dependent_selected = [0]
+        if (this.item.id) this.$store.dispatch('navigation/update')
+        else this.$store.dispatch('navigation/insert')
       }
     }
   }

@@ -6,7 +6,7 @@
       <div :class="['list-content',classContent]" :style="{minHeight:minHeight+'px',maxHeight:maxHeight+'px'}">
         <div v-for="(item,index) in itemsLeft" :key="index" :class="['list-item',classItem]"
           @click="onPush($event,item)">
-          <slot v-if="item.slot" :name="item.slot" :item="item"></slot>
+          <slot v-if="hasSlotItems" name="items" :item="item"></slot>
           <template v-else>
             <v-checkbox v-if="checkbox" v-model="local_selected" :value="item" :label="item.title"></v-checkbox>
             <div v-else>{{item.title}}</div>
@@ -76,6 +76,12 @@ export default {
   created() {
     // this.items.select = this.items.select ? this.items.select : []
     // console.log(this.selected)
+  },
+  computed: {
+    hasSlotItems() {
+    console.log(this.$slots, this.$scopedSlots)
+    return !!this.$scopedSlots['items']
+    }
   },
   watch: {
     // selected(val) {

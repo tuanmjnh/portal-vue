@@ -19,7 +19,7 @@
       </v-toolbar>
       <v-divider></v-divider>
       <v-list>
-        <template v-for="(item, i) in $store.getters['navigation/getRender']('content-left')">
+        <template v-for="(item, i) in $store.getters['navigation/getRender']({position: 'content-left',roles:$store.state.auth.user.roles})">
           <v-list-tile v-if="item.children.length<1" :key="i" @click="MenuAction(item)">
             <v-list-tile-action v-html="item.icon">
               <!-- <v-icon v-html="item.icon"></v-icon> -->
@@ -35,14 +35,47 @@
                 <v-list-tile-title v-text="$store.getters.languages(`navigation.${item.code}`)"></v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
-            <template v-if="item.children">
-              <v-list-tile v-for="(children, ii) in item.children" :key="ii" @click="MenuAction(children)">
-                <v-list-tile-title v-text="$store.getters.languages(`navigation.${children.code}`)"></v-list-tile-title>
-                <v-list-tile-action v-html="children.icon">
-                  <!-- <v-icon v-text="children.icon"></v-icon> -->
-                </v-list-tile-action>
+            <template v-for="(children, ii) in item.children">
+              <v-list-tile :key="ii" v-if="children.children.length<1" @click="MenuAction(children)">
+                <v-list-tile-title v-text="$store.getters.languages(`navigation.${children.code}`)" />
+                <v-list-tile-action v-html="children.icon" />
               </v-list-tile>
+              <v-list-group v-else :key="ii" no-action sub-group>
+                <v-list-tile slot="activator">
+                  <v-list-tile-title v-text="$store.getters.languages(`navigation.${children.code}`)" />
+                  <v-list-tile-action v-html="children.icon" />
+                </v-list-tile>
+                <template v-for="(child, iii) in children.children">
+                  <v-list-tile :key="iii" @click="MenuAction(child)">
+                    <v-list-tile-title v-text="$store.getters.languages(`navigation.${child.code}`)" />
+                    <v-list-tile-action v-html="child.icon" />
+                  </v-list-tile>
+                </template>
+              </v-list-group>
             </template>
+
+            <!-- </v-list-group> -->
+            <!-- <template v-if="item.children.length>0">
+              <v-list-tile v-for="(children, ii) in item.children" :key="ii" @click="MenuAction(children)">
+
+                <v-list-group v-if="children.children.length>0" no-action sub-group value="true">
+                  <v-list-tile-title v-text="$store.getters.languages(`navigation.${children.code}`)" />
+                  <v-list-tile-action v-html="children.icon" />
+
+                  <v-list-tile v-for="(admin, iii) in admins" :key="iii">
+                    <v-list-tile-title v-text="admin[0]"></v-list-tile-title>
+                    <v-list-tile-action>
+                      <v-icon v-text="admin[1]"></v-icon>
+                    </v-list-tile-action>
+                  </v-list-tile>
+                </v-list-group> 
+
+                <template>
+                  <v-list-tile-title v-text="$store.getters.languages(`navigation.${children.code}`)" />
+                  <v-list-tile-action v-html="children.icon" />
+                </template>
+              </v-list-tile>
+            </template> -->
           </v-list-group>
         </template>
       </v-list>
@@ -69,7 +102,7 @@
       <!-- <v-btn icon @click.stop="rightDrawer = !rightDrawer">
         <v-icon>apps</v-icon>
       </v-btn> -->
-      <template v-for="(item, index) in $store.getters['navigation/getRender']('head-right')">
+      <template v-for="(item, index) in $store.getters['navigation/getRender']({position: 'head-right'})">
         <template v-if="item.children.length>0">
           <v-menu :key="item.id" bottom :min-width="166">
             <v-tooltip slot="activator" bottom :key="index" v-if="item.icon">
@@ -79,7 +112,7 @@
               <span>{{$store.getters.languages(`navigation.${item.code}`)}}</span>
             </v-tooltip>
             <v-btn slot="activator" :key="index" flat v-else>
-              <div class="v-btn__content" v-if="item.code=='userlogged'">{{getAuth('fullname')}}
+              <div class="v-btn__content" v-if="item.code=='userlogged'">{{$store.state.auth.user.ten_nd}}
                 <v-icon>arrow_drop_down</v-icon>
               </div>
               <div class="v-btn__content" v-else>{{$store.getters.languages(`navigation.${children.code}`)}}</div>
@@ -219,6 +252,10 @@ export default {
     right: true,
     miniVariant: false,
     // rightDrawer: false,
+    admins: [
+      ['Management', 'people_outline'],
+      ['Settings', 'settings']
+    ],
     items: [
       { icon: 'home', title: 'Trang chủ', push: 'dashboard' },
       {
@@ -289,7 +326,7 @@ export default {
       return rs
     },
     navHeadLeft() {
-      const rs = this.$store.getters['navigation/getRender']('head-left')
+      const rs = this.$store.getters['navigation/getRender']({ position: 'head-left' })
       if (rs.length > 0) return rs[0]
       else return {
         title: 'Portal',
