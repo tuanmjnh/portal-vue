@@ -1,10 +1,10 @@
 <template>
   <v-app>
+    <template-snackbar></template-snackbar>
     <div class="mid-center" v-if="$store.state.$loadingApp">
       <v-progress-circular :size="130" :width="10" color="primary" indeterminate></v-progress-circular>
     </div>
     <template v-else>
-      <template-snackbar></template-snackbar>
       <template-main v-if="isAuth"></template-main>
       <template-auth v-else></template-auth>
     </template>
@@ -33,6 +33,7 @@ export default {
     if (!this.$store.state.$language || !this.$store.state.$languages) this.$store.dispatch('setLanguage')
     // Get Navigation
     if (this.$store.state.navigation.isGetFirst) this.$store.dispatch('navigation/select')
+    // Check Authenticated Refresh
     this.$store.dispatch('auth/setIsAuth', storageAuth.Authenticated())
   },
   computed: {

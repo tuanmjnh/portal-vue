@@ -1,9 +1,14 @@
 {
   "eslint.autoFixOnSave": true,
-  "eslint.validate": ["javascript", "javascriptreact", "vue", "typescript"],
-  "prettier.singleQuote": true,
-  "prettier.semi": true,
-  "prettier.eslintIntegration": false,
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "vue",
+    "typescript"
+  ],
+  // "prettier.singleQuote": true,
+  // "prettier.semi": true,
+  // "prettier.eslintIntegration": false,
   "vetur.format.defaultFormatter.html": "js-beautify-html",
   "vetur.format.defaultFormatter.stylus": "stylus-supremacy",
   "vetur.format.defaultFormatter.js": "vscode-typescript", // vscode-typescript
@@ -14,9 +19,9 @@
       "indent_size": 2,
     }
   },
-  "beautify.config": {
-    "brace_style": "collapse,preserve-inline",
-    "indent_size": 2,
-    "end_with_newline": true,
-  }
+  // "beautify.config": {
+  //   "brace_style": "collapse,preserve-inline",
+  //   "indent_size": 2,
+  //   "end_with_newline": true,
+  // }
 }

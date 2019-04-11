@@ -227,8 +227,8 @@
     <v-footer :fixed="fixed" app>
       <!-- <v-layout wrap class="pl-3"> -->
       <v-flex xs3 sm3 md2 class="pl-3">
-        <v-select :items="dataLanguages" v-model="$store.state.$language" :hide-selected="true"
-          item-text="title" item-value="code"></v-select>
+        <v-select :items="$store.getters['languages/getFilter']({flag:1})" v-model="$store.state.$language"
+          :hide-selected="true" item-text="title" item-value="code"></v-select>
       </v-flex>
       <v-spacer></v-spacer>
       <!-- <v-flex xs9 sm9 md10></v-flex> -->

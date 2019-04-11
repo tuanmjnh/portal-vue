@@ -13,8 +13,8 @@
           <v-container grid-list-md>
             <v-tabs v-model="tabActive" color="secondary" dark>
               <v-tab>{{$store.getters.languages(['global.main_info'])}}</v-tab>
-              <v-tab>{{$store.getters.languages(['global.note'])}}</v-tab>
               <v-tab>{{$store.getters.languages(['global.roles'])}}</v-tab>
+              <v-tab>{{$store.getters.languages(['global.note'])}}</v-tab>
               <v-tab-item>
                 <v-layout wrap class="pt-2">
                   <v-flex xs12 sm6 md6>
@@ -22,7 +22,7 @@
                       :label="$store.getters.languages(['roles.name'])"></v-text-field>
                   </v-flex>
                   <!-- <v-flex xs12 md6 sm6>
-                    <v-select :items="permissions" v-model="permissions_selected"
+                    <v-select :items="permissions" v-model="roles_selected"
                       multiple :menu-props="{ maxHeight: '400' }" item-text="title"
                       item-value="code" :label="$store.getters.languages(['permissions.title'])"
                       persistent-hint :hint="$store.getters.languages(['permissions.select'])"
@@ -47,11 +47,6 @@
                 </v-layout>
               </v-tab-item>
               <v-tab-item>
-                <v-flex xs12 sm12 md12>
-                  <v-textarea v-model.trim="item.descs" auto-grow box :placeholder="$store.getters.languages(['global.input',' ','global.descs'])"></v-textarea>
-                </v-flex>
-              </v-tab-item>
-              <v-tab-item>
                 <!-- <list-select :itemsLeft.sync="modules_items" :itemsRight.sync="modules_selected"
                   :checkbox="true" /> -->
                 <v-layout wrap class="pt-2">
@@ -71,7 +66,7 @@
                         <tr v-for="(item,index) in modules" :key="index">
                           <td>{{$store.getters.languages(`modules.${item.code}`)}}</td>
                           <td v-for="(per,index) in permissions" :key="index">
-                            <v-checkbox v-model="permissions_selected" :value="`${item.code}.${per.code}`"
+                            <v-checkbox v-model="roles_selected" :value="`${item.code}.${per.code}`"
                               :label="$store.getters.languages(`roles.${per.code}`)"></v-checkbox>
                           </td>
                         </tr>
@@ -79,6 +74,11 @@
                     </table>
                   </v-flex>
                 </v-layout>
+              </v-tab-item>
+              <v-tab-item>
+                <v-flex xs12 sm12 md12>
+                  <v-textarea v-model.trim="item.descs" auto-grow box :placeholder="$store.getters.languages(['global.input',' ','global.descs'])"></v-textarea>
+                </v-flex>
               </v-tab-item>
             </v-tabs>
           </v-container>
@@ -115,7 +115,7 @@ export default {
     tabActive: null,
     list_selected: [],
     color: { cover: "default", text: "white" },
-    permissions_selected: []
+    roles_selected: []
   }),
   created() {
     this.$store.dispatch('roles/item')
@@ -157,9 +157,9 @@ export default {
   watch: {
     dialog(val) {
       if (!val) this.$store.dispatch('roles/item')
-      else this.permissions_selected = this.item.roles.trim(',').split(',')
+      else this.roles_selected = this.item.roles.trim(',').split(',')
       this.$refs.form.resetValidation()
-      //this.permissions_selected = []
+      //this.roles_selected = []
     },
     uploadFiles: {
       handler(val) {
@@ -173,9 +173,9 @@ export default {
         if (JSON.parse(val.color) != null)
           this.color = JSON.parse(val.color)
         // if (this.permissions && this.permissions.length > 0) {
-        //   this.permissions_selected = []
+        //   this.roles_selected = []
         //   this.permissions.forEach(e => {
-        //     if (val.permissions.indexOf(`,${e.code},`) > -1) this.permissions_selected.push(e.code)
+        //     if (val.permissions.indexOf(`,${e.code},`) > -1) this.roles_selected.push(e.code)
         //   });
         // }
       },
@@ -185,23 +185,23 @@ export default {
   methods: {
     onSave() {
       if (this.valid) {
-        this.item.roles = `,${this.permissions_selected.join(',')},`
+        this.item.roles = `,${this.roles_selected.join(',')},`
         this.item.color = JSON.stringify(this.color)
         if (this.item.id) this.$store.dispatch('roles/update')
         else this.$store.dispatch('roles/insert').then(() => {
-          this.permissions_selected = []
+          this.roles_selected = []
         })
       }
     },
     selectAll(event, item) {
       if (event)
         this.modules.forEach(e => {
-          if (this.permissions_selected.indexOf(`${e.code}.${item}`) < 0)
-            this.permissions_selected.push(`${e.code}.${item}`)
+          if (this.roles_selected.indexOf(`${e.code}.${item}`) < 0)
+            this.roles_selected.push(`${e.code}.${item}`)
         })
       else
         this.modules.forEach(e => {
-          this.permissions_selected.splice(this.permissions_selected.indexOf(`${e.code}.${item}`), 1)
+          this.roles_selected.splice(this.roles_selected.indexOf(`${e.code}.${item}`), 1)
         })
     }
   }

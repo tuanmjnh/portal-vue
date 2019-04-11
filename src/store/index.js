@@ -1,6 +1,5 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { SET_MESSAGE, SET_CATCH } from './mutation-type'
 import { vnptbkn } from '@/plugins/axios-config'
 import * as _languages from '@/plugins/languages'
 //
@@ -45,7 +44,15 @@ export default new Vuex.Store({
     $loadingGet: false,
     $loadingCommit: false,
     $noimage: `Uploads/noimage.jpg`,
-    $message: { show: false },
+    $message: {
+      mode: '',
+      x: 'right',
+      y: 'top',
+      timeout: 6000,
+      show: false,
+      color: 'success',
+      text: ''
+    },
     $language_def: 'vi-VN',
     $language: _languages.GetLanguage(),
     $dictionary: _languages.GetDictionary(),
@@ -108,9 +115,47 @@ export default new Vuex.Store({
     //   return rs
     // }
   }, // = computed properties
+  mutations: {
+    ['SET_MESSAGE'](state, res) {
+      state.$message = {
+        mode: '',
+        x: 'right',
+        y: 'top',
+        show: res.text ? true : false,
+        timeout: 6000,
+        color: res.color || 'success',
+        text: res.text || ''
+      }
+    },
+    SET_CATCH(state, error) {
+      state.$message.mode = ''
+      state.$message.x = 'right'
+      state.$message.y = 'top'
+      state.$message.timeout = 6000
+      state.$message.show = true
+      state.$message.color = 'danger'
+      state.$message.text = state.$dictionary.error && state.$dictionary.error.connection ?
+        state.$dictionary.error.connection : error.message
+      if (!error.response) {
+        console.log(error.message) // Network Error
+      } else if (error.response.status === 401) {
+        this.dispatch('auth/signOut')
+        state.$message.text = state.$dictionary.auth && state.$dictionary.auth.msg_err_expired ?
+          state.$dictionary.auth.msg_err_expired :
+          error.response ? error.response.statusText : error
+        console.log(error.response.statusText)
+      }
+    },
+    SET_LANGUAGE(state, data) {
+      state.$language = data ? data : state.$language_def
+    },
+    SET_LANGUAGES(state, data) {
+      state.$dictionary = data
+    }
+  }, // Mutations
   actions: {
     message({ commit }, data) {
-      commit(SET_MESSAGE, data)
+      commit('SET_MESSAGE', data)
     },
     messageClose({ state }, data) {
       state.$message.show = data
@@ -121,21 +166,21 @@ export default new Vuex.Store({
       let lang_data = {}
       commit('SET_LANGUAGE', state.$language)
       // commit('SET_LANGUAGES', lang_data)
-      await vnptbkn.get(`dictionary/getlang/${state.$language}`).then(function(res) {
-          if (res.status == 200) {
-            _languages.SetLanguage(state.$language)
-            if (res.data.data) {
-              res.data.data.forEach(e => {
-                if (!lang_data[e.module_code] || lang_data[e.module_code] === undefined) lang_data[e.module_code] = {}
-                Object.assign(lang_data[e.module_code], JSON.parse(`{"${e.key}":"${e.value}"}`))
-              });
-              commit('SET_LANGUAGES', lang_data)
-              // state.$dictionary = _languages.GetDictionary()
-              _languages.SetDictionary(lang_data).then(state.$loadingApp = false)
-            }
-          } else commit(SET_CATCH, null)
-        })
-        .catch(function(error) { commit(SET_CATCH, error) })
+      await vnptbkn.get(`dictionary/GetByLanguage/${state.$language}`).then(function (res) {
+        if (res.status == 200) {
+          _languages.SetLanguage(state.$language)
+          if (res.data.data) {
+            res.data.data.forEach(e => {
+              if (!lang_data[e.module_code] || lang_data[e.module_code] === undefined) lang_data[e.module_code] = {}
+              Object.assign(lang_data[e.module_code], JSON.parse(`{"${e.key}":"${e.value}"}`))
+            });
+            commit('SET_LANGUAGES', lang_data)
+            // state.$dictionary = _languages.GetDictionary()
+            _languages.SetDictionary(lang_data).then(state.$loadingApp = false)
+          }
+        } else commit('SET_CATCH', null)
+      })
+        .catch(function (error) { commit('SET_CATCH', error) })
 
       // Data Json
       // commit('SET_LANGUAGE', state.$language)
@@ -147,9 +192,9 @@ export default new Vuex.Store({
       //         lang_data = res.data.data[0].lang_data
       //       _languages.SetDictionary(lang_data)
       //       state.$dictionary = _languages.GetDictionary()
-      //     } else commit(SET_CATCH, null)
+      //     } else commit('SET_CATCH', null)
       //   })
-      //   .catch(function(error) { commit(SET_CATCH, error) })
+      //   .catch(function(error) { commit('SET_CATCH', error) })
 
       // Json File
       // await vnptbkn.get(`../Languages/${state.$language}.json`).then(function(res) {
@@ -157,9 +202,9 @@ export default new Vuex.Store({
       //       commit('SET_LANGUAGES', res.data)
       //       _languages.SetLanguage(state.$language)
       //       _languages.SetDictionary(JSON.stringify(res.data))
-      //     } else commit(SET_CATCH, null)
+      //     } else commit('SET_CATCH', null)
       //   })
-      //   .catch(function(error) { commit(SET_CATCH, error) })
+      //   .catch(function(error) { commit('SET_CATCH', error) })
     },
     notification({ state }) {
       state.$notification = !state.$notification
@@ -168,70 +213,9 @@ export default new Vuex.Store({
       var error = {}
       error.response = { status: 401 }
       // console.log(getters.languages('auth.msg_err_expired'))
-      await commit(SET_CATCH, error)
+      await commit('SET_CATCH', error)
     }
-  }, // Actions
-  mutations: {
-    [SET_MESSAGE](state, res) {
-      state.$message = {
-        mode: '',
-        x: 'right',
-        y: 'top',
-        show: res.text ? true : false,
-        timeout: 6000,
-        color: res.color || 'success',
-        text: res.text || '',
-        status: res.status || 0,
-        statusText: res.statusText || 'Error'
-      }
-    },
-    [SET_CATCH](state, error) {
-      if (!error.response) {
-        console.log(error)
-        return
-      }
-      if (error.response.status === 401) {
-        this.dispatch('auth/signOut')
-        let text = state.$dictionary.auth && state.$dictionary.auth.msg_err_expired ?
-          state.$dictionary.auth.msg_err_expired :
-          error.response ? error.response.statusText : error
-        state.$message = {
-          mode: '',
-          x: 'right',
-          y: 'top',
-          timeout: 6000,
-          show: true,
-          color: 'danger',
-          text: text,
-          status: error.response ? error.response.status : 0,
-          statusText: error.response ? error.response.statusText : error
-        }
-      } else {
-        let text = state.$dictionary.messages && state.$dictionary.messages.err_connection ?
-          state.$dictionary.messages.err_connection :
-          error.response ? error.response.statusText : error
-        state.$message = {
-          mode: '',
-          x: 'right',
-          y: 'top',
-          timeout: 6000,
-          show: true,
-          color: 'danger',
-          text: text,
-          status: error.response ? error.response.status : 0,
-          statusText: error.response ? error.response.statusText : error
-        }
-      }
-      // state.$message.show = true
-      // console.log(state.$message)
-    },
-    ['SET_LANGUAGE'](state, data) {
-      state.$language = data ? data : state.$language_def
-    },
-    ['SET_LANGUAGES'](state, data) {
-      state.$dictionary = data
-    }
-  } // Mutations
+  } // Actions
 })
 
 // import Vue from 'vue'

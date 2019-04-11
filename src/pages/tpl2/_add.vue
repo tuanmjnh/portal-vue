@@ -36,7 +36,7 @@
           </v-flex>
           <v-flex xs12 sm12 md12>
             <!-- <editor v-model="dataItem.desc" apiKey="yat69ufb2vpeon5rcyk9z5jm6r9jjf85vmvw5t2aacdeupw6" :init="tinymceSettings"></editor> -->
-            <tinymce id="d1" v-model="dataItem.desc"></tinymce>
+            <!-- <tinymce id="d1" v-model="dataItem.desc"></tinymce> -->
             <!-- <textarea v-model="dataItem.desc"></textarea> -->
             <!-- <v-text-field v-model="dataItem.desc" label="Descriptions"></v-text-field> -->
           </v-flex>
@@ -66,10 +66,10 @@
 </template>
 
 <script>
-import tinymce from "vue-tinymce-editor";
+// import tinymce from "vue-tinymce-editor";
 export default {
     components: {
-        tinymce
+        // tinymce
     },
     data: () => ({
         dataItem: {}

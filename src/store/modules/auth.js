@@ -102,7 +102,7 @@ export default {
       if (val) {
         await vnptbkn.get(`nguoidung/${storageAuth.GetUid()}`).then(function(res) {
           if (res.data.data) commit('SET_USER', res.data.data)
-        })
+        }).catch(function(error) { commit(SET_CATCH, error, { root: true }) }) // commit catch
       }
     },
     async item({ commit }, data = null) {
