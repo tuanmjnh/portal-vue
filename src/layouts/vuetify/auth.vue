@@ -38,7 +38,7 @@
     </v-layout>
     <v-layout wrap class="align-center justify-center">
       <v-flex xs6 sm6 md3>
-        <v-select :items="$store.getters['languages/getFilter']({flag:1})" v-model="$store.state.$language"
+        <v-select :items="$store.getters['languages/getFilter']({find:{flag:1}})" v-model="$store.state.$language"
           :hide-selected="true" item-text="title" item-value="code"></v-select>
       </v-flex>
     </v-layout>
@@ -48,18 +48,16 @@
 <script>
 export default {
   data: () => ({}),
-  created() {
-    this.$store.dispatch('auth/item')
+  beforeCreate() {
+    this.$store.commit('auth/SET_ITEM')
     // this.$store.dispatch('TEST')
   },
   computed: {
     item() {
-      const rs = this.$store.state.auth.item
-      return rs
+      return this.$store.state.auth.item
     },
     language() {
-      const rs = this.$store.state.$language
-      return rs
+      return this.$store.state.$language
     }
   },
   watch: {

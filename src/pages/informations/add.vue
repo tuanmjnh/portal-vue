@@ -1,12 +1,10 @@
 <template>
-  <v-dialog v-model="localDialog" max-width="1024px">
-    <!-- <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn> -->
+  <v-dialog v-model="$store.state.informations.dialog" max-width="1024px" persistent>
     <v-card>
       <v-card-title>
         <span class="headline">{{ formTitle }}</span>
       </v-card-title>
-
-      <v-card-text>
+      <v-card-text class="p-0">
         <v-container grid-list-md>
           <v-layout wrap>
             <v-flex xs12 sm6 md4>

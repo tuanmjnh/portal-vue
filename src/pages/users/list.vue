@@ -8,38 +8,39 @@
               :hide-selected="true" item-text="ten_donvi" item-value="donvi_id" :label="$store.getters.languages(['global.local'])"></v-select>
           </v-flex>
           <v-flex xs12 sm4 md4 class="mr-3">
-            <v-text-field v-model="pagination.search" append-icon="search" :label="$store.getters.languages('global.search')"
+            <v-text-field v-model="$store.state.users.pagination.search"
+              append-icon="search" :label="$store.getters.languages('global.search')"
               single-line hide-details></v-text-field>
           </v-flex>
           <v-spacer></v-spacer>
           <v-tooltip bottom>
-            <v-btn flat icon slot="activator" color="primary" @click="$store.state.users.dialog=true">
+            <v-btn flat icon slot="activator" color="primary" @click="$store.state.navigation.dialog=true">
               <v-icon>add</v-icon>
             </v-btn>
             <span>{{$store.getters.languages('global.add')}}</span>
           </v-tooltip>
-          <v-tooltip bottom v-if="$store.state.users.selected.length>0 && pagination.find.flag===1">
+          <v-tooltip bottom v-if="$store.state.users.selected.length>0 && $store.state.users.pagination.find.flag===1">
             <v-btn flat icon slot="activator" color="danger" @click="onDelete()">
               <v-icon>delete</v-icon>
             </v-btn>
             <span>{{$store.getters.languages('global.delete_selected')}}</span>
           </v-tooltip>
-          <v-tooltip bottom v-if="$store.state.users.selected.length>0 && pagination.find.flag===0">
+          <v-tooltip bottom v-if="$store.state.users.selected.length>0 && $store.state.users.pagination.find.flag===0">
             <v-btn flat icon slot="activator" color="info" @click="onDelete()">
               <v-icon>refresh</v-icon>
             </v-btn>
             <span>{{$store.getters.languages('global.recover_selected')}}</span>
           </v-tooltip>
         </v-layout>
-        <v-btn-toggle v-model="toggle_one" mandatory>
+        <v-btn-toggle v-model="$store.state.navigation.pagination.toggle" mandatory>
           <v-tooltip bottom>
-            <v-btn slot="activator" flat @click="pagination.find.flag=1">
+            <v-btn slot="activator" flat @click="$store.state.users.pagination.find.flag=1">
               <v-icon>view_list</v-icon>
             </v-btn>
             <span>{{$store.getters.languages('global.using')}}</span>
           </v-tooltip>
           <v-tooltip bottom>
-            <v-btn slot="activator" flat @click="pagination.find.flag=0">
+            <v-btn slot="activator" flat @click="$store.state.users.pagination.find.flag=0">
               <v-icon>delete</v-icon>
             </v-btn>
             <span>{{$store.getters.languages('global.deleted')}}</span>
@@ -47,9 +48,9 @@
         </v-btn-toggle>
       </v-card-title>
       <v-data-table class="elevation-1" v-model="$store.state.users.selected" select-all
-        item-key="user_id" :headers="headers" :items="items" :rows-per-page-items="rowPerPage"
-        :rows-per-page-text="$store.getters.languages('global.rows_per_page')"
-        :pagination.sync="pagination" :search="pagination.search">
+        item-key="user_id" :headers="$store.getters['users/headers']" :items="items"
+        :rows-per-page-items="$store.state.$row_per_page" :rows-per-page-text="$store.getters.languages('global.rows_per_page')"
+        :pagination.sync="$store.state.users.pagination" :search="$store.state.users.pagination.search">
         <!--:loading="loading" :pagination.sync="pagination" :total-items="totalItems" -->
         <template slot="items" slot-scope="props">
           <tr>
@@ -67,7 +68,7 @@
                 </v-btn>
                 <span>{{$store.getters.languages('global.edit')}}</span>
               </v-tooltip>
-              <v-tooltip bottom v-if="pagination.find.flag===1">
+              <v-tooltip bottom v-if="$store.state.users.pagination.find.flag===1">
                 <v-btn flat icon slot="activator" color="error" class="mx-0" @click="onDelete(props.item)">
                   <v-icon>delete</v-icon>
                 </v-btn>
@@ -94,44 +95,14 @@
 import confirm from '@/components/confirm'
 export default {
   components: { 'tpl-confirm': confirm },
-  data: () => {
-    return {
-      selected: [],
-      donvi_id: null,
-      toggle_one: 0,
-      localDialog: false,
-      confirmDialog: false,
-      pagination: { search: '', sortBy: 'created_at', direction: false, find: { flag: 1 } },
-      rowPerPage: [5, 10, 25, 50, 100, { text: "All", value: -1 }],
-      headers: [
-        { text: 'users.username', value: 'username' },
-        { text: 'users.full_name', value: 'full_name' },
-        { text: 'users.mobile', value: 'mobile' },
-        { text: 'users.email', value: 'email' },
-        { text: '#', value: '#', sortable: false }
-      ]
-    }
-  },
-  created() {
-    this.headers.forEach(e => { e.text = this.$store.getters.languages(e.text) });
-    if (this.$store.state.users.isGetFirst) this.$store.dispatch('users/select', true)
-    if (this.$store.state.db_donvi.isGetFirst) this.$store.dispatch('db_donvi/select', true)
-  },
+  data: () => { },
   computed: {
     items() {
-      var rs = this.$store.getters['users/getFilterDonvi'](this.pagination)
-      return rs
+      return this.$store.getters['users/getFilterDonvi']
     },
     db_donvi() {
       var rs = this.$store.getters['db_donvi/getFilter']({ sortBy: 'ma_dvi' })
       return [...[{ donvi_id: 0, ten_donvi: '-- Tất cả --' }], ...rs] //.unshift({ donvi_id: 0, ten_donvi: '-- Tất cả --' })
-    }
-  },
-  watch: {
-    dialog(val) { this.localDialog = val },
-    localDialog(val) {
-      this.$emit('handleDialog', val)
-      if (!val) this.$store.dispatch('users/item')
     }
   },
   methods: {
@@ -140,7 +111,7 @@ export default {
       this.$store.state.users.dialog = true
     },
     onDelete(item) {
-      this.confirmDialog = !this.confirmDialog
+      this.$store.state.users.confirm = true
       if (item) this.$store.state.users.selected.push(item);
     },
     onCFMAccept() {

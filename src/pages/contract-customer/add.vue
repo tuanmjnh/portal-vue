@@ -1,126 +1,128 @@
 <template>
   <v-dialog v-model="$store.state.contract_customer.dialog" max-width="1024px" persistent>
-    <!-- <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn> -->
     <v-card>
-      <v-card-title>
-        <span class="headline">{{ khachhang.cc_id ?
-          'Chi tiết hợp đồng lưu trữ' : 'Thêm mới hợp đồng lưu trữ' }}</span>
+      <v-card-title class="headline grey lighten-2">
+        {{ khachhang.id ?
+        $store.getters.languages('global.details') :
+        $store.getters.languages('global.add') }}
       </v-card-title>
-      <v-card-text>
-        <v-container grid-list-md>
-          <v-tabs v-model="tabActive" color="secondary" dark>
-            <v-tab>Thông tin khách hàng</v-tab>
-            <v-tab>Thông tin thuê bao</v-tab>
-            <v-tab>Ghi chú</v-tab>
-            <v-tab>Thông tin thêm</v-tab>
-            <v-tab-item>
-              <v-layout wrap class="pt-2">
-                <v-flex xs12 sm12 md4>
-                  <v-text-field v-model.trim="khachhang.ma_gd" label="Mã hợp đồng" class="text-color-initial"
-                    v-on:keyup.enter="getContract" :disabled="khachhang.cc_id?true:false"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm12 md8>
-                  <v-text-field v-model.trim="khachhang.ten_kh" label="Tên khách hàng"
-                    :disabled="true" class="text-color-initial"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm12 md12>
-                  <v-text-field v-model.trim="khachhang.diachi_kh" label="Địa chỉ khách hàng"
-                    :disabled="true" class="text-color-initial"></v-text-field>
-                </v-flex>
-                <!-- <v-flex xs12 sm12 md12>
+      <v-card-text class="p-0">
+        <v-form v-model="$store.state.contract_customer.valid" ref="form">
+          <v-container grid-list-md>
+            <v-tabs v-model="$store.state.contract_customer.tabs" color="secondary" dark>
+              <v-tab>Thông tin khách hàng</v-tab>
+              <v-tab>Thông tin thuê bao</v-tab>
+              <v-tab>Thông tin chi tiết</v-tab>
+              <v-tab>Ghi chú</v-tab>
+              <v-tab-item>
+                <v-layout wrap class="pt-2">
+                  <v-flex xs12 sm12 md4>
+                    <v-text-field v-model.trim="khachhang.ma_gd" label="Mã hợp đồng"
+                      class="text-color-initial" v-on:keyup.enter="getContract" :disabled="khachhang.cc_id?true:false"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm12 md8>
+                    <v-text-field v-model.trim="khachhang.ten_kh" label="Tên khách hàng"
+                      :disabled="true" class="text-color-initial"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm12 md12>
+                    <v-text-field v-model.trim="khachhang.diachi_kh" label="Địa chỉ khách hàng"
+                      :disabled="true" class="text-color-initial"></v-text-field>
+                  </v-flex>
+                  <!-- <v-flex xs12 sm12 md12>
               <v-text-field v-model="khachhang.diachi_tb" label="Địa chỉ thuê bao"></v-text-field>
             </v-flex>
             <v-flex xs12 sm12 md12>
               <v-text-field v-model="khachhang.diachi_ld" label="Địa chỉ lắp đặt"></v-text-field>
             </v-flex> -->
-                <v-flex xs12 sm6 md6>
-                  <v-text-field v-model.trim="khachhang.so_dt" label="Điện thoại liên hệ"
-                    :disabled="true" class="text-color-initial"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md6>
-                  <v-text-field v-model.trim="khachhang.so_gt" label="Số giấy tờ"
-                    :disabled="true" class="text-color-initial"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md6>
-                  <v-text-field v-model.trim="khachhang.mst" label="Mã số thuế" :disabled="true"
-                    class="text-color-initial"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md6>
-                  <v-text-field v-model.trim="khachhang.stk" label="Số tài khoản"
-                    :disabled="true" class="text-color-initial"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm12 md12 v-if="khachhang.cc_id">
-                  Hợp đồng: <a class="mx-0 v-btn v-btn--icon theme--info" :href="vnptbkn.defaults.host+khachhang.attach"
-                    target="_blank"><i class="material-icons">attachment</i></a>
-                </v-flex>
-                <template v-if="!khachhang.cc_id">
-                  <v-flex xs12 sm6 md6 v-if="khachhang.ma_gd">
-                    <upload-files @handleUpload="uploadFiles=$event" :buttonUse="false"
-                      :basePath="uploadFiles.basePath" :multiple="false" :autoName="true"
-                      :http="vnptbkn" extension="application/pdf" buttonText="Ấn vào đây để chọn hợp đồng"></upload-files>
-                    <!-- :fileName="khachhang.ma_gd.replace(/\//g,'_')" -->
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field v-model.trim="khachhang.so_dt" label="Điện thoại liên hệ"
+                      :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
-                  <v-flex xs12 sm6 md6 v-if="khachhang.ma_gd">
-                    <display-files :files="uploadFiles.files" :baseUrl="vnptbkn.defaults.host"
-                      :isShowName="false" classes="w-x"></display-files>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field v-model.trim="khachhang.so_gt" label="Số giấy tờ"
+                      :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
-                </template>
-                <!-- <v-flex xs12 sm6 md4>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field v-model.trim="khachhang.mst" label="Mã số thuế"
+                      :disabled="true" class="text-color-initial"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field v-model.trim="khachhang.stk" label="Số tài khoản"
+                      :disabled="true" class="text-color-initial"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm12 md12 v-if="khachhang.cc_id">
+                    Hợp đồng: <a class="mx-0 v-btn v-btn--icon theme--info" :href="vnptbkn.defaults.host+khachhang.attach"
+                      target="_blank"><i class="material-icons">attachment</i></a>
+                  </v-flex>
+                  <template v-if="!khachhang.cc_id">
+                    <v-flex xs12 sm6 md6 v-if="khachhang.ma_gd">
+                      <upload-files @handleUpload="uploadFiles=$event" :buttonUse="false"
+                        :basePath="uploadFiles.basePath" :multiple="false" :autoName="true"
+                        :http="vnptbkn" extension="application/pdf" buttonText="Ấn vào đây để chọn hợp đồng"></upload-files>
+                      <!-- :fileName="khachhang.ma_gd.replace(/\//g,'_')" -->
+                    </v-flex>
+                    <v-flex xs12 sm6 md6 v-if="khachhang.ma_gd">
+                      <display-files :files="uploadFiles.files" :baseUrl="vnptbkn.defaults.host"
+                        :isShowName="false" classes="w-x"></display-files>
+                    </v-flex>
+                  </template>
+                  <!-- <v-flex xs12 sm6 md4>
               <v-switch color="primary" :label="khachhang.flag===1?'Show':'Hide'" :true-value="1"
                 :false-value="0" v-model.number="khachhang.flag"></v-switch>
             </v-flex> -->
-              </v-layout>
-            </v-tab-item>
-            <v-tab-item>
-              <v-data-table :headers="headers" :items="thuebao" class="elevation-1"
-                hide-actions>
-                <template slot="items" slot-scope="props">
-                  <td>{{ props.item.ma_tb }}</td>
-                  <td>{{ props.item.ten_tb }}</td>
-                  <td>{{ props.item.diachi_tb }}</td>
-                  <td>{{ props.item.diachi_ld }}</td>
-                  <td>{{ props.item.loaihinh_tb }}</td>
-                  <td>{{ props.item.ten_dv }}</td>
-                </template>
-              </v-data-table>
-            </v-tab-item>
-            <v-tab-item>
-              <v-layout wrap class="pt-2">
-                <v-flex xs12 sm12 md12>
-                  <vue-quill-editor v-model.trim="khachhang.details" ref="Ghi chú">
-                  </vue-quill-editor>
-                  <!-- <tinymce id="desc" v-model="khachhang.desc"></tinymce> -->
-                </v-flex>
-              </v-layout>
-            </v-tab-item>
-            <v-tab-item>
-              <v-layout wrap class="pt-2">
-                <v-flex xs12 sm6 md6>
-                  <v-text-field :value="khachhang.ten_dv" label="Đơn vị" :disabled="true"
-                    class="text-color-initial"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md6>
-                  <v-text-field :value="khachhang.ten_loaihd" label="Loại hợp đồng"
-                    :disabled="true" class="text-color-initial"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md6>
-                  <v-text-field v-model="khachhang.ten_loaikh" label="Loại khách hàng"
-                    :disabled="true" class="text-color-initial"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md6>
-                </v-flex>
-                <v-flex xs12 sm6 md6>
-                  <v-text-field v-model="khachhang.nguoi_cn" label="Người cập nhật"
-                    :disabled="true" class="text-color-initial"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md6>
-                  <v-text-field :value="khachhang.ngay_cn|formatDate" label="Ngày cập nhật"
-                    :disabled="true" class="text-color-initial"></v-text-field>
-                </v-flex>
-              </v-layout>
-            </v-tab-item>
-          </v-tabs>
-        </v-container>
+                </v-layout>
+              </v-tab-item>
+              <v-tab-item>
+                <v-data-table :headers="headers" :items="thuebao" class="elevation-1"
+                  hide-actions>
+                  <template slot="items" slot-scope="props">
+                    <td>{{ props.item.ma_tb }}</td>
+                    <td>{{ props.item.ten_tb }}</td>
+                    <td>{{ props.item.diachi_tb }}</td>
+                    <td>{{ props.item.diachi_ld }}</td>
+                    <td>{{ props.item.loaihinh_tb }}</td>
+                    <td>{{ props.item.ten_dv }}</td>
+                  </template>
+                </v-data-table>
+              </v-tab-item>
+              <v-tab-item>
+                <v-layout wrap class="pt-2">
+                  <v-flex xs12 sm12 md12>
+                    <vue-quill-editor v-model.trim="khachhang.details" ref="Ghi chú">
+                    </vue-quill-editor>
+                    <!-- <tinymce id="desc" v-model="khachhang.desc"></tinymce> -->
+                  </v-flex>
+                </v-layout>
+              </v-tab-item>
+              <v-tab-item>
+                <v-layout wrap class="pt-2">
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field :value="khachhang.ten_dv" label="Đơn vị" :disabled="true"
+                      class="text-color-initial"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field :value="khachhang.ten_loaihd" label="Loại hợp đồng"
+                      :disabled="true" class="text-color-initial"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field v-model="khachhang.ten_loaikh" label="Loại khách hàng"
+                      :disabled="true" class="text-color-initial"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md6>
+                  </v-flex>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field v-model="khachhang.nguoi_cn" label="Người cập nhật"
+                      :disabled="true" class="text-color-initial"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field :value="khachhang.ngay_cn|formatDate" label="Ngày cập nhật"
+                      :disabled="true" class="text-color-initial"></v-text-field>
+                  </v-flex>
+                </v-layout>
+              </v-tab-item>
+            </v-tabs>
+          </v-container>
+        </v-form>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
@@ -154,7 +156,6 @@ export default {
     'display-files': displayFiles
   },
   data: () => ({
-    tabActive: null,
     uploadFiles: { files: [], basePath: 'Uploads\\HopDong' },
     vnptbkn: vnptbkn,
     headers: [
@@ -167,28 +168,23 @@ export default {
     ]
   }),
   mounted() {
-    this.$store.dispatch('contract_customer/khachhang')
+    this.reset()
   },
   computed: {
+    dialog() {
+      return this.$store.state.navigation.dialog
+    },
     khachhang() {
-      var khachhang = this.$store.state.contract_customer.khachhang
-      return khachhang
+      return this.$store.state.contract_customer.khachhang
     },
     thuebao() {
-      var thuebao = this.$store.state.contract_customer.thuebao
-      return thuebao
+      return this.$store.state.contract_customer.thuebao
     }
   },
   watch: {
-    // dialog(val) { this.localDialog = val },
-    // localDialog(val) {
-    //   this.$emit('handleDialog', val)
-    //   if (!val) {
-    //     this.$store.dispatch('contract_customer/khachhang')
-    //     this.$store.dispatch('contract_customer/thuebao')
-    //     this.uploadFiles.files = []
-    //   }
-    // },
+    dialog(val) {
+      if (!val) this.reset()
+    },
     uploadFiles: {
       handler(val) {
         if (val.files && val.files.length > 0)
@@ -211,10 +207,11 @@ export default {
     getContract() {
       if (this.khachhang.ma_gd.length > 0)
         this.$store.dispatch('contract_customer/getContract').then()
+    },
+    reset() {
+      this.$store.commit('contract_customer/SET_KHACHHANG')
+      this.$refs.form.resetValidation()
     }
-  },
-  created() {
-    // console.log(this.vnptbkn.defaults)
   }
 }
 </script>

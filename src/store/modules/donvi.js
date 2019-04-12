@@ -1,10 +1,11 @@
 import { vnptbkn } from '@/plugins/axios-config'
-const collection = 'languages'
+const collection = 'donvi'
 export default {
   namespaced: true,
   state: {
     items: [],
     item: {},
+    donvi_id: 0,
     tabs: null,
     selected: [],
     valid: false,
@@ -13,36 +14,26 @@ export default {
     exist_code: true,
     isGetFirst: true,
     headers: [
-      // { text: 'ID', value: 'id', align: 'left' },
-      { text: 'languages.title', value: 'title', align: 'left' },
-      { text: 'global.code', value: 'code', align: 'left' },
-      { text: 'global.orders', value: 'orders' },
-      { text: 'global.created_at', value: 'created_at' },
-      { text: 'Icon', value: 'icon' },
+      { text: 'nguoidung.username', value: 'ma_nd' },
+      { text: 'nguoidung.full_name', value: 'ten_nd' },
+      { text: 'nguoidung.mobile', value: 'so_dt' },
+      { text: 'nguoidung.email', value: 'email' },
+      { text: 'global.roles', value: 'roles_name' },
       { text: '#', value: '#', sortable: false }
     ],
     pagination: {
       search: '',
-      sortBy: 'orders',
-      toggle: 0,
-      find: { flag: 1 }
+      sortBy: 'ma_dvi',
+      direction: false
     },
-    languages_default: 'vi-VN',
     default: {
-      id: '',
-      code: '',
-      title: '',
-      icon: '<i class="material-icons">outlined_flag</i>',
-      attach: '',
-      orders: 1,
-      descs: '',
-      created_by: '',
-      created_at: new Date(),
-      updated_by: '',
-      updated_at: null,
-      deleted_by: '',
-      deleted_at: null,
-      flag: 1
+      ma_dvi: 0,
+      donvi_id: 0,
+      donvi_ql_id: 0,
+      ten_dv: '',
+      ten_dv_ql: '',
+      sdt: '',
+      stk: ''
     }
   },
   getters: {
@@ -50,7 +41,7 @@ export default {
       return state.items
     },
     getById: state => id => {
-      return state.items.find(x => x.id === id)
+      return state.items.find(x => x.donvi_id === id)
     },
     getFilter: state => pagination => {
       let rs = [...state.items]
@@ -75,7 +66,7 @@ export default {
       state.item = item ? { ...item } : { ...state.default }
     },
     SET_ITEM_ID(state, id) {
-      state.item = id ? { ...state.items.find(x => x.id == id) } : { ...state.default }
+      state.item = id ? { ...state.items.find(x => x.donvi_id == id) } : { ...state.default }
     },
     PUSH_ITEMS(state, item) {
       state.items.push(item)
@@ -88,53 +79,6 @@ export default {
     }
   },
   actions: {
-    pagination({ commit, state }, { search, pagination }) {
-      var items = []
-      var obj = {
-        search: [],
-        orderBy: [],
-        limit: 5
-      }
-      if (search) {
-        obj.search.push('name', '>=', search)
-        obj.search.push('name', '<=', search)
-        // cll = cll.where('name', '==', 'lang 0')
-      }
-      if (pagination.sortBy) {
-        obj.orderBy.push('name', pagination.descending ? 'desc' : 'asc')
-        // cll = cll.orderBy('name', pagination.descending ? 'desc' : 'asc')
-      }
-      if (pagination.rowsPerPage) {
-        obj.limit = 5
-        // cll = cll.limit(5)
-      }
-      if (obj.search.length > 0)
-        state.cll
-          .where(obj.search[0], obj.search[1], obj.search[2])
-          .orderBy(obj.orderBy[0], obj.orderBy[1])
-          .limit(obj.limit)
-          .get().then(query => {
-            query.forEach(function (doc) {
-              var item = state.default
-              item = doc.data()
-              item.id = doc.id
-              items.push(item)
-            })
-          })
-      else
-        state.cll
-          .orderBy(obj.orderBy[0], obj.orderBy[1])
-          .limit(obj.limit)
-          .get().then(query => {
-            query.forEach(function (doc) {
-              var item = state.default
-              item = doc.data()
-              item.id = doc.id
-              items.push(item)
-            })
-          })
-      commit('SET_ITEMS', items)
-    },
     async select({ commit, state, rootGetters, rootState }, loading = true) {
       // Loading
       if (loading) rootState.$loadingGet = true
@@ -153,6 +97,25 @@ export default {
       }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
         .finally(() => { if (loading) rootState.$loadingGet = false })
     },
+    // async GetRoles({ commit, state, rootGetters, rootState }, loading = true) {
+    //   // Loading
+    //   if (loading) rootState.$loadingCommit = true
+    //   // http
+    //   await vnptbkn.get(collection + '/GetRoles').then(function(res) {
+    //     if (res.status === 200) {
+    //       if (res.data.msg === 'danger') {
+    //         commit(SET_MESSAGE, { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+    //         return
+    //       }
+    //       if (res.data.data) commit(SET_ITEMS, res.data.data)
+    //     } else commit(SET_CATCH, null, { root: true })
+    //   }).catch(function(error) {
+    //     commit(SET_CATCH, error, { root: true })
+    //   }).finally(() => {
+    //     // state.isGetFirst = false
+    //     if (loading) rootState.$loadingCommit = false
+    //   })
+    // },
     async insert({ commit, state, rootGetters, rootState }, loading = true) {
       // Loading
       if (loading) rootState.$loadingCommit = true
@@ -162,7 +125,7 @@ export default {
       await vnptbkn.post(collection, state.item).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'exist') {
-            commit('SET_MESSAGE', { text: rootGetters.languages('languages.err_exist'), color: 'warning' }, { root: true })
+            commit('SET_MESSAGE', { text: rootGetters.languages('modules.err_exist'), color: 'warning' }, { root: true })
             return
           }
           if (res.data.msg === 'danger') {
@@ -170,8 +133,8 @@ export default {
             return
           }
           // Success
-          commit('SET_ITEM')
           commit('PUSH_ITEMS', res.data.data)
+          commit('SET_ITEM')
           commit('SET_MESSAGE', { text: rootGetters.languages('success.add'), color: res.data.msg }, { root: true })
         } else commit('SET_CATCH', null, { root: true })
       }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
@@ -200,8 +163,12 @@ export default {
       // Loading
       if (loading) rootState.$loadingCommit = true
       // http
-      const data = state.selected.map(x => ({ id: x.id, flag: x.flag === 0 ? 1 : 0 }))
-      await vnptbkn.put(`${collection}/delete`, data).then(function (res) {
+      if (state.selected.length < 1) {
+        commit('SET_MESSAGE', { text: rootGetters.languages('error.required_select'), color: 'error' }, { root: true })
+        return
+      }
+      const data = state.selected.map(x => ({ nguoidung_id: x.nguoidung_id, flag: x.flag === 0 ? 1 : 0 }))
+      await vnptbkn.put(collection + '/delete', data).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'danger') {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
@@ -209,7 +176,7 @@ export default {
           }
           // Success
           //state.selected.forEach(e => { commit(UPDATE_ITEMS, e) });
-          state.selected.update(data, 'id')
+          state.selected.update(data, 'nguoidung_id')
           state.selected = []
           commit('SET_ITEM')
           commit('SET_MESSAGE', { text: rootGetters.languages('success.delete'), color: res.data.msg }, { root: true })
@@ -221,14 +188,14 @@ export default {
       // Loading
       if (loading) rootState.$loadingCommit = true
       // http
-      await vnptbkn.delete(collection, state.item).then(function (res) {
+      await vnptbkn.delete(collection, state.selected).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'danger') {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
             return
           }
           // Success
-          commit('REMOVE_ITEMS', state.item)
+          state.selected.forEach(e => { commit('REMOVE_ITEMS', encodeURI) })
           state.selected = []
           commit('SET_ITEM')
           commit('SET_MESSAGE', { text: rootGetters.languages('success.delete'), color: res.data.msg }, { root: true })
@@ -236,19 +203,65 @@ export default {
       }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
         .finally(() => { if (loading) rootState.$loadingCommit = false })
     },
-    async exist_code({ commit, state, rootState }, loading = true) {
+    exist_username({ commit, state, rootState }, loading = true) {
       // Loading
       if (loading) rootState.$loadingCommit = true
       // http
-      await vnptbkn.get(`${collection}/ExistCode/${state.item.code}`, { timeout: 1000 }).then(function (res) { //, { timeout: 3000 }
-        if (res.status === 200) {
-          if (res.data.msg === 'exist') state.exist_code = false
-          else state.exist_code = true
+      const promise = new Promise(function (resolve, reject) {
+        resolve(state.items.findIndex(x => x.username === state.item.username) < 0 ? false : true);
+        reject(Error('Error'));
+      });
+      return promise
+        .catch((error) => { commit('SET_CATCH', error, { root: true }) })
+        .finally(() => { if (loading) rootState.$loadingCommit = false })
+    },
+    async reset_password({ commit, state, rootGetters, rootState }, loading = true) {
+      // Loading
+      if (loading) rootState.$loadingCommit = true
+      // http
+      if (state.selected.length < 1) {
+        commit('SET_MESSAGE', { text: rootGetters.languages('error.required_select'), color: 'error' }, { root: true })
+        if (loading) rootState.$loadingCommit = false
+        return
+      }
+      await vnptbkn.put(`${collection}/ResetPassword/${state.selected[0].nguoidung_id}`).then(function (res) {
+        if (res.status == 200) {
+          if (res.data.msg === 'danger') {
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            return
+          }
+          // Success
+          state.selected = []
+          commit('SET_ITEM')
+          commit('SET_MESSAGE', { text: rootGetters.languages('success.reset_password:' + res.data.data), color: res.data.msg }, { root: true })
         } else commit('SET_CATCH', null, { root: true })
-      }).catch((error) => {
-        commit('SET_CATCH', error, { root: true })
-        return Promise.reject(error)
-      }).finally(() => { if (loading) rootState.$loadingCommit = false })
+      }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
+        .finally(() => { if (loading) rootState.$loadingCommit = false })
+    },
+    async set_roles({ commit, state, rootGetters, rootState }, roles, loading = true) {
+      // Loading
+      if (loading) rootState.$loadingCommit = true
+      // http
+      if (state.selected.length < 1) {
+        commit('SET_MESSAGE', { text: rootGetters.languages('error.required_select'), color: 'error' }, { root: true })
+        if (loading) rootState.$loadingCommit = false
+        return
+      }
+      const data = state.selected.map(x => ({ nguoidung_id: x.nguoidung_id, roles_id: roles.id, roles_name: roles.name }))
+      await vnptbkn.post(`${collection}/SetRoles`, data).then(function (res) {
+        if (res.status == 200) {
+          if (res.data.msg === 'danger') {
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            if (loading) rootState.$loadingCommit = false
+            return
+          }
+          // Success
+          state.selected.update(data, 'nguoidung_id')
+          state.selected = []
+          commit('SET_MESSAGE', { text: rootGetters.languages('success.roles:' + res.data.data), color: res.data.msg }, { root: true })
+        } else commit('SET_CATCH', null, { root: true })
+      }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
+        .finally(() => { if (loading) rootState.$loadingCommit = false })
     }
   }
 }

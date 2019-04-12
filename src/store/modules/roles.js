@@ -12,8 +12,6 @@ export default {
     confirm: false,
     exist_code: true,
     isGetFirst: true,
-    rowPerPage: [10, 25, 50, 100, 200, 500], //  { text: "All", value: -1 }
-    pagination: { search: '', sortBy: 'orders', toggle: 0, find: { flag: 1 } },
     headers: [
       // { text: 'ID', value: 'id', align: 'left' },
       { text: 'roles.name', value: 'name', align: 'left' },
@@ -21,6 +19,12 @@ export default {
       { text: 'global.created_at', value: 'created_at', sortable: true },
       { text: '#', value: '#', sortable: false }
     ],
+    pagination: {
+      search: '',
+      sortBy: 'orders',
+      toggle: 0,
+      find: { flag: 1 }
+    },
     default: {
       id: '',
       name: '',
@@ -44,11 +48,15 @@ export default {
     getById: state => id => {
       return state.items.find(x => x.id === id)
     },
-    getByFlag: state => flag => {
-      return state.items.filter(x => x.flag === flag)
-    },
     getFilter: state => pagination => {
-      return state.items.filterValue(pagination.find)
+      let rs = [...state.items]
+      if (pagination && pagination.find) rs = rs.filterValue(pagination.find)
+      else rs = rs.filterValue(state.pagination.find)
+      if (pagination && pagination.search) rs = rs.searchValue(pagination.find)
+      else rs = rs.searchValue(state.pagination.find)
+      if (pagination && pagination.sortBy) rs = rs.sortByKey(pagination.sortBy)
+      else rs = rs.sortByKey(state.pagination.sortBy)
+      return rs
     },
     headers: (state, getters, rootState, rootGetters) => {
       state.headers.forEach(e => { e.text = rootGetters.languages(e.text) })
@@ -60,7 +68,10 @@ export default {
       state.items = items
     },
     SET_ITEM(state, item) {
-      state.item = item ? { ...state.items.find(x => x.id == item) } : { ...state.default }
+      state.item = item ? { ...item } : { ...state.default }
+    },
+    SET_ITEM_ID(state, id) {
+      state.item = id ? { ...state.items.find(x => x.id == id) } : { ...state.default }
     },
     PUSH_ITEMS(state, item) {
       state.items.push(item)

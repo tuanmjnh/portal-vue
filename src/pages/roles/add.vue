@@ -1,17 +1,15 @@
 <template>
-  <v-dialog v-model="$store.state.roles.dialog" :persistent="$store.state.$loadingCommit"
-    max-width="1024px">
-    <!-- <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn> -->
+  <v-dialog v-model="$store.state.roles.dialog" max-width="1024px" persistent>
     <v-card>
       <v-card-title class="headline grey lighten-2">
         {{ item.id ?
         $store.getters.languages(['global.details']) :
         $store.getters.languages(['global.add']) }}
       </v-card-title>
-      <v-card-text>
-        <v-form v-model="valid" ref="form">
+      <v-card-text class="p-0">
+        <v-form v-model="$store.state.roles.valid" ref="form">
           <v-container grid-list-md>
-            <v-tabs v-model="tabActive" color="secondary" dark>
+            <v-tabs v-model="$store.state.roles.tabs" color="secondary" dark>
               <v-tab>{{$store.getters.languages(['global.main_info'])}}</v-tab>
               <v-tab>{{$store.getters.languages(['global.roles'])}}</v-tab>
               <v-tab>{{$store.getters.languages(['global.note'])}}</v-tab>
@@ -84,10 +82,12 @@
           </v-container>
         </v-form>
       </v-card-text>
+      <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" flat @click.native="onSave" :loading="$store.state.$loadingCommit">
-          {{$store.getters.languages(['global.update'])}}
+        <v-btn color="primary" flat @click.native="onSave" :disabled="!$store.state.roles.valid"
+          :loading="$store.state.$loadingCommit">
+          {{$store.getters.languages('global.update')}}
         </v-btn>
         <v-btn color="secondary" flat @click.native="$store.state.roles.dialog=false"
           :disabled="$store.state.$loadingCommit">
@@ -103,50 +103,37 @@ import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
 import { quillEditor } from 'vue-quill-editor'
-import listSelect from '@/components/list-select'
+// import listSelect from '@/components/list-select'
 export default {
   components: {
     'vue-quill-editor': quillEditor,
-    'list-select': listSelect
+    // 'list-select': listSelect
   },
   data: () => ({
-    valid: false,
-    isExist: true,
-    tabActive: null,
-    list_selected: [],
-    color: { cover: "default", text: "white" },
-    roles_selected: []
+    roles_selected: [],
+    color: {}
   }),
-  created() {
-    this.$store.dispatch('roles/item')
-    var _modules = []
-    // modules
-    if (this.$store.state.modules.isGetFirst) this.$store.dispatch('modules/select')
-    // permissions
-    if (this.$store.state.permissions.isGetFirst) this.$store.dispatch('permissions/select')
+  mounted() {
+    this.reset()
   },
   computed: {
     dialog() {
-      const rs = this.$store.state.roles.dialog
-      return rs
+      return this.$store.state.roles.dialog
     },
     item() {
-      const rs = this.$store.state.roles.item
-      return rs
+      return this.$store.state.roles.item
     },
     modules() {
-      const rs = this.$store.getters['modules/getFilter']({ sortBy: 'orders', find: { flag: 1 } }).sortByKey('orders')
+      return this.$store.getters['modules/getFilter']({ sortBy: 'orders', find: { flag: 1 } }).sortByKey('orders')
       // return rs.map(x => ({
       //   orders:x.orders,
       //   code: x.code,
       //   title: x.title,
       //   permissions: x.permissions.trim(',').split(',')
       // })).sortByKey
-      return rs
     },
     permissions() {
-      var rs = this.$store.getters['permissions/getFilter']({ sortBy: 'orders', find: { flag: 1 } }).sortByKey('orders')
-      return rs
+      return this.$store.getters['permissions/getFilter']({ sortBy: 'orders', find: { flag: 1 } }).sortByKey('orders')
     }
     // navigation() {
     //   var filter = { sortBy: 'orders', find: { flag: 1 } };
@@ -156,22 +143,13 @@ export default {
   },
   watch: {
     dialog(val) {
-      if (!val) this.$store.dispatch('roles/item')
-      else this.roles_selected = this.item.roles.trim(',').split(',')
-      this.$refs.form.resetValidation()
-      //this.roles_selected = []
-    },
-    uploadFiles: {
-      handler(val) {
-        if (val.files && val.files.length > 0)
-          this.item.image = val.files[0].full_name
-      },
-      deep: true
+      if (!val) this.reset()
     },
     item: {
       handler(val) {
         if (JSON.parse(val.color) != null)
           this.color = JSON.parse(val.color)
+        this.roles_selected = this.item.roles.trim(',').split(',')
         // if (this.permissions && this.permissions.length > 0) {
         //   this.roles_selected = []
         //   this.permissions.forEach(e => {
@@ -184,13 +162,11 @@ export default {
   },
   methods: {
     onSave() {
-      if (this.valid) {
+      if (this.$store.state.roles.valid) {
         this.item.roles = `,${this.roles_selected.join(',')},`
         this.item.color = JSON.stringify(this.color)
         if (this.item.id) this.$store.dispatch('roles/update')
-        else this.$store.dispatch('roles/insert').then(() => {
-          this.roles_selected = []
-        })
+        else this.$store.dispatch('roles/insert')
       }
     },
     selectAll(event, item) {
@@ -203,6 +179,12 @@ export default {
         this.modules.forEach(e => {
           this.roles_selected.splice(this.roles_selected.indexOf(`${e.code}.${item}`), 1)
         })
+    },
+    reset() {
+      this.$store.commit('roles/SET_ITEM')
+      this.roles_selected = []
+      this.color = { cover: "default", text: "white" }
+      this.$refs.form.resetValidation()
     }
   }
 }

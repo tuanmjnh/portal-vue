@@ -2,7 +2,8 @@
   <div>
     <v-card>
       <v-card-title>
-        <v-text-field v-model="pagination.search" append-icon="search" label="Search" single-line hide-details></v-text-field>
+        <v-text-field v-model="$store.state.permissions.pagination.search" append-icon="search"
+          :label="$store.getters.languages('global.search')" single-line hide-details></v-text-field>
         <v-spacer></v-spacer>
         <v-tooltip bottom>
           <v-btn slot="activator" color="primary" small fab flat @click="$store.state.contract_enterprise.dialog=true">
@@ -25,8 +26,8 @@
           </v-tooltip>
         </v-btn-toggle>
       </v-card-title>
-      <v-data-table class="elevation-1" v-model="selected" select-all item-key="user_id" :headers="headers"
-        :items="items" :rows-per-page-items="rowPerPage" :loading="loading">
+      <v-data-table class="elevation-1" v-model="selected" select-all item-key="user_id"
+        :headers="headers" :items="items" :rows-per-page-items="rowPerPage" :loading="loading">
         <!--:loading="loading" :pagination.sync="pagination" :total-items="totalItems" -->
         <template slot="items" slot-scope="props">
           <tr>

@@ -1,21 +1,20 @@
 <template>
-  <div class="mid-center" v-if="$store.state.$loadingGet">
-    <v-progress-circular :size="130" :width="10" color="primary" indeterminate></v-progress-circular>
-  </div>
-  <div v-else>
-    <add></add>
+  <!-- <router-view></router-view> -->
+  <div>
     <list></list>
-    <!-- <items></items> -->
+    <add></add>
   </div>
 </template>
 
 <script>
 import list from './list'
 import add from './add'
-import items from './items'
 export default {
-  components: { list, add, items },
-  data: () => ({})
+  components: { list, add },
+  data: () => ({}),
+  beforeCreate() {
+    if (this.$store.state.languages.isGetFirst) this.$store.dispatch('languages/select', true)
+  }
 }
 </script>
 

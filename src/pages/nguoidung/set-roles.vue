@@ -14,6 +14,9 @@
               :loading="$store.state.$loadingCommit">
               {{$store.getters.languages('global.update')}}
             </v-btn>
+            <v-btn color="secondary" flat @click="$router.push('/nguoidung')" :disabled="$store.state.$loadingCommit">
+              {{$store.getters.languages(['global.back'])}}
+            </v-btn>
           </v-layout>
         </v-card-title>
       </v-form>
@@ -21,8 +24,8 @@
       <v-card-text>
         <v-layout wrap>
           <v-flex xs12 sm5 md5>
-            <v-select :items="db_donvi" v-model="$store.state.nguoidung.donvi_id"
-              :hide-selected="true" item-text="ten_donvi" item-value="donvi_id" :label="$store.getters.languages('global.local')"></v-select>
+            <v-select :items="donvi" v-model="$store.state.nguoidung.donvi_id"
+              :hide-selected="true" item-text="ten_dv" item-value="donvi_id" :label="$store.getters.languages('global.local')"></v-select>
           </v-flex>
           <v-spacer></v-spacer>
           <v-flex xs12 sm3 md3>
@@ -42,7 +45,13 @@
               </td>
               <td>{{ props.item.ma_nd }}</td>
               <td>{{ props.item.ten_nd }}</td>
-              <td><v-chip :color="JSON.parse(props.item.color).cover" :text-color="JSON.parse(props.item.color).text" small>{{ props.item.roles_name }}</v-chip></td>
+              <td>
+                <v-chip small :color="getColor(props.item,'cover')" :text-color="getColor(props.item,'text')">
+                  {{
+                  props.item.roles_name?props.item.roles_name:$store.getters.languages('global.undefined')
+                  }}
+                </v-chip>
+              </td>
             </tr>
           </template>
         </v-data-table>
@@ -81,17 +90,17 @@ export default {
     if (this.$store.state.nguoidung.isGetFirst) this.$store.dispatch('nguoidung/select').then(() => {
       this.nguoidung_list = this.$store.getters['nguoidung/getFilter']({ sortBy: 'ma_nd', find: { trangthai: 1 } })
     })
-    if (this.$store.state.db_donvi.isGetFirst) this.$store.dispatch('db_donvi/select')
-    if (this.$store.state.roles.isGetFirst) this.$store.dispatch('roles/select')
+    if (this.$store.state.donvi.isGetFirst) this.$store.dispatch('donvi/select', false)
+    if (this.$store.state.roles.isGetFirst) this.$store.dispatch('roles/select', false)
   },
   computed: {
     items() {
-      var rs = this.$store.getters['nguoidung/getFilterDonvi'](this.pagination)
+      var rs = this.$store.getters['nguoidung/getFilterDonvi']
       return rs
     },
-    db_donvi() {
-      var rs = this.$store.getters['db_donvi/getFilter']({ sortBy: 'ma_dvi' })
-      return [...[{ donvi_id: 0, ten_donvi: '-- Tất cả --' }], ...rs] //.unshift({ donvi_id: 0, ten_donvi: '-- Tất cả --' })
+    donvi() {
+      var rs = this.$store.getters['donvi/getFilter']({ sortBy: 'ma_dvi' })
+      return [...[{ donvi_id: 0, ten_dv: '-- Tất cả --' }], ...rs] //.unshift({ donvi_id: 0, ten_donvi: '-- Tất cả --' })
     },
     roles() {
       var rs = this.$store.getters['roles/getFilter']({ sortBy: 'orders', find: { flag: 1 } })
@@ -111,6 +120,13 @@ export default {
     },
     onCFMCancel() {
       this.$store.state.nguoidung.selected = []
+    },
+    getColor(item, element) {
+      if (item) {
+        const rs = JSON.parse(item.color)
+        if (rs && rs[element]) return rs[element]
+      }
+      return ''
     }
   }
 }

@@ -1,4 +1,3 @@
-import { SET_CATCH, SET_ITEMS, PUSH_ITEMS, UPDATE_ITEMS, REMOVE_ITEMS, SET_ITEM, SET_MESSAGE } from '../mutation-type'
 import { vnptbkn } from '@/plugins/axios-config'
 const collection = 'modules'
 export default {
@@ -6,16 +5,36 @@ export default {
   state: {
     items: [],
     item: {},
+    tabs: null,
     selected: [],
+    valid: false,
     dialog: false,
+    confirm: false,
+    exist_code: true,
     isGetFirst: true,
+    headers: [
+      // { text: 'ID', value: 'id', align: 'left' },
+      { text: 'modules.title', value: 'title', align: 'left' },
+      { text: 'global.code', value: 'code', align: 'left' },
+      { text: 'global.url', value: 'url', sortable: true },
+      { text: 'modules.auth', value: 'required_auth', sortable: true },
+      { text: 'global.orders', value: 'orders', sortable: true },
+      { text: '#', value: '#', sortable: false }
+    ],
+    pagination:
+    {
+      search: '',
+      sortBy: 'orders',
+      toggle: 0,
+      find: { flag: 1 }
+    },
     default: {
       id: '',
       code: '',
       title: '',
       icon: '<i class="material-icons">view_module</i>',
-      image: '',
-      url: '',
+      required_auth: 1,
+      alias: '',
       permissions: '',
       orders: 1,
       descs: '',
@@ -36,33 +55,39 @@ export default {
     getById: state => id => {
       return state.items.find(x => x.id === id)
     },
-    getByFlag: state => flag => {
-      return state.items.filter(x => x.flag === flag)
-    },
     getFilter: state => pagination => {
-      return state.items.filterValue(pagination.find)
+      let rs = [...state.items]
+      if (pagination && pagination.find) rs = rs.filterValue(pagination.find)
+      else rs = rs.filterValue(state.pagination.find)
+      if (pagination && pagination.search) rs = rs.searchValue(pagination.find)
+      else rs = rs.searchValue(state.pagination.find)
+      if (pagination && pagination.sortBy) rs = rs.sortByKey(pagination.sortBy)
+      else rs = rs.sortByKey(state.pagination.sortBy)
+      return rs
     },
-    getCodeFilter(state) {
-      return state.items.map(e => e.code)
+    headers: (state, getters, rootState, rootGetters) => {
+      state.headers.forEach(e => { e.text = rootGetters.languages(e.text) })
+      return state.headers
     }
   },
   mutations: {
-    [SET_ITEMS](state, items) {
+    SET_ITEMS(state, items) {
       state.items = items
     },
-    [SET_ITEM](state, item) {
+    SET_ITEM(state, item) {
       state.item = item ? { ...item } : { ...state.default }
     },
-    [PUSH_ITEMS](state, item) {
+    SET_ITEM_ID(state, id) {
+      state.item = id ? { ...state.items.find(x => x.id == id) } : { ...state.default }
+    },
+    PUSH_ITEMS(state, item) {
       state.items.push(item)
     },
-    [UPDATE_ITEMS](state, item) {
-      const index = state.items.findIndex(x => x.id === item.id)
-      state.items.splice(index, 1, item)
+    UPDATE_ITEMS(state, item) {
+      state.items.update(item)
     },
-    [REMOVE_ITEMS](state, item) {
-      const index = state.items.findIndex(x => x.id === item.id)
-      if (index >= 0) state.items.splice(index, 1)
+    REMOVE_ITEMS(state, item) {
+      state.items.remove(item)
     }
   },
   actions: {
@@ -70,20 +95,19 @@ export default {
       // Loading
       if (loading) rootState.$loadingGet = true
       // http
-      await vnptbkn.get(collection).then(function(res) {
+      await vnptbkn.get(collection).then(function (res) {
         if (res.status === 200) {
           if (res.data.msg === 'danger') {
-            commit(SET_MESSAGE, { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
             return
           }
           if (res.data.data) {
             state.isGetFirst = false
-            commit(SET_ITEMS, res.data.data)
+            commit('SET_ITEMS', res.data.data)
           }
-        } else commit(SET_CATCH, null, { root: true })
-      }).catch(function(error) {
-        commit(SET_CATCH, error, { root: true })
-      }).finally(() => { if (loading) rootState.$loadingGet = false })
+        } else commit('SET_CATCH', null, { root: true })
+      }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
+        .finally(() => { if (loading) rootState.$loadingGet = false })
     },
     async insert({ commit, state, rootGetters, rootState }, loading = true) {
       // Loading
@@ -91,26 +115,23 @@ export default {
       // http
       state.item.created_by = vnptbkn.defaults.headers.Author
       state.item.created_at = new Date()
-      await vnptbkn.post(collection, state.item).then(function(res) {
+      await vnptbkn.post(collection, state.item).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'exist') {
-            commit(SET_MESSAGE, { text: rootGetters.languages('modules.err_exist'), color: 'warning' }, { root: true })
+            commit('SET_MESSAGE', { text: rootGetters.languages('modules.err_exist'), color: 'warning' }, { root: true })
             return
           }
           if (res.data.msg === 'danger') {
-            commit(SET_MESSAGE, { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
             return
           }
           // Success
-          commit(PUSH_ITEMS, res.data.data)
-          commit(SET_MESSAGE, { text: rootGetters.languages('success.add'), color: res.data.msg }, { root: true })
-        } else commit(SET_CATCH, null, { root: true })
-      }).catch(function(error) {
-        commit(SET_CATCH, error, { root: true })
-      }).finally(() => {
-        commit(SET_ITEM)
-        if (loading) rootState.$loadingCommit = false
-      })
+          commit('SET_ITEM')
+          commit('PUSH_ITEMS', res.data.data)
+          commit('SET_MESSAGE', { text: rootGetters.languages('success.add'), color: res.data.msg }, { root: true })
+        } else commit('SET_CATCH', null, { root: true })
+      }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
+        .finally(() => { if (loading) rootState.$loadingCommit = false })
     },
     async update({ commit, state, rootGetters, rootState }, loading = true) {
       // Loading
@@ -118,86 +139,72 @@ export default {
       // http
       state.item.updated_by = vnptbkn.defaults.headers.Author
       state.item.updated_at = new Date()
-      await vnptbkn.put(collection, state.item).then(function(res) {
+      await vnptbkn.put(collection, state.item).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'danger') {
-            commit(SET_MESSAGE, { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
             return
           }
           // Success
-          commit(UPDATE_ITEMS, state.item)
-          commit(SET_MESSAGE, { text: rootGetters.languages('success.update'), color: res.data.msg }, { root: true })
-        } else commit(SET_CATCH, null, { root: true })
-      }).catch(function(error) {
-        commit(SET_CATCH, error, { root: true })
-      }).finally(() => {
-        if (loading) rootState.$loadingCommit = false
-      })
+          commit('UPDATE_ITEMS', state.item)
+          commit('SET_MESSAGE', { text: rootGetters.languages('success.update'), color: res.data.msg }, { root: true })
+        } else commit('SET_CATCH', null, { root: true })
+      }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
+        .finally(() => { if (loading) rootState.$loadingCommit = false })
     },
     async delete({ commit, state, rootGetters, rootState }, loading = true) {
       // Loading
       if (loading) rootState.$loadingCommit = true
       // http
       const data = state.selected.map(x => ({ id: x.id, flag: x.flag === 0 ? 1 : 0 }))
-      await vnptbkn.put(collection + '/delete', data).then(function(res) {
+      await vnptbkn.put(`${collection}/delete`, data).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'danger') {
-            commit(SET_MESSAGE, { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
             return
           }
           // Success
           //state.selected.forEach(e => { commit(UPDATE_ITEMS, e) });
           state.selected.update(data, 'id')
-          commit(SET_MESSAGE, { text: rootGetters.languages('success.delete'), color: res.data.msg }, { root: true })
-        } else commit(SET_CATCH, null, { root: true })
-      }).catch(function(error) {
-        commit(SET_CATCH, error, { root: true })
-      }).finally(() => {
-        commit(SET_ITEM)
-        state.selected = []
-        if (loading) rootState.$loadingCommit = false
-      })
+          state.selected = []
+          commit('SET_ITEM')
+          commit('SET_MESSAGE', { text: rootGetters.languages('success.delete'), color: res.data.msg }, { root: true })
+        } else commit('SET_CATCH', null, { root: true })
+      }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
+        .finally(() => { if (loading) rootState.$loadingCommit = false })
     },
     async remove({ commit, state, rootGetters, rootState }, loading = true) {
       // Loading
       if (loading) rootState.$loadingCommit = true
       // http
-      await vnptbkn.delete(collection, state.item).then(function(res) {
+      await vnptbkn.delete(collection, state.item).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'danger') {
-            commit(SET_MESSAGE, { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
             return
           }
           // Success
-          commit(REMOVE_ITEMS, state.item)
-          commit(SET_MESSAGE, { text: rootGetters.languages('success.delete'), color: res.data.msg }, { root: true })
-        } else commit(SET_CATCH, null, { root: true })
-      }).catch(function(error) {
-        commit(SET_CATCH, error, { root: true })
-      }).finally(() => {
-        commit(SET_ITEM)
-        state.selected = []
-        if (loading) rootState.$loadingCommit = false
-      })
+          commit('REMOVE_ITEMS', state.item)
+          state.selected = []
+          commit('SET_ITEM')
+          commit('SET_MESSAGE', { text: rootGetters.languages('success.delete'), color: res.data.msg }, { root: true })
+        } else commit('SET_CATCH', null, { root: true })
+      }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
+        .finally(() => { if (loading) rootState.$loadingCommit = false })
     },
-    async item({ commit }, item) {
-      commit(SET_ITEM, item)
-    },
-    existCode({ commit, state, rootState }, loading = true) {
+    async exist_code({ commit, state, rootState }, loading = true) {
       // Loading
       if (loading) rootState.$loadingCommit = true
       // http
-      return vnptbkn.get(collection + '/ExistCode/' + state.item.code, { timeout: 1000 }).then(function(res) { //, { timeout: 3000 }
-          if (res.status === 200) {
-            if (res.data.msg === 'exist') return false
-            else return true
-          } else commit(SET_CATCH, null, { root: true })
-        })
-        .catch(function(error) {
-          commit(SET_CATCH, error, { root: true })
-          return Promise.reject(error)
-        })
-        .finally(() => { if (loading) rootState.$loadingCommit = false })
+      await vnptbkn.get(`${collection}/ExistCode/${state.item.code}`, { timeout: 1000 }).then(function (res) { //, { timeout: 3000 }
+        if (res.status === 200) {
+          if (res.data.msg === 'exist') state.exist_code = false
+          else state.exist_code = true
+        } else commit('SET_CATCH', null, { root: true })
+      }).catch((error) => {
+        commit('SET_CATCH', error, { root: true })
+        return Promise.reject(error)
+      }).finally(() => { if (loading) rootState.$loadingCommit = false })
     }
   }
 }

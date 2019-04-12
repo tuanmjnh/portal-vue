@@ -11,10 +11,8 @@ export default {
     valid: false,
     dialog: false,
     confirm: false,
-    exist_code: true,
+    exist_username: true,
     isGetFirst: true,
-    rowPerPage: [10, 25, 50, 100, 200, 500], //  { text: "All", value: -1 }
-    pagination: { search: '', sortBy: 'created_at', direction: false, find: { trangthai: 1 } },
     headers: [
       { text: 'nguoidung.username', value: 'ma_nd' },
       { text: 'nguoidung.full_name', value: 'ten_nd' },
@@ -23,6 +21,12 @@ export default {
       { text: 'global.roles', value: 'roles_name' },
       { text: '#', value: '#', sortable: false }
     ],
+    pagination: {
+      search: '',
+      sortBy: 'created_at',
+      direction: false,
+      find: { trangthai: 1 }
+    },
     default: {
       nguoidung_id: '',
       donvi_id: 5588,
@@ -44,7 +48,8 @@ export default {
       ngay_sn: null,
       loaidv_id: 2,
       roles_id: '',
-      roles_name: ''
+      roles_name: '',
+      color: ''
     }
   },
   getters: {
@@ -54,17 +59,21 @@ export default {
     getById: state => id => {
       return state.items.find(x => x.nguoidung_id === id)
     },
-    getByFlag: state => flag => {
-      return state.items.filter(x => x.flag === flag)
-    },
     getFilter: state => pagination => {
-      return state.items.filterValue(pagination.find)
+      let rs = [...state.items]
+      if (pagination && pagination.find) rs = rs.filterValue(pagination.find)
+      else rs = rs.filterValue(state.pagination.find)
+      if (pagination && pagination.search) rs = rs.searchValue(pagination.find)
+      else rs = rs.searchValue(state.pagination.find)
+      if (pagination && pagination.sortBy) rs = rs.sortByKey(pagination.sortBy)
+      else rs = rs.sortByKey(state.pagination.sortBy)
+      return rs
     },
-    getFilterDonvi: state => pagination => {
+    getFilterDonvi: state => {
       if (state.donvi_id > 0)
-        return state.items.filterValue({ ...pagination.find, ...{ donvi_id: state.donvi_id } })
+        return state.items.filterValue({ ...state.pagination.find, ...{ donvi_id: state.donvi_id } })
       else
-        return state.items.filterValue(pagination.find)
+        return state.items.filterValue(state.pagination.find)
     },
     headers: (state, getters, rootState, rootGetters) => {
       state.headers.forEach(e => { e.text = rootGetters.languages(e.text) })
@@ -76,7 +85,10 @@ export default {
       state.items = items
     },
     SET_ITEM(state, item) {
-      state.item = item ? { ...state.items.find(x => x.nguoidung_id == item) } : { ...state.default }
+      state.item = item ? { ...item } : { ...state.default }
+    },
+    SET_ITEM_ID(state, id) {
+      state.item = id ? { ...state.items.find(x => x.nguoidung_id == id) } : { ...state.default }
     },
     PUSH_ITEMS(state, item) {
       state.items.push(item)

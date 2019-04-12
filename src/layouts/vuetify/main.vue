@@ -187,7 +187,10 @@
             <i class="material-icons">close</i>
           </v-btn>
         </v-snackbar>
-        <router-view></router-view>
+        <div class="mid-center" v-if="$store.state.$loadingGet">
+          <v-progress-circular :size="130" :width="10" color="primary" indeterminate></v-progress-circular>
+        </div>
+        <router-view v-else></router-view>
       </div>
     </v-content>
     <v-navigation-drawer temporary :right="right" v-model="$store.state.$notification"
@@ -302,8 +305,7 @@ export default {
   },
   computed: {
     snackbar() {
-      var rs = this.$store.state.$message
-      return rs
+      return this.$store.state.$message
     },
     clipped() {
       var mobile = !this.$vuetify.breakpoint.lgAndUp

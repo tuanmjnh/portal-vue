@@ -54,17 +54,18 @@ export default {
       await vnptbkn.get(collection).then(function(res) {
         if (res.status === 200) {
           if (res.data.msg === 'danger') {
-            commit(SET_MESSAGE, { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
             return
           }
           if (res.data.data) {
             state.isGetFirst = false
             // res.data.data.forEach(e => { e.url_plus = e.url_plus ? JSON.parse(e.url_plus) : state.url_plus });
-            commit(SET_ITEMS, res.data.data.sortByKey('orders').sortByKey('parent_id'))
+            commit('SET_ITEMS', res.data.data.sortByKey('orders').sortByKey('parent_id'))
           }
-        } else commit(SET_CATCH, null, { root: true })
+        } else commit('SET_CATCH', null, { root: true })
       }).catch(function(error) {
-        commit(SET_CATCH, error, { root: true })
+        commit('SET_CATCH', error, { root: true })
       }).finally(() => { if (loading) rootState.$loadingGet = false })
     }
   }
+}

@@ -1,32 +1,31 @@
 <template>
-  <v-dialog v-model="$store.state.users.dialog" :persistent="$store.state.$loadingCommit" max-width="1024px">
-    <!-- <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn> -->
+  <v-dialog v-model="$store.state.users.dialog" max-width="1024px" persistent>
     <v-card>
-      <v-card-title class="headline grey lighten-2">
-        {{ item.user_id ?
+      <v-card-title class="headline">
+        {{ item.id ?
         $store.getters.languages('global.details') :
         $store.getters.languages('global.add') }}
       </v-card-title>
-      <v-card-text>
-        <v-form v-model="valid" ref="form">
+      <v-card-text class="p-0">
+        <v-form v-model="$store.state.users.valid" ref="form">
           <v-container grid-list-md>
-            <v-tabs v-model="tabActive" color="secondary" dark>
+            <v-tabs v-model="$store.state.users.tabs" color="secondary" dark>
               <v-tab>{{$store.getters.languages('global.main_info')}}</v-tab>
               <v-tab>{{$store.getters.languages('global.note')}}</v-tab>
               <v-tab-item>
                 <v-layout wrap class="pt-2">
                   <v-flex xs12 md8 sm8>
-                    <v-select :items="db_donvi" v-model="item.donvi_id"
-                      :menu-props="{ maxHeight: '400' }" item-text="ten_donvi" item-value="donvi_id"
-                      :label="$store.getters.languages(['global.local'])" persistent-hint
-                      :hint="$store.getters.languages(['global.local'])" :rules="[v =>!!v||$store.getters.languages(['error.required_select'])]"></v-select>
+                    <v-select :items="db_donvi" v-model="item.donvi_id" :menu-props="{ maxHeight: '400' }"
+                      item-text="ten_donvi" item-value="donvi_id" :label="$store.getters.languages(['global.local'])"
+                      persistent-hint :hint="$store.getters.languages(['global.local'])"
+                      :rules="[v =>!!v||$store.getters.languages(['error.required_select'])]"></v-select>
                   </v-flex>
                   <v-flex xs12 md8 sm8>
                   </v-flex>
                   <v-flex xs12 sm8 md8>
                     <v-text-field v-model.trim="item.username" :label="$store.getters.languages('users.username')"
-                      :disabled="item.user_id?true:false" class="text-color-initial"
-                      :rules="[!!item.username||$store.getters.languages('error.required'),exist_username||$store.getters.languages('error.exist')]"></v-text-field>
+                      :rules="[!!item.username||$store.getters.languages('error.required'),$store.state.permissions.exist_username||$store.getters.languages('error.exist')]"
+                      :disabled="item.id?true:false" class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
                     <v-text-field v-model.trim="item.email" :label="$store.getters.languages('users.email')"
@@ -74,10 +73,11 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" flat @click.native="onSave" :disabled="!valid" :loading="$store.state.$loadingCommit">
+        <v-btn color="primary" flat @click.native="onSave" :disabled="!$store.state.users.valid"
+          :loading="$store.state.$loadingCommit">
           {{$store.getters.languages('global.update')}}
         </v-btn>
-        <v-btn color="secondary" flat @click.native="$store.state.users.dialog=false"
+        <v-btn color="secondary" flat @click.native="$router.push($route.params.id ? '../list' : 'list')"
           :disabled="$store.state.$loadingCommit">
           {{$store.getters.languages('global.back')}}
         </v-btn>
@@ -96,38 +96,26 @@ export default {
     'vue-quill-editor': quillEditor,
   },
   data: () => ({
-    valid: false,
-    exist_username: true,
-    tabActive: null,
     repassword: ''
   }),
-  created() {
-    this.$store.dispatch('users/item')
+  beforeCreate() {
+    if (!this.$route.params.id) this.$store.commit('permissions/SET_ITEM')
   },
   computed: {
-    dialog() {
-      const rs = this.$store.state.users.dialog
-      return rs
-    },
     item() {
-      var rs = this.$store.state.users.item
-      return rs
+      if (this.$route.params.id) this.$store.commit('permissions/SET_ITEM', this.$route.params.id)
+      return this.$store.state.users.item
     },
     db_donvi() {
-      var rs = this.$store.getters['db_donvi/getFilter']({ sortBy: 'ma_dvi' })
-      return rs
+      return this.$store.getters['db_donvi/getFilter']({ sortBy: 'ma_dvi' })
     }
   },
   watch: {
-    dialog(val) {
-      if (!val) this.$store.dispatch('users/item')
-      this.$refs.form.resetValidation()
-    },
     item: {
       handler(val) {
         if (this.item.code) {
           this.item.code = this.item.code.toString().toLowerCase()
-          if (!this.item.user_id) this.$store.dispatch('users/exist_username').then((rs) => { this.exist_username = rs })
+          if (!this.item.id) this.$store.dispatch('users/exist_username')
         }
       },
       deep: true
@@ -135,8 +123,8 @@ export default {
   },
   methods: {
     onSave() {
-      if (this.valid) {
-        if (this.item.user_id) this.$store.dispatch('users/update')
+      if (this.$store.state.users.valid) {
+        if (this.item.id) this.$store.dispatch('users/update')
         else this.$store.dispatch('users/insert')
       }
     }

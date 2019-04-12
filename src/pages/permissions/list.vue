@@ -6,7 +6,7 @@
           :label="$store.getters.languages('global.search')" single-line hide-details></v-text-field>
         <v-spacer></v-spacer>
         <v-tooltip bottom>
-          <v-btn flat icon slot="activator" color="primary" @click="$router.push('add')">
+          <v-btn flat icon slot="activator" color="primary" @click="$store.state.permissions.dialog=true">
             <v-icon>add</v-icon>
           </v-btn>
           <span>{{$store.getters.languages('global.add')}}</span>
@@ -40,7 +40,7 @@
       </v-card-title>
       <v-data-table class="elevation-1" v-model="$store.state.permissions.selected"
         select-all item-key="id" :headers="$store.getters['permissions/headers']" :items="items"
-        :rows-per-page-items="$store.state.permissions.rowPerPage" :rows-per-page-text="$store.getters.languages('global.rows_per_page')"
+        :rows-per-page-items="$store.state.$row_per_page" :rows-per-page-text="$store.getters.languages('global.rows_per_page')"
         :pagination.sync="$store.state.permissions.pagination" :search="$store.state.permissions.pagination.search">
         <!--:loading="loading" :pagination.sync="pagination" :total-items="totalItems" -->
         <template slot="items" slot-scope="props">
@@ -55,7 +55,7 @@
             <td>{{ props.item.created_at|formatDate('DD/MM/YYYY hh:mm') }}</td>
             <td class="justify-center layout px-0">
               <v-tooltip bottom>
-                <v-btn flat icon slot="activator" color="teal" class="mx-0" @click="$router.push(`add/${props.item.id}`)">
+                <v-btn flat icon slot="activator" color="teal" class="mx-0" @click="onEdit(props.item)">
                   <!-- @click="onEdit(props.item)" -->
                   <v-icon>edit</v-icon>
                 </v-btn>
@@ -91,14 +91,13 @@ export default {
   components: { 'tpl-confirm': confirm },
   computed: {
     items() {
-      var rs = this.$store.getters['permissions/getFilter'](this.$store.state.permissions.pagination)
-      return rs
+      return this.$store.getters['permissions/getFilter']()
     }
   },
   methods: {
     onEdit(item) {
-      this.$store.dispatch('permissions/item', item)
-      this.$router.push(`add/${item.id}`)
+      this.$store.commit('permissions/SET_ITEM', item)
+      this.$store.state.permissions.dialog = true
     },
     onDelete(item) {
       this.$store.state.permissions.confirm = true

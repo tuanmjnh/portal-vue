@@ -2,8 +2,8 @@
   <div>
     <v-card>
       <v-card-title>
-        <v-text-field v-model="pagination.search" append-icon="search" label="Tìm kiếm hợp đồng"
-          single-line hide-details></v-text-field>
+        <v-text-field v-model="$store.state.contract_customer.pagination.search"
+          append-icon="search" label="Tìm kiếm hợp đồng" single-line hide-details></v-text-field>
         <v-spacer></v-spacer>
         <v-tooltip bottom>
           <v-btn slot="activator" color="primary" small fab flat @click="$store.state.contract_customer.dialog=true">
@@ -11,30 +11,33 @@
           </v-btn>
           <span>Nhập mới hợp đồng</span>
         </v-tooltip>
-        <v-btn-toggle v-model="toggle_one" mandatory>
+        <v-btn-toggle v-model="$store.state.contract_customer.pagination.toggle"
+          mandatory>
           <v-tooltip bottom>
-            <v-btn slot="activator" flat @click="pagination.find.flag=1">
+            <v-btn slot="activator" flat @click="$store.state.contract_customer.pagination.find.flag=1">
               <i class="material-icons">view_list</i>
             </v-btn>
             <span>Danh sách hợp đồng</span>
           </v-tooltip>
           <v-tooltip bottom>
-            <v-btn slot="activator" flat @click="pagination.find.flag=0">
+            <v-btn slot="activator" flat @click="$store.state.contract_customer.pagination.find.flag=0">
               <i class="material-icons">delete</i>
             </v-btn>
             <span>Danh sách hợp đồng đã cập nhật</span>
           </v-tooltip>
         </v-btn-toggle>
       </v-card-title>
-      <v-data-table class="elevation-1" v-model="selected" item-key="user_id" :headers="headers"
-        :items="items" :rows-per-page-items="rowPerPage" :loading="loading"
-        :pagination.sync="pagination">
-        <!-- select-all :loading="loading" :pagination.sync="pagination" :total-items="totalItems" -->
+      <v-data-table class="elevation-1" v-model="$store.state.contract_customer.selected"
+        select-all item-key="cc_id" :headers="this.$store.getters['contract_customer/headers']"
+        :items="items" :rows-per-page-items="$store.state.$row_per_page"
+        :rows-per-page-text="$store.getters.languages(['global.rows_per_page'])"
+        :pagination.sync="$store.state.contract_customer.pagination" :search="$store.state.contract_customer.pagination.search">
+        <!-- select-all :loading="loading" :total-items="totalItems" -->
         <template slot="items" slot-scope="props">
           <tr>
-            <!-- <td>
+            <td>
               <v-checkbox v-model="props.selected" primary hide-details></v-checkbox>
-            </td> -->
+            </td>
             <!-- <td>{{ props.item.id }}</td> -->
             <td>{{ props.item.ma_gd }}</td>
             <td>{{ props.item.ten_kh }}</td>
@@ -59,7 +62,10 @@
         </template>
       </v-data-table>
     </v-card>
-    <tpl-confirm :dialog="confirmDialog" @ok="onConfirm"></tpl-confirm>
+    <tpl-confirm :dialog="$store.state.contract_customer.confirm" @onAccept="onCFMAccept"
+      @onCancel="onCFMCancel" :title="$store.getters.languages(['global.message'])"
+      :content="$store.getters.languages(['messages.confirm_content'])" :btnAcceptText="$store.getters.languages(['global.accept'])"
+      :btnCancelText="$store.getters.languages(['global.cancel'])"></tpl-confirm>
   </div>
 </template>
 
@@ -68,53 +74,29 @@ import confirm from '@/components/confirm'
 import { vnptbkn } from '@/plugins/axios-config'
 export default {
   components: { 'tpl-confirm': confirm },
-  data: () => {
-    return {
-      loading: true,
-      selected: [],
-      toggle_one: 0,
-      confirmDialog: false,
-      rowPerPage: [10, 25, 50, 100, 200, 500], //  { text: "All", value: -1 }
-      vnptbkn: vnptbkn,
-      pagination: { search: '', sortBy: 'created_at', find: { flag: 1 } },
-      // pagination: { search: '', flag: 1, sortBy: 'created_at', descending: true },
-      headers: [
-        { text: 'Mã hợp đồng', value: 'contract_code' },
-        { text: 'Tên khách hàng', value: 'customer_name' },
-        { text: 'Điện thoại', value: 'customer_phone' },
-        { text: 'Người tạo', value: 'created_by' },
-        { text: 'Ngày tạo', value: 'created_at' },
-        { text: '#', value: '#', sortable: false }
-      ]
-    }
-  },
+  data: () => ({
+    vnptbkn: vnptbkn
+  }),
   computed: {
     items() {
-      var rs = this.$store.getters['contract_customer/getFilter'](this.pagination)
-      return rs
+      return this.$store.getters['contract_customer/getFilter']()
     }
-  },
-  watch: {
-    // localDialog(val) {
-    //   this.$emit('handleDialog', val)
-    //   if (!val) this.$store.dispatch('contract_customer/khachhang')
-    // }
-  },
-  created() {
-    this.$store.dispatch('contract_customer/select').then(this.loading = false)
   },
   methods: {
     onEdit(item) {
-      this.$store.dispatch('contract_customer/khachhang', item)
+      this.$store.commit('contract_customer/SET_ITEM', item)
       this.$store.dispatch('contract_customer/getThuebao')
       this.$store.state.contract_customer.dialog = true
     },
     onDelete(item) {
-      this.confirmDialog = !this.confirmDialog
-      this.$store.dispatch('contract_customer/khachhang', item)
+      this.$store.state.contract_customer.confirm = true
+      if (item) this.$store.state.contract_customer.selected.push(item);
     },
-    onConfirm() {
-      this.$store.dispatch('contract_customer/delete')
+    onCFMAccept() {
+      this.$store.dispatch('navigation/delete')
+    },
+    onCFMCancel() {
+      this.$store.state.navigation.selected = []
     }
   }
 }

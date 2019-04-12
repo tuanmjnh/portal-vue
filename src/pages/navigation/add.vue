@@ -1,16 +1,15 @@
 <template>
-  <v-dialog v-model="$store.state.navigation.dialog" :persistent="$store.state.$loadingCommit" max-width="1024px">
-    <!-- <v-btn slot="activator" color="primary" dark class="mb-2">New Item</v-btn> -->
+  <v-dialog v-model="$store.state.navigation.dialog" max-width="1024px" persistent>
     <v-card>
       <v-card-title class="headline grey lighten-2">
         {{ item.id ?
         $store.getters.languages('global.details') :
         $store.getters.languages('global.add') }}
       </v-card-title>
-      <v-card-text>
-        <v-form v-model="valid" ref="form">
+      <v-card-text class="p-0">
+        <v-form v-model="$store.state.navigation.valid" ref="form">
           <v-container grid-list-md>
-            <v-tabs v-model="tabActive" color="secondary" dark>
+            <v-tabs v-model="$store.state.navigation.tabs" color="secondary" dark>
               <v-tab>{{$store.getters.languages('global.main_info')}}</v-tab>
               <v-tab>{{$store.getters.languages('global.note')}}</v-tab>
               <v-tab-item>
@@ -28,7 +27,7 @@
                   <v-flex xs12 sm4 md4>
                     <v-text-field v-model.trim="item.code" class="text-color-initial"
                       :disabled="item.id?true:false" :label="$store.getters.languages(['global.code'])"
-                      :rules="[v => !!v || $store.getters.languages('error.required'), isExist||$store.getters.languages('error.exist')]"></v-text-field>
+                      :rules="[v => !!v || $store.getters.languages('error.required'),$store.state.navigation.exist_code||$store.getters.languages('error.exist')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
                     <v-text-field v-model.trim="item.url" :rules="[v => !!v || $store.getters.languages('error.required')]"
@@ -91,9 +90,11 @@
           </v-container>
         </v-form>
       </v-card-text>
+      <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" flat @click.native="onSave" :loading="$store.state.$loadingCommit">
+        <v-btn color="primary" flat @click.native="onSave" :disabled="!$store.state.navigation.valid"
+          :loading="$store.state.$loadingCommit">
           {{$store.getters.languages('global.update')}}
         </v-btn>
         <v-btn color="secondary" flat @click.native="$store.state.navigation.dialog=false"
@@ -114,40 +115,43 @@ export default {
     'upload-files': uploadFiles,
     'display-files': displayFiles
   },
-
   data: () => ({
-    valid: false,
-    isExist: true,
-    tabActive: null,
     vnptbkn: vnptbkn,
     dependent_selected: [],
     uploadFiles: { files: [], basePath: 'navigation' },
   }),
-  created() {
-    this.$store.dispatch('navigation/item')
+  mounted() {
+    this.reset()
   },
   computed: {
     dialog() {
-      const rs = this.$store.state.navigation.dialog
-      return rs
+      return this.$store.state.navigation.dialog
     },
     item() {
-      const rs = this.$store.state.navigation.item
-      return rs
+      return this.$store.state.navigation.item
     },
     items() {
-      var rs = this.$store.getters['navigation/getDependent']({ sortBy: 'parent_id', find: { flag: 1 } })
-      rs = [...[{ id: 0, title: `-- ${this.$store.getters.languages('global.navigation_main')} --` }], ...rs]
-      return rs
+      return [
+        ...[{ id: 0, title: `-- ${this.$store.getters.languages('global.navigation_main')} --` }],
+        ...this.$store.getters['navigation/getDependent']
+      ]
     }
   },
   watch: {
     dialog(val) {
-      this.$refs.form.resetValidation()
-      if (!val) {
-        this.$store.dispatch('navigation/item')
-        this.dependent_selected = [0]
-      }
+      if (!val) this.reset()
+    },
+    item: {
+      handler(val) {
+        if (this.item.dependent)
+          this.dependent_selected = this.item.dependent.trim(',').split(',').map(e => parseInt(e))
+        //
+        if (this.item.code) {
+          this.item.code = this.item.code.toString().toLowerCase()
+          if (!this.item.id) this.$store.dispatch('navigation/exist_code')
+        }
+      },
+      deep: true
     },
     uploadFiles: {
       handler(val) {
@@ -155,26 +159,20 @@ export default {
           this.item.image = val.files[0].full_name
       },
       deep: true
-    },
-    item: {
-      handler(val) {
-        if (this.item.dependent)
-          this.dependent_selected = this.item.dependent.trim(',').split(',').map(e => parseInt(e))
-        if (this.item.code) {
-          this.item.code = this.item.code.toString().toLowerCase()
-          if (!this.item.id) this.$store.dispatch('navigation/existCode').then((rs) => { this.isExist = rs })
-        }
-      },
-      deep: true
     }
   },
   methods: {
     onSave() {
-      if (this.valid) {
+      if (this.$store.state.navigation.valid) {
         this.item.dependent = `,${this.dependent_selected.join(',')},`
         if (this.item.id) this.$store.dispatch('navigation/update')
         else this.$store.dispatch('navigation/insert')
       }
+    },
+    reset() {
+      this.$store.commit('navigation/SET_ITEM')
+      this.dependent_selected = [0]
+      this.$refs.form.resetValidation()
     }
   }
 }

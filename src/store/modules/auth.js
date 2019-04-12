@@ -1,4 +1,3 @@
-import { SET_CATCH, SET_MESSAGE } from '../mutation-type'
 import { vnptbkn, setHeaderAuth } from '@/plugins/axios-config'
 import * as storageAuth from '@/plugins/storage-auth'
 import router from '@/router'
@@ -21,7 +20,7 @@ export default {
   getters: {},
   mutations: {
     'SET_ITEM'(state, item) {
-      state.item = { ...item }
+      state.item = item ? { ...item } : { ...state.default }
     },
     'SET_DEFAULT'(state) {
       state.item = { ...state.default }
@@ -39,7 +38,7 @@ export default {
       // Loading
       if (loading) rootState.$loadingApp = true
       // http
-      await vnptbkn.post(collection, state.item).then(function(res) {
+      await vnptbkn.post(collection, state.item).then(function (res) {
         // commit auth
         if (res.data.data && res.data.token) {
           commit('SET_USER', res.data.data)
@@ -72,11 +71,10 @@ export default {
           res.color = 'danger'
           res.text = rootGetters.languages('auth.msg_err_login')
         }
-        commit(SET_MESSAGE, res, { root: true })
+        commit('SET_MESSAGE', res, { root: true })
         setHeaderAuth()
-      }).catch(function(error) {
-        commit(SET_CATCH, error, { root: true })
-      }).finally(() => { setTimeout(() => { rootState.$loadingApp = false }, 200) })
+      }).catch(function (error) { commit('SET_CATCH', error, { root: true }) })
+        .finally(() => { setTimeout(() => { rootState.$loadingApp = false }, 200) })
     },
     async signOut({ commit, rootGetters, rootState }, loading = false) {
       // Loading
@@ -91,7 +89,7 @@ export default {
         status: 200,
         statusText: 'OK'
       }
-      commit(SET_MESSAGE, res, { root: true })
+      commit('SET_MESSAGE', res, { root: true })
       setTimeout(() => {
         rootState.$loadingApp = false
         router.push('/auth')
@@ -100,19 +98,17 @@ export default {
     async setIsAuth({ commit, state }, val = false) {
       commit('SET_ISAUTH', val)
       if (val) {
-        await vnptbkn.get(`nguoidung/${storageAuth.GetUid()}`).then(function(res) {
+        await vnptbkn.get(`nguoidung/${storageAuth.GetUid()}`).then(function (res) {
           if (res.data.data) commit('SET_USER', res.data.data)
-        }).catch(function(error) { commit(SET_CATCH, error, { root: true }) }) // commit catch
+        }).catch(function (error) { commit('SET_CATCH', error, { root: true }) }) // commit catch
+          .finally(() => { })
       }
     },
-    async item({ commit }, data = null) {
-      if (data) commit('SET_ITEM', data)
-      else commit('SET_DEFAULT')
-    },
     async get({ commit }, data) {
-      await vnptbkn.get(collection, data).then(function(res) {
-        commit(SET_MESSAGE, res, { root: true })
-      }).catch(function(error) { commit(SET_CATCH, error, { root: true }) }) // commit catch
+      await vnptbkn.get(collection, data).then(function (res) {
+        commit('SET_MESSAGE', res, { root: true })
+      }).catch(function (error) { commit('SET_CATCH', error, { root: true }) }) // commit catch
+        .finally(() => { })
     }
   }
 }

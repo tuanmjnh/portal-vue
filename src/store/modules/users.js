@@ -6,11 +6,29 @@ export default {
     items: [],
     item: {},
     donvi_id: 0,
+    tabs: null,
     selected: [],
+    valid: false,
     dialog: false,
+    confirm: false,
+    exist_code: true,
     isGetFirst: true,
+    headers: [
+      { text: 'users.username', value: 'username' },
+      { text: 'users.full_name', value: 'full_name' },
+      { text: 'users.mobile', value: 'mobile' },
+      { text: 'users.email', value: 'email' },
+      { text: '#', value: '#', sortable: false }
+    ],
+    pagination: {
+      search: '',
+      sortBy: 'created_at',
+      toggle: 0,
+      direction: false,
+      find: { flag: 1 }
+    },
     default: {
-      user_id: '',
+      id: '',
       parent_id: '',
       group_id: '',
       username: '',
@@ -42,17 +60,19 @@ export default {
     getById: state => id => {
       return state.items.find(x => x.id === id)
     },
-    getByFlag: state => flag => {
-      return state.items.filter(x => x.flag === flag)
-    },
     getFilter: state => pagination => {
-      return state.items.filterValue(pagination.find)
+      let rs = [...state.items]
+      if (pagination && pagination.find) rs = rs.filterValue(pagination.find)
+      else rs = rs.filterValue(state.pagination.find)
+      if (pagination && pagination.search) rs = rs.searchValue(pagination.find)
+      else rs = rs.searchValue(state.pagination.find)
+      if (pagination && pagination.sortBy) rs = rs.sortByKey(pagination.sortBy)
+      else rs = rs.sortByKey(state.pagination.sortBy)
+      return rs
     },
-    getFilterDonvi: state => pagination => {
-      if (state.donvi_id > 0)
-        return state.items.filterValue({ ...pagination.find, ...{ donvi_id: state.donvi_id } })
-      else
-        return state.items.filterValue(pagination.find)
+    headers: (state, getters, rootState, rootGetters) => {
+      state.headers.forEach(e => { e.text = rootGetters.languages(e.text) })
+      return state.headers
     }
   },
   mutations: {
@@ -61,6 +81,9 @@ export default {
     },
     SET_ITEM(state, item) {
       state.item = item ? { ...item } : { ...state.default }
+    },
+    SET_ITEM_ID(state, id) {
+      state.item = id ? { ...state.items.find(x => x.id == id) } : { ...state.default }
     },
     PUSH_ITEMS(state, item) {
       state.items.push(item)

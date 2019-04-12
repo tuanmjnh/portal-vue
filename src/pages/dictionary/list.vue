@@ -9,9 +9,9 @@
               :hide-selected="true" item-text="title" item-value="code" :label="$store.getters.languages(['languages.title'])"></v-select>
           </v-flex>
           <v-flex xs12 sm4 md4>
-            <v-combobox v-model="pagination.search" :items="modules" item-text="code"
-              item-value="code" :auto-select-first="true" :label="$store.getters.languages(['global.search'])"></v-combobox>
-            <!-- <v-text-field v-model="pagination.search" append-icon="search" label="Search"
+            <v-combobox v-model="$store.state.dictionary.pagination.search" :items="modules"
+              item-text="code" item-value="code" :auto-select-first="true" :label="$store.getters.languages(['global.search'])"></v-combobox>
+            <!-- <v-text-field v-model="$store.state.dictionary.pagination.search" append-icon="search" label="Search"
               single-line hide-details></v-text-field> -->
           </v-flex>
           <v-spacer></v-spacer>
@@ -31,10 +31,10 @@
       </v-card-title>
       <v-form v-model="valid" ref="form">
         <v-data-table class="elevation-1" v-model="$store.state.dictionary.selected"
-          select-all item-key="id" :headers="headers" :items="items" :rows-per-page-items="rowPerPage"
-          :rows-per-page-text="$store.getters.languages(['global.rows_per_page'])"
-          :pagination.sync="pagination" :search="pagination.search">
-          <!--:loading="loading" :pagination.sync="pagination" :total-items="totalItems" -->
+          select-all item-key="id" :headers="$store.state.dictionary.headers" :items="items"
+          :rows-per-page-items="[25, 50, 100, 200, 500]" :rows-per-page-text="$store.getters.languages(['global.rows_per_page'])"
+          :pagination.sync="$store.state.dictionary.pagination" :search="$store.state.dictionary.pagination.search">
+          <!--:loading="loading" :total-items="totalItems" -->
           <template slot="items" slot-scope="props">
             <tr>
               <td>
@@ -84,49 +84,31 @@
         </v-data-table>
       </v-form>
     </v-card>
-    <tpl-confirm :dialog="confirmDialog" @onAccept="onCFMAccept" @onCancel="onCFMCancel"
-      :title="$store.getters.languages(['global.message'])" :content="$store.getters.languages(['messages.confirm_content'])"
-      :btnAcceptText="$store.getters.languages(['global.accept'])" :btnCancelText="$store.getters.languages(['global.cancel'])"></tpl-confirm>
+    <tpl-confirm :dialog="$store.state.navigation.confirm" @onAccept="onCFMAccept"
+      @onCancel="onCFMCancel" :title="$store.getters.languages(['global.message'])"
+      :content="$store.getters.languages(['messages.confirm_content'])" :btnAcceptText="$store.getters.languages(['global.accept'])"
+      :btnCancelText="$store.getters.languages(['global.cancel'])"></tpl-confirm>
   </div>
 </template>
 
 <script>
 import confirm from '@/components/confirm'
+import { setTimeout } from 'timers';
 export default {
   components: { 'tpl-confirm': confirm },
   data: () => ({
-    valid: false,
-    confirmDialog: false,
-    rowPerPage: [25, 50, 100, 200, 500], //  { text: "All", value: -1 }
-    pagination: { search: 'global', sortBy: 'key' },
-    headers: [
-      // { text: 'ID', value: 'id', align: 'left' },
-      { text: 'Modules', value: 'module_code', align: 'left' },
-      { text: 'Key', value: 'key', align: 'left' },
-      { text: 'Value', value: 'value' },
-      { text: '#', value: '#', sortable: false }
-    ]
+    valid: false
   }),
-  created() {
-    if (this.$store.state.dictionary.isGetFirst)
-      this.$store.dispatch('dictionary/selectByLang', true).then(() => {
-        if (this.$store.state.languages.isGetFirst) this.$store.dispatch('languages/select')
-        if (this.$store.state.modules.isGetFirst) this.$store.dispatch('modules/select')
-      })
-  },
   computed: {
-    item() {
-      const rs = this.$store.state.dictionary.item
-      return rs
-    },
+    // item() {
+    //   return this.$store.state.dictionary.item
+    // },
     items() {
-      const rs = JSON.parse(JSON.stringify(this.$store.getters['dictionary/getFilter'](this.pagination)))
+      return JSON.parse(JSON.stringify(this.$store.getters['dictionary/getFilter']))
       // const rs = this.$store.getters['dictionary/getFilter'](this.pagination)
-      return rs
     },
     languages() {
-      const rs = this.$store.getters['languages/getFilter']({ sortBy: 'orders', find: { flag: 1 } })
-      return rs
+      return this.$store.getters['languages/getFilter']({ sortBy: 'orders', find: { flag: 1 } })
     },
     modules() {
       const rs = this.$store.state.dictionary.modules
@@ -137,8 +119,7 @@ export default {
       // return rs
     },
     lang_code() {
-      const rs = this.$store.state.dictionary.lang_code
-      return rs
+      return this.$store.state.dictionary.lang_code
     }
   },
   watch: {
@@ -146,11 +127,11 @@ export default {
   },
   methods: {
     onEdit(item) {
-      this.$store.dispatch('dictionary/item', item)
+      this.$store.commit('dictionary/SET_ITEM', item)
       this.$store.state.dictionary.dialog = true
     },
     onDelete(item) {
-      this.confirmDialog = !this.confirmDialog
+      this.$store.state.dictionary.confirm = true
       if (item) this.$store.state.dictionary.selected.push(item);
     },
     onCFMAccept() {
@@ -161,14 +142,18 @@ export default {
     },
     onQuickSave(item) {
       if (this.valid) {
-        this.$store.dispatch('dictionary/item', item).then(() => {
+        this.$store.commit('dictionary/SET_ITEM', item)
+        setTimeout(() => {
           this.$store.dispatch('dictionary/update')
-        })
+        }, 100)
       }
-    },
-    onCancelQuickSave(val) {
-      console.log(val)
+      // this.$store.dispatch('dictionary/item', item).then(() => {
+      //   this.$store.dispatch('dictionary/update')
+      // })
     }
+  },
+  onCancelQuickSave(val) {
+    console.log(val)
   }
 }
 </script>

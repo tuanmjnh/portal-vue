@@ -13,8 +13,6 @@ export default {
     exist_code: true,
     isGetFirst: true,
     url_plus: { push: '', go: '', store: '' },
-    rowPerPage: [10, 25, 50, 100, 200, 500], //  { text: "All", value: -1 }
-    pagination: { search: '', sortBy: 'dependent', toggle: 0, find: { flag: 1 } },
     headers: [
       // { text: 'ID', value: 'id', align: 'left' },
       { text: 'global.navigation_title', value: 'title', align: 'left' },
@@ -26,6 +24,12 @@ export default {
       { text: 'Icon', value: 'icon' },
       { text: '#', value: '#', sortable: false }
     ],
+    pagination: {
+      search: '',
+      sortBy: 'app_key',
+      toggle: 0,
+      find: { flag: 1 }
+    },
     default: {
       id: 0,
       app_key: 'content-left',
@@ -93,23 +97,26 @@ export default {
     getById: state => id => {
       return state.items.find(x => x.id === id)
     },
-    getByFlag: state => flag => {
-      return state.items.filter(x => x.flag === flag)
-    },
     getFilter: state => pagination => {
-      return state.items.filterValue(pagination.find)
+      let rs = [...state.items]
+      if (pagination && pagination.find) rs = rs.filterValue(pagination.find)
+      else rs = rs.filterValue(state.pagination.find)
+      if (pagination && pagination.search) rs = rs.searchValue(pagination.find)
+      else rs = rs.searchValue(state.pagination.find)
+      if (pagination && pagination.sortBy) rs = rs.sortByKey(pagination.sortBy)
+      else rs = rs.sortByKey(state.pagination.sortBy)
+      return rs
     },
     headers: (state, getters, rootState, rootGetters) => {
       state.headers.forEach(e => { e.text = rootGetters.languages(e.text) })
       return state.headers
     },
-    getDependent: state => pagination => {
-      const rs = state.items
-        .filterValue(pagination.find)
+    getDependent: state => {
+      return state.items
+        .filterValue({ flag: 1 })
         .filter(e => { return e.id != state.item.id })
-        .sortByKey('dependent')
+        // .sortByKey('app_key')
         .map(e => ({ 'id': e.id, 'title': e.title }))
-      return rs
     },
     getRender: state => filter => {
       let items = state.items
@@ -117,9 +124,7 @@ export default {
         .filter(row => { return row.app_key === filter.position })
       if (filter.roles && filter.roles.length > 0)
         items = items.filter(row => { return filter.roles.indexOf(row.url) > -1 })
-      const rs = items
-        .filter(row => { return row.dependent.indexOf(',0,') > -1 })
-        .sortByKey('orders')
+      const rs = items.filter(row => { return row.dependent.indexOf(',0,') > -1 })
       // get children
       rs.forEach(e => {
         const _child = items.filter(row => { return row.dependent.indexOf(`,${e.id},`) > -1 })
@@ -139,17 +144,24 @@ export default {
       if (item) {
         if (item.url_plus) state.url_plus = JSON.parse(item.url_plus)
         else state.url_plus = { push: '', go: '', store: '' }
-        state.item = { ...state.items.find(x => x.id == item) }
+        state.item = { ...item }
+      } else state.item = { ...state.default }
+    },
+    SET_ITEM_ID(state, id) {
+      if (id) {
+        state.item = { ...state.items.find(x => x.id == id) }
+        if (state.item.url_plus) state.url_plus = JSON.parse(state.item.url_plus)
+        else state.url_plus = { push: '', go: '', store: '' }
       } else state.item = { ...state.default }
     },
     PUSH_ITEMS(state, item) {
       state.items.push(item)
     },
     UPDATE_ITEMS(state, item) {
-      state.items.update(item)
+      state.items.update(item, 'id')
     },
     REMOVE_ITEMS(state, item) {
-      state.items.remove(item)
+      state.items.remove(item, 'id')
     }
   },
   actions: {
@@ -166,7 +178,7 @@ export default {
           if (res.data.data) {
             state.isGetFirst = false
             // res.data.data.forEach(e => { e.url_plus = e.url_plus ? JSON.parse(e.url_plus) : state.url_plus });
-            commit('SET_ITEMS', res.data.data.sortByKey('orders').sortByKey('parent_id'))
+            commit('SET_ITEMS', res.data.data.sortByKey('orders'))
           }
         } else commit('SET_CATCH', null, { root: true })
       }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
@@ -204,7 +216,7 @@ export default {
       // http
       state.item.updated_by = vnptbkn.defaults.headers.Author
       state.item.updated_at = new Date()
-      state.item.url_plus = JSON.stringify(state.url_plus)
+      // state.item.url_plus = JSON.stringify(state.url_plus)
       await vnptbkn.put(collection, state.item).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'danger') {

@@ -12,7 +12,7 @@ import auth from './modules/auth'
 import roles from './modules/roles'
 // import users from './modules/users'
 import nguoidung from './modules/nguoidung'
-import db_donvi from './modules/db_donvi'
+import donvi from './modules/donvi'
 import setting from './modules/setting'
 import modules from './modules/modules'
 import languages from './modules/languages'
@@ -27,10 +27,10 @@ export default new Vuex.Store({
   modules: {
     auth: auth,
     roles: roles,
-    nguoidung: nguoidung,
-    db_donvi: db_donvi,
-    setting: setting,
+    donvi: donvi,
     modules: modules,
+    setting: setting,
+    nguoidung: nguoidung,
     languages: languages,
     dictionary: dictionary,
     navigation: navigation,
@@ -56,7 +56,8 @@ export default new Vuex.Store({
     $language_def: 'vi-VN',
     $language: _languages.GetLanguage(),
     $dictionary: _languages.GetDictionary(),
-    $notification: false
+    $notification: false,
+    $row_per_page: [10, 25, 50, 100, 200, 500], //  { text: "All", value: -1 }
     // _language: 'vi-VN',
     // _dictionary: JSON.parse(_store.Get('language'))
     // _axios: {
@@ -132,8 +133,6 @@ export default new Vuex.Store({
       state.$message.x = 'right'
       state.$message.y = 'top'
       state.$message.timeout = 6000
-      state.$message.show = true
-      state.$message.color = 'danger'
       state.$message.text = state.$dictionary.error && state.$dictionary.error.connection ?
         state.$dictionary.error.connection : error.message
       if (!error.response) {
@@ -145,6 +144,8 @@ export default new Vuex.Store({
           error.response ? error.response.statusText : error
         console.log(error.response.statusText)
       }
+      state.$message.color = 'danger'
+      state.$message.show = true
     },
     SET_LANGUAGE(state, data) {
       state.$language = data ? data : state.$language_def

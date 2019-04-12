@@ -2,8 +2,8 @@
   <div>
     <v-card>
       <v-card-title>
-        <v-text-field v-model="pagination.search" append-icon="search" :label="$store.getters.languages(['global.search'])"
-          single-line hide-details></v-text-field>
+        <v-text-field v-model="$store.state.modules.pagination.search" append-icon="search"
+          :label="$store.getters.languages(['global.search'])" single-line hide-details></v-text-field>
         <v-spacer></v-spacer>
         <v-tooltip bottom>
           <v-btn flat icon slot="activator" color="primary" @click="$store.state.modules.dialog=true">
@@ -11,27 +11,27 @@
           </v-btn>
           <span>{{$store.getters.languages(['global.add'])}}</span>
         </v-tooltip>
-        <v-tooltip bottom v-if="$store.state.modules.selected.length>0 && pagination.find.flag===1">
+        <v-tooltip bottom v-if="$store.state.modules.selected.length>0 && $store.state.modules.pagination.find.flag===1">
           <v-btn flat icon slot="activator" color="danger" @click="onDelete()">
             <v-icon>delete</v-icon>
           </v-btn>
           <span>{{$store.getters.languages('global.delete_selected')}}</span>
         </v-tooltip>
-        <v-tooltip bottom v-if="$store.state.modules.selected.length>0 && pagination.find.flag===0">
+        <v-tooltip bottom v-if="$store.state.modules.selected.length>0 && $store.state.modules.pagination.find.flag===0">
           <v-btn flat icon slot="activator" color="info" @click="onDelete()">
-            <v-icon>refresh</v-icon>
+            <v-icon>refresh</v-icon>F
           </v-btn>
           <span>{{$store.getters.languages('global.recover_selected')}}</span>
         </v-tooltip>
-        <v-btn-toggle v-model="toggle_one" mandatory>
+        <v-btn-toggle v-model="$store.state.modules.pagination.toggle" mandatory>
           <v-tooltip bottom>
-            <v-btn slot="activator" flat @click="pagination.find.flag=1">
+            <v-btn slot="activator" flat @click="$store.state.modules.pagination.find.flag=1">
               <v-icon>view_list</v-icon>
             </v-btn>
             <span>{{$store.getters.languages(['global.using'])}}</span>
           </v-tooltip>
           <v-tooltip bottom>
-            <v-btn slot="activator" flat @click="pagination.find.flag=0">
+            <v-btn slot="activator" flat @click="$store.state.modules.pagination.find.flag=0">
               <v-icon>delete</v-icon>
             </v-btn>
             <span>{{$store.getters.languages(['global.deleted'])}}</span>
@@ -40,10 +40,10 @@
       </v-card-title>
       <!-- <v-form ref="form" v-model="valid" lazy-validation> -->
       <v-data-table class="elevation-1" v-model="$store.state.modules.selected"
-        select-all item-key="id" :headers="headers" :items="items" :rows-per-page-items="rowPerPage"
-        :rows-per-page-text="$store.getters.languages(['global.rows_per_page'])"
-        :pagination.sync="pagination" :search="pagination.search">
-        <!--:loading="loading" :pagination.sync="pagination" :total-items="totalItems" -->
+        select-all item-key="id" :headers="$store.getters['modules/headers']" :items="items"
+        :rows-per-page-items="$store.state.$row_per_page" :rows-per-page-text="$store.getters.languages(['global.rows_per_page'])"
+        :pagination.sync="$store.state.modules.pagination" :search="$store.state.modules.pagination.search">
+        <!--:loading="loading" :total-items="totalItems" -->
         <template slot="items" slot-scope="props">
           <tr>
             <td>
@@ -53,9 +53,16 @@
             <td>{{ $store.getters.languages(`modules.${props.item.code}`) }}</td>
             <td>{{ props.item.code }}</td>
             <td>{{ props.item.url }}</td>
+            <td>
+              <v-chip small>
+                {{props.item.required_auth===1?
+                $store.getters.languages(['global.yes']):
+                $store.getters.languages(['global.no'])}}
+              </v-chip>
+            </td>
             <td>{{ props.item.orders }}</td>
             <!-- <td>{{ props.item.created_at|formatDate('DD/MM/YYYY hh:mm') }}</td> -->
-            <td v-html="props.item.icon"></td>
+            <!-- <td v-html="props.item.icon"></td> -->
             <td class="justify-center layout px-0">
               <v-tooltip bottom>
                 <v-btn flat icon slot="activator" color="teal" class="mx-0" @click="onEdit(props.item)">
@@ -63,7 +70,7 @@
                 </v-btn>
                 <span>{{$store.getters.languages(['global.edit'])}}</span>
               </v-tooltip>
-              <v-tooltip bottom v-if="pagination.find.flag===1">
+              <v-tooltip bottom v-if="$store.state.modules.pagination.find.flag===1">
                 <v-btn flat icon slot="activator" color="error" class="mx-0" @click="onDelete(props.item)">
                   <v-icon>delete</v-icon>
                 </v-btn>
@@ -81,9 +88,10 @@
       </v-data-table>
       <!-- </v-form> -->
     </v-card>
-    <tpl-confirm :dialog="confirmDialog" @onAccept="onCFMAccept" @onCancel="onCFMCancel"
-      :title="$store.getters.languages(['global.message'])" :content="$store.getters.languages(['messages.confirm_content'])"
-      :btnAcceptText="$store.getters.languages(['global.accept'])" :btnCancelText="$store.getters.languages(['global.cancel'])"></tpl-confirm>
+    <tpl-confirm :dialog="$store.state.permissions.confirm" @onAccept="onCFMAccept"
+      @onCancel="onCFMCancel" :title="$store.getters.languages(['global.message'])"
+      :content="$store.getters.languages(['messages.confirm_content'])" :btnAcceptText="$store.getters.languages(['global.accept'])"
+      :btnCancelText="$store.getters.languages(['global.cancel'])"></tpl-confirm>
   </div>
 </template>
 
@@ -91,43 +99,19 @@
 import confirm from '@/components/confirm'
 export default {
   components: { 'tpl-confirm': confirm },
-  data: () => ({
-    toggle_one: 0,
-    confirmDialog: false,
-    rowPerPage: [10, 25, 50, 100, 200, 500], //  { text: "All", value: -1 }
-    pagination: { search: '', sortBy: 'orders', find: { flag: 1 } },
-    headers: [
-      // { text: 'ID', value: 'id', align: 'left' },
-      { text: 'modules.title', value: 'title', align: 'left' },
-      { text: 'global.code', value: 'code', align: 'left' },
-      { text: 'global.url', value: 'url', sortable: true },
-      { text: 'global.orders', value: 'orders', sortable: true },
-      { text: 'Icon', value: 'icon' },
-      { text: '#', value: '#', sortable: false }
-    ]
-  }),
-  created() {
-    this.headers.forEach(e => { e.text = this.$store.getters.languages([e.text]) });
-    if (this.$store.state.modules.isGetFirst) this.$store.dispatch('modules/select', true)
-  },
+  data: () => ({}),
   computed: {
     items() {
-      var rs = JSON.parse(JSON.stringify(this.$store.getters['modules/getFilter'](this.pagination)))
-      // var rs = this.$store.getters['modules/getFilter'](this.pagination)
-      return rs
+      return this.$store.getters['modules/getFilter']()
     }
   },
   methods: {
-    onItems(item) {
-      this.$store.dispatch('modules/item', item)
-      this.$store.state.modules.dialog = true
-    },
     onEdit(item) {
-      this.$store.dispatch('modules/item', item)
+      this.$store.commit('modules/SET_ITEM', item)
       this.$store.state.modules.dialog = true
     },
     onDelete(item) {
-      this.confirmDialog = !this.confirmDialog
+      this.$store.state.modules.confirm = true
       if (item) this.$store.state.modules.selected.push(item);
     },
     onCFMAccept() {

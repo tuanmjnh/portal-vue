@@ -35,6 +35,7 @@ export default {
     if (this.$store.state.navigation.isGetFirst) this.$store.dispatch('navigation/select')
     // Check Authenticated Refresh
     this.$store.dispatch('auth/setIsAuth', storageAuth.Authenticated())
+    // this.$store.commit('SET_CATCH', { response: { status: 401 } })
   },
   computed: {
     isAuth() {
