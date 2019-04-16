@@ -4,9 +4,11 @@ import App from './App.vue'
 // Vuetify
 import './plugins/vuetify'
 // jQuery
-import $ from 'jquery';
-window.jQuery = $;
-window.$ = $;
+// import $ from 'jquery';
+// window.jQuery = $;
+// window.$ = $;
+// // Storage
+// import * as Storage from './plugins/storage'
 // Helpers
 import helpers from './plugins/helpers'
 // Mixins

@@ -1,6 +1,7 @@
 import axios from 'axios'
 import * as storageAuth from './storage-auth'
-let host = 'http://localhost:5000/'
+//let host = 'http://localhost:5000/'
+let host = 'http://10.17.20.99/vnpt/'
 let api = 'api/'
 const source = axios.CancelToken.source();
 const vnptbkn = axios.create({

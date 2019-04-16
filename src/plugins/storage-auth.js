@@ -1,5 +1,4 @@
 import * as Storage from './storage'
-import { json } from 'body-parser';
 const auth = 'authentication'
 const header = {
   uid: null,
@@ -34,25 +33,25 @@ const signOut = function(extras = null) {
   // Object.keys(header).forEach(function(key, index) {
   //   Storage.Remove(key, $this.GetRemember());
   // });
-  Storage.Remove(auth, this.GetRemember());
+  Storage.Remove(auth, GetRemember());
 }
 const GetStorage = function() {
   const rs = Storage.Get(auth, true) || Storage.Get(auth, false)
   return rs ? JSON.parse(rs) : header;
 }
 const GetRemember = function() {
-  return this.GetStorage().remember
+  return GetStorage().remember
 }
 const GetAccount = function() {
-  return this.GetStorage().account
+  return GetStorage().account
 }
 const GetToken = function() {
-  return this.GetStorage().token
+  return GetStorage().token
 }
 const GetUid = function() {
-  return this.GetStorage().uid
+  return GetStorage().uid
 }
 const Authenticated = function() {
-  return this.GetStorage().token && this.GetStorage().uid ? true : false;
+  return GetStorage().token && GetStorage().uid ? true : false;
 }
 export { signIn, signOut, GetStorage, GetUid, GetAccount, GetToken, GetRemember, Authenticated };

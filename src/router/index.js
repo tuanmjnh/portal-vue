@@ -14,6 +14,10 @@ const routes = [
   //   // redirect: 'dashboard'
   // },
   {
+    path: '/',
+    redirect: { name: 'dashboard' }
+  },
+  {
     path: '/dashboard',
     name: 'dashboard',
     alias: '',
@@ -323,7 +327,9 @@ const routes = [
 ]
 
 // Routing logic
+// console.log(process.env.NODE_ENV)
 var router = new VueRouter({
+  base: process.env.NODE_ENV === 'production' ? 'portal' : '/',
   routes: routes,
   mode: 'history',
   linkExactActiveClass: 'active',

@@ -5,6 +5,7 @@ export default {
   namespaced: true,
   state: {
     items: [],
+    item: {},
     khachhang: {},
     thuebao: [],
     tabs: null,
@@ -29,7 +30,6 @@ export default {
       find: { flag: 1 }
     },
     df_khachhang: {
-      cc_id: '',
       hdkh_id: '',
       khachhang_id: '',
       app_key: '',
@@ -99,6 +99,12 @@ export default {
     SET_ITEMS(state, items) {
       state.items = items
     },
+    // SET_ITEM(state, item) {
+    //   state.item = item ? { ...item } : { ...state.df_khachhang }
+    // },
+    // SET_ITEM_ID(state, id) {
+    //   state.khachhang = id ? { ...state.items.find(x => x.id == id) } : { ...state.df_khachhang }
+    // },
     SET_KHACHHANG(state, item) {
       state.khachhang = item ? { ...item } : { ...state.df_khachhang }
     },
@@ -106,7 +112,7 @@ export default {
       state.khachhang = id ? { ...state.items.find(x => x.cc_id == id) } : { ...state.df_khachhang }
     },
     SET_THUEBAO(state, item) {
-      state.thuebao = item ? { ...state.item } : { ...state.df_thuebao }
+      state.thuebao = item ? [...item] : []
     },
     SET_THUEBAO_ID(state, id) {
       state.thuebao = id ? { ...state.items.find(x => x.hdtb_id == id) } : { ...state.df_thuebao }
@@ -126,7 +132,7 @@ export default {
       // Loading
       if (loading) rootState.$loadingGet = true
       // http
-      await vnptbkn.get(collection).then(function (res) {
+      await vnptbkn.get(`${collection}/GetByDonVi`).then(function (res) {
         if (res.status === 200) {
           if (res.data.msg === 'danger') {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
@@ -141,36 +147,44 @@ export default {
         .finally(() => { if (loading) rootState.$loadingGet = false })
     },
     async getThuebao({ commit, state, rootGetters, rootState }, loading = true) {
+      // Loading
+      if (loading) rootState.$loadingCommit = true
+      // http
       await vnptbkn.get(`${collection}/getThuebao/${state.khachhang.hdkh_id}`).then(function (res) {
         if (res.status === 200) {
           if (res.data.data) commit('SET_THUEBAO', res.data.data)
         } else commit('SET_CATCH', null, { root: true })
       }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
-        .finally(() => { if (loading) rootState.$loadingGet = false })
+        .finally(() => { if (loading) rootState.$loadingCommit = false })
     },
     async insert({ commit, state, rootGetters, rootState }, loading = true) {
+      // Loading
+      if (loading) rootState.$loadingCommit = true
+      // http
       // const khachhang = { ...state.khachhang } // Object.assign({}, state.khachhang)
       // state.khachhang.created_by = vnptbkn.defaults.headers.Author
       // state.khachhang.created_at = new Date()
       // const thuebao = [...state.thuebao]
-      const data = { khachhang: { ...state.khachhang }, thuebao: [...state.thuebao] }
-      await vnptbkn.post(collection, data).then(function (res) {
+      // const data = { khachhang: { ...state.khachhang }, thuebao: [...state.thuebao] }
+      await vnptbkn.post(collection, state.khachhang).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'exist') {
             commit('SET_MESSAGE', { text: rootGetters.languages('contract_customer.msg_err_exist'), color: 'warning' }, { root: true })
             return
           }
           if (res.data.msg === 'danger') {
-            commit('SET_MESSAGE', { text: rootGetters.languages('messages.err_data'), color: res.data.msg }, { root: true })
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
             return
           }
-          if (res.data.data.khachhang) {
-            commit('PUSH_ITEMS', res.data.data.khachhang)
+          if (res.data.data) {
+            commit('PUSH_ITEMS', res.data.data)
+            commit('SET_KHACHHANG')
+            commit('SET_THUEBAO')
           }
-          commit('SET_MESSAGE', { text: rootGetters.languages('messages.suc_add'), color: res.data.msg }, { root: true })
+          commit('SET_MESSAGE', { text: rootGetters.languages('success.add'), color: res.data.msg }, { root: true })
         } else commit('SET_CATCH', null, { root: true })
       }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
-        .finally(() => { if (loading) rootState.$loadingGet = false })
+        .finally(() => { if (loading) rootState.$loadingCommit = false })
     },
     async update({ commit, state }) {
       const item = { ...state.khachhang } // Object.assign({}, state.khachhang)
@@ -208,10 +222,13 @@ export default {
       //   .catch(error => { commit(SET_CATCH, error, { root: true }) })
     },
     async getContract({ commit, state, rootGetters, rootState }, loading = true) {
-      await vnptbkn.get(collection + '/getContract?key=' + state.khachhang.ma_gd).then(function (res) {
+      // Loading
+      if (loading) rootState.$loadingCommit = true
+      // http
+      await vnptbkn.get(`${collection}/getContract?key=${state.khachhang.ma_gd}`).then(function (res) {
         if (res.status == 200) {
-          if (res.data.msg === 'notexist') {
-            commit('SET_MESSAGE', { text: rootGetters.languages('contract_customer.msg_err_exist_contact'), color: 'warning' }, { root: true })
+          if (res.data.msg === 'not_exist') {
+            commit('SET_MESSAGE', { text: rootGetters.languages('contract_customer.msg_err_not_exist'), color: 'warning' }, { root: true })
             return
           }
           if (res.data.msg === 'exist') {
@@ -219,19 +236,19 @@ export default {
             return
           }
           if (res.data.msg === 'danger') {
-            commit('SET_MESSAGE', { text: rootGetters.languages('messages.err_data'), color: res.data.msg }, { root: true })
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
             return
           }
           if (res.data.data.khachhang && res.data.data.thuebao && res.data.data.thuebao.length > 0) {
             // SET_KHACHHANG
             // commit('SET_KHACHHANG', ObjectToFillSource({ ...state.df_khachhang }, res.data.data.khachhang))
-            commit('SET_KHACHHANG', ObjectToLowerKey(res.data.data.khachhang))
+            commit('SET_KHACHHANG', res.data.data.khachhang) //ObjectToLowerKey(res.data.data.khachhang))
             // SET_THUEBAO
-            commit('SET_THUEBAO', ObjectToLowerKey(res.data.data.thuebao))
+            commit('SET_THUEBAO', res.data.data.thuebao)//ObjectToLowerKey(res.data.data.thuebao))
           }
         } else commit('SET_CATCH', null, { root: true })
       }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
-        .finally(() => { if (loading) rootState.$loadingGet = false })
+        .finally(() => { if (loading) rootState.$loadingCommit = false })
     }
   }
 }

@@ -84,7 +84,7 @@ export default {
   },
   methods: {
     onEdit(item) {
-      this.$store.commit('contract_customer/SET_ITEM', item)
+      this.$store.commit('contract_customer/SET_KHACHHANG', item)
       this.$store.dispatch('contract_customer/getThuebao')
       this.$store.state.contract_customer.dialog = true
     },

@@ -12,7 +12,8 @@ export default {
   components: { list, add },
   data: () => ({}),
   beforeCreate() {
-    if (this.$store.state.contract_enterprise.isGetFirst) this.$store.dispatch('contract_enterprise/select', true)
+    if (this.$store.state.contract_enterprise.isGetFirst)
+      this.$store.dispatch('contract_enterprise/select')
   }
 }
 </script>
