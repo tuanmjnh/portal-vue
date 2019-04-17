@@ -178,6 +178,14 @@ function sprintf() {
   });
 }
 // Array prototype
+Array.prototype.indexOfArray = function (element) {
+  let $this = this
+  for (let i = 0; i < element.length; i++) {
+    let index = $this.indexOf(element[i])
+    if (index > -1) return index
+  }
+  return -1
+};
 Array.prototype.update = function (element, key = null) {
   let $this = this
   if (key) {

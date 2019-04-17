@@ -8,6 +8,7 @@ export default {
     item: {},
     khachhang: {},
     thuebao: [],
+    donvi_id: 0,
     tabs: null,
     selected: [],
     valid: false,
@@ -16,11 +17,11 @@ export default {
     exist_code: true,
     isGetFirst: true,
     headers: [
-      { text: 'Mã hợp đồng', value: 'contract_code' },
-      { text: 'Tên khách hàng', value: 'customer_name' },
-      { text: 'Điện thoại', value: 'customer_phone' },
-      { text: 'Người tạo', value: 'created_by' },
-      { text: 'Ngày tạo', value: 'created_at' },
+      { text: 'contract_customer.contract_code', value: 'contract_code' },
+      { text: 'contract_customer.customer_name', value: 'customer_name' },
+      { text: 'nguoidung.mobile', value: 'customer_phone' },
+      { text: 'global.created_by', value: 'created_by' },
+      { text: 'global.created_at', value: 'created_at' },
       { text: '#', value: '#', sortable: false }
     ],
     pagination: {
@@ -88,6 +89,7 @@ export default {
       else rs = rs.searchValue(state.pagination.find)
       if (pagination && pagination.sortBy) rs = rs.sortByKey(pagination.sortBy)
       else rs = rs.sortByKey(state.pagination.sortBy)
+      // console.log(state.pagination.find)
       return rs
     },
     headers: (state, getters, rootState, rootGetters) => {
@@ -121,16 +123,16 @@ export default {
       state.items.push(khachhang)
     },
     UPDATE_ITEMS(state, item) {
-      state.items.update(item)
+      state.items.update(item, 'id')
     },
     REMOVE_ITEMS(state, item) {
-      state.items.remove(item)
+      state.items.remove(item, 'id')
     }
   },
   actions: {
     async select({ commit, state, rootGetters, rootState }, loading = true) {
       // Loading
-      if (loading) rootState.$loadingGet = true
+      if (loading && !rootState.$loadingGet) rootState.$loadingGet = true
       // http
       await vnptbkn.get(`${collection}/GetByDonVi`).then(function (res) {
         if (res.status === 200) {
@@ -139,12 +141,14 @@ export default {
             return
           }
           if (res.data.data) {
-            state.isGetFirst = false
             commit('SET_ITEMS', res.data.data)
           }
         } else { commit('SET_CATCH', null, { root: true }) }
       }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
-        .finally(() => { if (loading) rootState.$loadingGet = false })
+        .finally(() => {
+          state.isGetFirst = false
+          if (loading) rootState.$loadingGet = false
+        })
     },
     async getThuebao({ commit, state, rootGetters, rootState }, loading = true) {
       // Loading
@@ -187,9 +191,9 @@ export default {
         .finally(() => { if (loading) rootState.$loadingCommit = false })
     },
     async update({ commit, state }) {
-      const item = { ...state.khachhang } // Object.assign({}, state.khachhang)
-      item.updated_by = vnptbkn.defaults.headers.Author
-      item.updated_at = new Date()
+      // const item = { ...state.khachhang } // Object.assign({}, state.khachhang)
+      // item.updated_by = vnptbkn.defaults.headers.Author
+      // item.updated_at = new Date()
       // FBStore.collection(collection).doc(item.id).set(item)
       //   .then(docRef => {
       //     commit(UPDATE_ITEMS, item)
@@ -197,22 +201,30 @@ export default {
       //   })
       //   .catch(error => { commit(SET_CATCH, error, { root: true }) })
     },
-    async delete({ commit, state }) {
-      const item = { ...state.khachhang } // Object.assign({}, state.khachhang)
-      item.deleted_by = vnptbkn.defaults.headers.Author
-      item.deleted_at = new Date()
-      // FBStore.collection(collection).doc(item.id)
-      //   .update({ flag: item.flag === 1 ? 0 : 1 })
-      //   .then(docRef => {
-      //     item.flag = item.flag === 1 ? 0 : 1
-      //     commit(UPDATE_ITEMS, item)
-      //     commit(SET_MESSAGE, { text: 'Xóa bản ghi thành công!', color: 'success' }, { root: true })
-      //   })
-      //   .then(() => { commit(SET_KHACHHANG, state.default) })
-      //   .catch(error => { commit(SET_CATCH, error, { root: true }) })
+    async delete({ commit, state, rootGetters, rootState }, loading = true) {
+      // Loading
+      if (loading) rootState.$loadingCommit = true
+      // http
+      const data = state.selected.map(x => ({ id: x.id, flag: 4 }))
+      await vnptbkn.put(`${collection}/delete`, data).then(function (res) {
+        if (res.status == 200) {
+          if (res.data.msg === 'danger') {
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            return
+          }
+          // Success
+          //state.selected.forEach(e => { commit(UPDATE_ITEMS, e) });
+          state.selected.update(data, 'id')
+          state.selected = []
+          commit('SET_KHACHHANG')
+          commit('SET_THUEBAO')
+          commit('SET_MESSAGE', { text: rootGetters.languages(['contract_customer.cancel',' ','global.success','!']), color: res.data.msg }, { root: true })
+        } else commit('SET_CATCH', null, { root: true })
+      }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
+        .finally(() => { if (loading) rootState.$loadingCommit = false })
     },
     async remove({ commit, state }) {
-      const item = { ...state.khachhang } // Object.assign({}, state.khachhang)
+      // const item = { ...state.khachhang } // Object.assign({}, state.khachhang)
       // FBStore.collection(collection).doc(item.id).delete()
       //   .then(docRef => {
       //     commit(REMOVE_ITEMS, item)

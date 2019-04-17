@@ -13,43 +13,43 @@
         <v-form v-else v-model="$store.state.contract_customer.valid" ref="form">
           <v-container grid-list-md>
             <v-tabs v-model="$store.state.contract_customer.tabs" color="secondary" dark>
-              <v-tab>Thông tin khách hàng</v-tab>
-              <v-tab>Thông tin thuê bao</v-tab>
-              <v-tab>Thông tin chi tiết</v-tab>
-              <v-tab>Ghi chú</v-tab>
+              <v-tab>{{$store.getters.languages('contract_customer.customer_info')}}</v-tab>
+              <v-tab>{{$store.getters.languages('contract_customer.subscribers_info')}}</v-tab>
+              <v-tab>{{$store.getters.languages('contract_customer.details')}}</v-tab>
+              <v-tab>{{$store.getters.languages('global.note')}}</v-tab>
               <v-tab-item>
                 <v-layout wrap class="pt-2">
                   <v-flex xs12 sm6 md4>
-                    <v-text-field v-model.trim="khachhang.ma_gd" label="Mã giao dịch"
+                    <v-text-field v-model.trim="khachhang.ma_gd" :label="$store.getters.languages('contract_customer.ma_gd')"
                       class="text-color-initial" v-on:keyup.enter="getContract" :disabled="khachhang.id?true:false"
                       :rules="[v=>!!v||$store.getters.languages('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
-                    <v-text-field v-model.trim="khachhang.ma_hd" label="Mã hợp đồng"
+                    <v-text-field v-model.trim="khachhang.ma_hd" :label="$store.getters.languages('contract_customer.ma_hd')"
                       :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
-                    <v-text-field v-model.trim="khachhang.ma_kh" label="Mã khách hàng"
+                    <v-text-field v-model.trim="khachhang.ma_kh" :label="$store.getters.languages('contract_customer.ma_kh')"
                       :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field v-model.trim="khachhang.ten_kh" label="Tên khách hàng"
+                    <v-text-field v-model.trim="khachhang.ten_kh" :label="$store.getters.languages('contract_customer.ten_kh')"
                       :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field v-model.trim="khachhang.so_dt" label="Điện thoại liên hệ"
+                    <v-text-field v-model.trim="khachhang.so_dt" :label="$store.getters.languages('nguoidung.mobile')"
                       :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field :value="khachhang.ten_dv" label="Đơn vị" :disabled="true"
-                      class="text-color-initial"></v-text-field>
-                  </v-flex>
-                  <v-flex xs12 sm6 md6>
-                    <v-text-field v-model.trim="khachhang.diachi_kh" label="Địa chỉ khách hàng"
+                    <v-text-field :value="khachhang.ten_dv" :label="$store.getters.languages('global.local')"
                       :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field v-model.trim="khachhang.hokhau" label="Hộ khẩu"
+                    <v-text-field v-model.trim="khachhang.diachi_kh" :label="$store.getters.languages('contract_customer.diachi_kh')"
+                      :disabled="true" class="text-color-initial"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field v-model.trim="khachhang.hokhau" :label="$store.getters.languages('contract_customer.hokhau')"
                       :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
                   <!-- <v-flex xs12 sm12 md12>
@@ -59,19 +59,20 @@
               <v-text-field v-model="khachhang.diachi_ld" label="Địa chỉ lắp đặt"></v-text-field>
             </v-flex> -->
                   <v-flex xs12 sm12 md12 v-if="khachhang.id">
-                    Hợp đồng: <a class="mx-0 v-btn v-btn--icon theme--info" :href="vnptbkn.defaults.host+khachhang.attach"
+                    {{$store.getters.languages('global.contract')}}: <a class="mx-0 v-btn v-btn--icon theme--info"
+                      :href="vnptbkn.defaults.baseURL.replace('api','')+khachhang.attach"
                       target="_blank"><i class="material-icons">attachment</i></a>
                   </v-flex>
                   <template v-else>
                     <v-flex xs12 sm6 md6 v-if="khachhang.hdkh_id">
                       <upload-files @handleUpload="uploadFiles=$event" :buttonUse="false"
-                        :basePath="uploadFiles.basePath" :multiple="false" :autoName="false"
+                        :basePath="uploadFiles.basePath" :multiple="false" :autoName="true"
                         :fileName="khachhang.hdkh_id.toString()" :http="vnptbkn"
-                        extension="application/pdf" buttonText="Ấn vào đây để chọn hợp đồng"></upload-files>
+                        extension="application/pdf" :buttonText="$store.getters.languages('contract_customer.upload_btn')"></upload-files>
                       <!-- :fileName="khachhang.ma_gd.replace(/\//g,'_')" -->
                     </v-flex>
                     <v-flex xs12 sm6 md6 v-if="khachhang.ma_gd">
-                      <display-files :files="uploadFiles.files" :baseUrl="vnptbkn.defaults.host"
+                      <display-files :files="uploadFiles.files" :baseUrl="vnptbkn.defaults.baseURL.replace('api','')"
                         :isShowName="false" classes="w-x"></display-files>
                     </v-flex>
                   </template>
@@ -100,52 +101,52 @@
               <v-tab-item>
                 <v-layout wrap class="pt-2">
                   <v-flex xs12 sm4 md4>
-                    <v-text-field v-model.trim="khachhang.so_gt" label="Số giấy tờ"
+                    <v-text-field v-model.trim="khachhang.so_gt" :label="$store.getters.languages('contract_customer.so_gt')"
                       :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field :value="khachhang.ngaycap|formatDate" label="Ngày cấp"
+                    <v-text-field :value="khachhang.ngaycap|formatDate" :label="$store.getters.languages('contract_customer.ngaycap')"
                       :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field v-model.trim="khachhang.noicap" label="Nơi cấp"
+                    <v-text-field v-model.trim="khachhang.noicap" :label="$store.getters.languages('contract_customer.noicap')"
                       :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field v-model.trim="khachhang.mst" label="Mã số thuế"
+                    <v-text-field v-model.trim="khachhang.mst" :label="$store.getters.languages('contract_customer.mst')"
                       :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field v-model.trim="khachhang.stk" label="Số tài khoản"
+                    <v-text-field v-model.trim="khachhang.stk" :label="$store.getters.languages('contract_customer.stk')"
                       :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field v-model.trim="khachhang.so_fax" label="Số Fax"
-                      :disabled="true" class="text-color-initial"></v-text-field>
+                    <v-text-field v-model.trim="khachhang.so_fax" label="Fax" :disabled="true"
+                      class="text-color-initial"></v-text-field>
                   </v-flex>
 
                   <v-flex xs12 sm4 md4>
-                    <v-text-field :value="khachhang.ten_loaihd" label="Loại hợp đồng"
+                    <v-text-field :value="khachhang.ten_loaihd" :label="$store.getters.languages('contract_customer.ten_loaihd')"
                       :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field v-model="khachhang.ten_loaikh" label="Loại khách hàng"
+                    <v-text-field v-model="khachhang.ten_loaikh" :label="$store.getters.languages('contract_customer.ten_loaikh')"
                       :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field v-model="khachhang.nguoi_dd" label="Người đại diện"
+                    <v-text-field v-model="khachhang.nguoi_dd" :label="$store.getters.languages('contract_customer.nguoi_dd')"
                       :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field v-model="khachhang.nguoi_cn" label="Người cập nhật"
+                    <v-text-field v-model="khachhang.nguoi_cn" :label="$store.getters.languages('global.updated_by')"
                       :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field v-model="khachhang.may_cn" label="Máy cập nhật"
+                    <v-text-field v-model="khachhang.may_cn" :label="$store.getters.languages('global.updated_comp')"
                       :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field :value="khachhang.ngay_cn|formatDate" label="Ngày cập nhật"
+                    <v-text-field :value="khachhang.ngay_cn|formatDate" :label="$store.getters.languages('global.updated_at')"
                       :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
                 </v-layout>
@@ -153,7 +154,7 @@
               <v-tab-item>
                 <v-layout wrap class="pt-2">
                   <v-flex xs12 sm12 md12>
-                    <vue-quill-editor v-model.trim="khachhang.details" ref="Ghi chú">
+                    <vue-quill-editor v-model.trim="khachhang.details" ref="details">
                     </vue-quill-editor>
                     <!-- <tinymce id="desc" v-model="khachhang.desc"></tinymce> -->
                   </v-flex>
@@ -198,18 +199,19 @@ export default {
     uploadFiles: { files: [], basePath: 'Uploads/HopDong' },
     vnptbkn: vnptbkn,
     headers: [
-      { text: 'Mã TB', align: 'left', value: 'ma_tb' },
-      { text: 'Tên TB', value: 'ten_tb' },
-      { text: 'Địa chỉ TB', value: 'diachi_tb' },
+      { text: 'contract_customer.ma_tb', align: 'left', value: 'ma_tb' },
+      { text: 'contract_customer.ten_tb', value: 'ten_tb' },
+      { text: 'contract_customer.diachi_tb', value: 'diachi_tb' },
       // { text: 'Địa chỉ LĐ', value: 'diachi_ld' },
-      { text: 'Đối tượng', value: 'ten_dt' },
-      { text: 'Dịch vụ', value: 'ten_dvvt' },
-      { text: 'Loại hình', value: 'loaihinh_tb' },
+      { text: 'contract_customer.ten_dt', value: 'ten_dt' },
+      { text: 'contract_customer.ten_dvvt', value: 'ten_dvvt' },
+      { text: 'contract_customer.loaihinh_tb', value: 'loaihinh_tb' },
       // { text: 'Đơn vị', value: 'ten_dv' },
-      { text: 'Ngày HT', value: 'ngay_ht' }
+      { text: 'contract_customer.ngay_ht', value: 'ngay_ht' }
     ]
   }),
   mounted() {
+    this.headers.forEach(e => { e.text = this.$store.getters.languages(e.text) })
     this.reset()
   },
   computed: {

@@ -90,7 +90,7 @@ export default {
       // var data = { module_code: this.module_code, key: this.key, value: this.value }
       if (this.$store.state.dictionary.valid) {
         if (this.item.id) this.$store.dispatch('dictionary/update')
-        else this.$store.dispatch('dictionary/insert')
+        else this.$store.dispatch('dictionary/insert').then(this.reset())
       }
     },
     reset() {

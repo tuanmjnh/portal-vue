@@ -24,21 +24,22 @@
                   </v-flex>
                   <v-flex xs12 sm4 md4>
                     <v-text-field v-model.trim="item.code" class="text-color-initial"
-                      :disabled="item.id?true:false" :label="$store.getters.languages(['global.code'])"
-                      :rules="[v => !!v || $store.getters.languages('error.required'),$store.state.modules.exist_code||$store.getters.languages('error.exist')]"></v-text-field>
+                      :disabled="item.id?true:false" @keyup="onExistCode()"
+                      :rules="[v => !!v || $store.getters.languages('error.required'),$store.state.modules.exist_code||$store.getters.languages('error.exist')]"
+                      :label="$store.getters.languages(['global.code'])"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
                     <v-text-field v-model.trim="item.url" :rules="[v => !!v || $store.getters.languages('error.required')]"
                       :label="$store.getters.languages(['global.url'])"></v-text-field>
                   </v-flex>
                   <v-flex xs12 md6 sm6>
-                    <v-select :items="permissions" v-model="permissions_selected"
+                    <v-select :items="permissions" v-model="$store.state.modules.permissions_selected"
                       multiple :menu-props="{ maxHeight: '400' }" item-text="title"
                       item-value="code" :label="$store.getters.languages(['permissions.title'])"
                       persistent-hint :hint="$store.getters.languages(['permissions.select'])"
                       :rules="[v => v.length>0 || $store.getters.languages(['error.required_select'])]"></v-select>
                   </v-flex>
-                      <v-flex xs6 sm3 md3>
+                  <v-flex xs6 sm3 md3>
                     <v-text-field v-model.trim="item.alias" label="Alias"></v-text-field>
                   </v-flex>
                   <v-flex xs6 sm3 md3>
@@ -100,7 +101,6 @@ import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
 import { quillEditor } from 'vue-quill-editor'
-import { vnptbkn } from '@/plugins/axios-config'
 // import uploadFiles from '@/components/upload-files'
 // import displayFiles from '@/components/display-files'
 export default {
@@ -110,12 +110,10 @@ export default {
     // 'display-files': displayFiles
   },
   data: () => ({
-    valid: false,
-    isExist: true,
-    tabActive: null,
-    vnptbkn: vnptbkn,
-    permissions_selected: [],
-    uploadFiles: { files: [], basePath: 'modules' },
+    // valid: false,
+    // isExist: true,
+    // tabActive: null,
+    // permissions_selected: [],
   }),
   mounted() {
     this.reset()
@@ -143,17 +141,13 @@ export default {
     dialog(val) {
       if (!val) this.reset()
     },
-    item: {
-      handler(val) {
-        if (this.permissions && this.permissions.length > 0)
-          this.permissions_selected = this.item.permissions.trim(',').split(',')
-        if (this.item.code) {
-          this.item.code = this.item.code.toString().toLowerCase()
-          if (!this.item.id) this.$store.dispatch('modules/existCode').then((rs) => { this.isExist = rs })
-        }
-      },
-      deep: true
-    },
+    // item: {
+    //   handler(val) {
+    //     if (this.permissions && this.permissions.length > 0)
+    //       this.permissions_selected = this.item.permissions.trim(',').split(',')
+    //   },
+    //   deep: true
+    // },
     // uploadFiles: {
     //   handler(val) {
     //     if (val.files && val.files.length > 0)
@@ -165,10 +159,14 @@ export default {
   methods: {
     onSave() {
       if (this.$store.state.modules.valid) {
-        this.item.permissions = `,${this.permissions_selected.join(',')},`
+        // this.item.permissions = `,${this.permissions_selected.join(',')},`
         if (this.item.id) this.$store.dispatch('modules/update')
         else this.$store.dispatch('modules/insert')
       }
+    },
+    onExistCode() {
+      this.item.code = this.item.code.toString().toLowerCase()
+      if (!this.item.id) this.$store.dispatch('modules/exist_code')
     },
     reset() {
       this.$store.commit('modules/SET_ITEM')

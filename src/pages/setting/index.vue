@@ -1,5 +1,8 @@
 <template>
-  <div>
+  <div class="mid-center" v-if="$store.state.$loadingGet">
+    <v-progress-circular :size="130" :width="10" color="primary" indeterminate></v-progress-circular>
+  </div>
+  <div v-else>
     <v-card>
       <v-card-title>
         <v-layout wrap class="pt-2">

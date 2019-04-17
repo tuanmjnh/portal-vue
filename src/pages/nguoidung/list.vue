@@ -113,7 +113,7 @@ export default {
     },
     donvi() {
       var rs = this.$store.getters['donvi/getFilter']({ sortBy: 'ma_dvi' })
-      return [...[{ donvi_id: 0, ten_dv: '-- Tất cả --' }], ...rs] //.unshift({ donvi_id: 0, ten_donvi: '-- Tất cả --' })
+      return [...[{ donvi_id: 0, ten_dv: this.$store.getters.languages('global.select_all') }], ...rs] //.unshift({ donvi_id: 0, ten_donvi: '-- Tất cả --' })
     }
   },
   methods: {

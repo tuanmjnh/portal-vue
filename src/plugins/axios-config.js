@@ -1,14 +1,11 @@
 import axios from 'axios'
 import * as storageAuth from './storage-auth'
-//let host = 'http://localhost:5000/'
-let host = 'http://10.17.20.99/vnpt/'
-let api = 'api/'
+import { env } from '@/environment.js';
+// console.log(environment.production)
 const source = axios.CancelToken.source();
 const vnptbkn = axios.create({
-  host: host,
-  api: api,
-  upload: 'filemanager',
-  baseURL: host + api,
+  upload: env.upload,
+  baseURL: env.api.join('/'), //'http://localhost:5000/',
   // timeout: 5000,
   headers: {
     Authorization: storageAuth.GetToken() || '',
@@ -18,13 +15,9 @@ const vnptbkn = axios.create({
 })
 // vnptbkn.CancelToken = axios.CancelToken;
 // vnptbkn.isCancel = axios.isCancel;
-host = 'http://localhost:8080/'
-api = ''
 const localhost = axios.create({
-  host: host,
-  api: api,
   upload: 'filemanager',
-  baseURL: host + api,
+  baseURL: 'http://localhost:8080/',
   // timeout: 1000,
   headers: {
     Authorization: storageAuth.GetToken() || '',
@@ -32,7 +25,7 @@ const localhost = axios.create({
     Remember: storageAuth.GetRemember()
   }
 })
-const setHeaderAuth = function() {
+const setHeaderAuth = function () {
   vnptbkn.defaults.headers.Author = storageAuth.GetUid() || ''
   vnptbkn.defaults.headers.Authorization = storageAuth.GetToken() || ''
   vnptbkn.defaults.headers.Remember = storageAuth.GetRemember()

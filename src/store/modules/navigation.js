@@ -123,7 +123,8 @@ export default {
         .filter(row => { return row.flag === 1 })
         .filter(row => { return row.app_key === filter.position })
       if (filter.roles && filter.roles.length > 0)
-        items = items.filter(row => { return filter.roles.indexOf(row.url) > -1 })
+        items = items.filter(row => { return filter.roles.indexOfArray(row.url.trim(',').split(',')) > -1 })
+      //items = items.filter(row => { return filter.roles.indexOfArray(row.url.trim(',').split(',')) > -1 })
       const rs = items.filter(row => { return row.dependent.indexOf(',0,') > -1 })
       // get children
       rs.forEach(e => {
@@ -176,13 +177,15 @@ export default {
             return
           }
           if (res.data.data) {
-            state.isGetFirst = false
             // res.data.data.forEach(e => { e.url_plus = e.url_plus ? JSON.parse(e.url_plus) : state.url_plus });
             commit('SET_ITEMS', res.data.data.sortByKey('orders'))
           }
         } else commit('SET_CATCH', null, { root: true })
       }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
-        .finally(() => { if (loading) rootState.$loadingGet = false })
+        .finally(() => {
+          state.isGetFirst = false
+          if (loading) rootState.$loadingGet = false
+        })
     },
     async insert({ commit, state, rootGetters, rootState }, loading = true) {
       // Loading

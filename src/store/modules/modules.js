@@ -7,6 +7,7 @@ export default {
     item: {},
     tabs: null,
     selected: [],
+    permissions_selected: [],
     valid: false,
     dialog: false,
     confirm: false,
@@ -76,6 +77,7 @@ export default {
     },
     SET_ITEM(state, item) {
       state.item = item ? { ...item } : { ...state.default }
+      if (state.item.permissions) state.permissions_selected = state.item.permissions.trim(',').split(',')
     },
     SET_ITEM_ID(state, id) {
       state.item = id ? { ...state.items.find(x => x.id == id) } : { ...state.default }
@@ -84,10 +86,10 @@ export default {
       state.items.push(item)
     },
     UPDATE_ITEMS(state, item) {
-      state.items.update(item)
+      state.items.update(item, 'id')
     },
     REMOVE_ITEMS(state, item) {
-      state.items.remove(item)
+      state.items.remove(item, 'id')
     }
   },
   actions: {
@@ -102,12 +104,14 @@ export default {
             return
           }
           if (res.data.data) {
-            state.isGetFirst = false
             commit('SET_ITEMS', res.data.data)
           }
         } else commit('SET_CATCH', null, { root: true })
       }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
-        .finally(() => { if (loading) rootState.$loadingGet = false })
+        .finally(() => {
+          state.isGetFirst = false
+          if (loading) rootState.$loadingGet = false
+        })
     },
     async insert({ commit, state, rootGetters, rootState }, loading = true) {
       // Loading
@@ -115,6 +119,7 @@ export default {
       // http
       state.item.created_by = vnptbkn.defaults.headers.Author
       state.item.created_at = new Date()
+      state.item.permissions = `,${state.permissions_selected.join(',')},`
       await vnptbkn.post(collection, state.item).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'exist') {
@@ -135,10 +140,11 @@ export default {
     },
     async update({ commit, state, rootGetters, rootState }, loading = true) {
       // Loading
-      if (loading) rootState.$loadingCommit = true
+      if (loading) rootState.$loadingCommit = true;
       // http
       state.item.updated_by = vnptbkn.defaults.headers.Author
       state.item.updated_at = new Date()
+      state.item.permissions = `,${state.permissions_selected.join(',')},`
       await vnptbkn.put(collection, state.item).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'danger') {
@@ -200,9 +206,13 @@ export default {
         if (res.status === 200) {
           if (res.data.msg === 'exist') state.exist_code = false
           else state.exist_code = true
-        } else commit('SET_CATCH', null, { root: true })
+        } else {
+          state.exist_code = false
+          commit('SET_CATCH', null, { root: true })
+        }
       }).catch((error) => {
         commit('SET_CATCH', error, { root: true })
+        state.exist_code = false
         return Promise.reject(error)
       }).finally(() => { if (loading) rootState.$loadingCommit = false })
     }

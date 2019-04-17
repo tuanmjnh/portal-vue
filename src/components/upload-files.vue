@@ -63,7 +63,7 @@ export default {
         // console.log(this.files)
       })
       if (this.http)
-        this.http.post(this.http.defaults.baseURL + this.http.defaults.upload, formData).then((rs) => {
+        this.http.post(`${this.http.defaults.baseURL}/${this.http.defaults.upload}`, formData).then((rs) => {
           this.$emit('handleUpload', Object.assign(rs.data, { basePath: this.basePath }))
           this.clear();
         })

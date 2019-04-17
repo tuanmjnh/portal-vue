@@ -187,10 +187,7 @@
             <i class="material-icons">close</i>
           </v-btn>
         </v-snackbar>
-        <div class="mid-center" v-if="$store.state.$loadingGet">
-          <v-progress-circular :size="130" :width="10" color="primary" indeterminate></v-progress-circular>
-        </div>
-        <router-view v-else></router-view>
+        <router-view></router-view>
       </div>
     </v-content>
     <v-navigation-drawer temporary :right="right" v-model="$store.state.$notification"

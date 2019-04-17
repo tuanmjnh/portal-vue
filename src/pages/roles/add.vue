@@ -20,7 +20,7 @@
                       :label="$store.getters.languages(['roles.name'])"></v-text-field>
                   </v-flex>
                   <!-- <v-flex xs12 md6 sm6>
-                    <v-select :items="permissions" v-model="roles_selected"
+                    <v-select :items="permissions" v-model="$store.state.roles.roles_selected"
                       multiple :menu-props="{ maxHeight: '400' }" item-text="title"
                       item-value="code" :label="$store.getters.languages(['permissions.title'])"
                       persistent-hint :hint="$store.getters.languages(['permissions.select'])"
@@ -34,13 +34,16 @@
                     <v-switch color="primary" :label="item.flag===1?$store.getters.languages(['global.show']):$store.getters.languages(['global.hide'])"
                       :true-value="1" :false-value="0" v-model.number="item.flag"></v-switch>
                   </v-flex>
-                  <v-flex xs6 sm6 md6>
-                    <v-text-field v-model.trim="color.cover" :label="$store.getters.languages(['global.color_cover'])"
+                  <v-flex xs6 sm4 md4>
+                    <v-text-field v-model.trim="$store.state.roles.color.cover" :label="$store.getters.languages(['global.color_cover'])"
                       :rules="[v => !!v || $store.getters.languages('error.required')]"></v-text-field>
                   </v-flex>
-                  <v-flex xs6 sm6 md6>
-                    <v-text-field v-model.trim="color.text" :label="$store.getters.languages(['global.color_text'])"
+                  <v-flex xs6 sm4 md4>
+                    <v-text-field v-model.trim="$store.state.roles.color.text" :label="$store.getters.languages(['global.color_text'])"
                       :rules="[v => !!v || $store.getters.languages('error.required')]"></v-text-field>
+                  </v-flex>
+                  <v-flex xs6 sm4 md4 class="mt-3">
+                    <v-chip small :color="$store.state.roles.color.cover" :text-color="$store.state.roles.color.text">{{item.name}}</v-chip>
                   </v-flex>
                 </v-layout>
               </v-tab-item>
@@ -64,7 +67,7 @@
                         <tr v-for="(item,index) in modules" :key="index">
                           <td>{{$store.getters.languages(`modules.${item.code}`)}}</td>
                           <td v-for="(per,index) in permissions" :key="index">
-                            <v-checkbox v-model="roles_selected" :value="`${item.code}.${per.code}`"
+                            <v-checkbox v-model="$store.state.roles.roles_selected" :value="`${item.code}.${per.code}`"
                               :label="$store.getters.languages(`roles.${per.code}`)"></v-checkbox>
                           </td>
                         </tr>
@@ -110,8 +113,8 @@ export default {
     // 'list-select': listSelect
   },
   data: () => ({
-    roles_selected: [],
-    color: {}
+    // roles_selected: [],
+    // color: {}
   }),
   mounted() {
     this.reset()
@@ -145,26 +148,24 @@ export default {
     dialog(val) {
       if (!val) this.reset()
     },
-    item: {
-      handler(val) {
-        if (JSON.parse(val.color) != null)
-          this.color = JSON.parse(val.color)
-        this.roles_selected = this.item.roles.trim(',').split(',')
-        // if (this.permissions && this.permissions.length > 0) {
-        //   this.roles_selected = []
-        //   this.permissions.forEach(e => {
-        //     if (val.permissions.indexOf(`,${e.code},`) > -1) this.roles_selected.push(e.code)
-        //   });
-        // }
-      },
-      deep: true
-    }
+    // item: {
+    //   handler(val) {
+    //     // if (JSON.parse(val.color) != null)
+    //     //   this.color = JSON.parse(val.color)
+    //     // this.roles_selected = this.item.roles.trim(',').split(',')
+    //     // if (this.permissions && this.permissions.length > 0) {
+    //     //   this.roles_selected = []
+    //     //   this.permissions.forEach(e => {
+    //     //     if (val.permissions.indexOf(`,${e.code},`) > -1) this.roles_selected.push(e.code)
+    //     //   });
+    //     // }
+    //   },
+    //   deep: true
+    // }
   },
   methods: {
     onSave() {
       if (this.$store.state.roles.valid) {
-        this.item.roles = `,${this.roles_selected.join(',')},`
-        this.item.color = JSON.stringify(this.color)
         if (this.item.id) this.$store.dispatch('roles/update')
         else this.$store.dispatch('roles/insert')
       }
@@ -172,18 +173,18 @@ export default {
     selectAll(event, item) {
       if (event)
         this.modules.forEach(e => {
-          if (this.roles_selected.indexOf(`${e.code}.${item}`) < 0)
-            this.roles_selected.push(`${e.code}.${item}`)
+          if (this.$store.state.roles.roles_selected.indexOf(`${e.code}.${item}`) < 0)
+            this.$store.state.roles.roles_selected.push(`${e.code}.${item}`)
         })
       else
         this.modules.forEach(e => {
-          this.roles_selected.splice(this.roles_selected.indexOf(`${e.code}.${item}`), 1)
+          this.$store.state.roles.roles_selected.splice(this.$store.state.roles.roles_selected.indexOf(`${e.code}.${item}`), 1)
         })
     },
     reset() {
       this.$store.commit('roles/SET_ITEM')
-      this.roles_selected = []
-      this.color = { cover: "default", text: "white" }
+      // this.roles_selected = []
+      // this.color = { cover: "default", text: "white" }
       this.$refs.form.resetValidation()
     }
   }

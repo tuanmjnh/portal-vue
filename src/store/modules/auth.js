@@ -17,7 +17,12 @@ export default {
       remember: false
     }
   },
-  getters: {},
+  getters: {
+    inRoles: state => roles => {
+      if (!state.user.roles) return false
+      return state.user.roles.indexOf(roles) < 0 ? false : true
+    },
+  },
   mutations: {
     'SET_ITEM'(state, item) {
       state.item = item ? { ...item } : { ...state.default }
@@ -30,25 +35,25 @@ export default {
     },
     'SET_USER'(state, user) {
       state.user = { ...user }
-      state.user.roles = state.user.roles.trim(',').split(',')
+      if (state.user.roles) state.user.roles = state.user.roles.trim(',').split(',')
     }
   },
   actions: {
-    async signIn({ commit, state, rootGetters, rootState }, loading = false) {
+    async signIn({ commit, state, rootGetters, rootState }, loading = true) {
       // Loading
       if (loading) rootState.$loadingApp = true
       // http
       await vnptbkn.post(collection, state.item).then(function (res) {
         // commit auth
-        if (res.data.data && res.data.token) {
-          commit('SET_USER', res.data.data)
+        if (res.data.data) {
           storageAuth.signIn({
             uid: res.data.data.nguoidung_id,
-            token: `Bearer ${res.data.token}`,
+            token: `Bearer ${res.data.data.token}`,
             remember: state.item.remember,
             // account: res.data.data.ma_nd,
             // name: res.data.data.ten_nd
           })
+          commit('SET_USER', res.data.data)
           commit('SET_ISAUTH', true)
         }
         // commit('SET_AUTH', { token: res.data.token, user: data.username, remember: data.remember })
@@ -76,7 +81,7 @@ export default {
       }).catch(function (error) { commit('SET_CATCH', error, { root: true }) })
         .finally(() => { setTimeout(() => { rootState.$loadingApp = false }, 200) })
     },
-    async signOut({ commit, rootGetters, rootState }, loading = false) {
+    async signOut({ commit, rootGetters, rootState }, loading = true) {
       // Loading
       if (loading) rootState.$loadingApp = true
       // Action

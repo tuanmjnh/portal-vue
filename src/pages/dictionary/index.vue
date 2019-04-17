@@ -1,6 +1,9 @@
 <template>
   <!-- <router-view></router-view> -->
-  <div>
+  <div class="mid-center" v-if="$store.state.$loadingGet">
+    <v-progress-circular :size="130" :width="10" color="primary" indeterminate></v-progress-circular>
+  </div>
+  <div v-else>
     <list></list>
     <add></add>
   </div>
@@ -13,11 +16,13 @@ export default {
   components: { list, add },
   data: () => ({}),
   beforeCreate() {
-    if (this.$store.state.dictionary.isGetFirst)
-      this.$store.dispatch('dictionary/selectByLang', true).then(() => {
-        if (this.$store.state.languages.isGetFirst) this.$store.dispatch('languages/select', false)
-        if (this.$store.state.modules.isGetFirst) this.$store.dispatch('modules/select', false)
-      })
+    // if (this.$store.state.dictionary.isGetFirst)
+    this.$store.dispatch('dictionary/selectByLang').then(() => {
+      // if (this.$store.state.languages.isGetFirst) 
+      this.$store.dispatch('languages/select', false)
+      // if (this.$store.state.modules.isGetFirst) 
+      this.$store.dispatch('modules/select', false)
+    })
   }
 }
 </script>

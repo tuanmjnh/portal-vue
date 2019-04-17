@@ -35,7 +35,7 @@ export default {
       // Loading
       if (loading) rootState.$loadingGet = true
       // http
-      await vnptbkn.get(`${collection}/GetLanguages`).then(function(res) {
+      await vnptbkn.get(`${collection}/GetLanguages`).then(function (res) {
         if (res.status === 200) {
           if (res.data.msg === 'danger') {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
@@ -43,29 +43,32 @@ export default {
           }
           if (res.data.data) state.languages = res.data.data
         } else commit('SET_CATCH', null, { root: true })
-      }).catch(function(error) {
-        commit('SET_CATCH', error, { root: true })
-      }).finally(() => { if (loading) rootState.$loadingGet = false })
+      }).catch(function (error) { commit('SET_CATCH', error, { root: true }) })
+        .finally(() => {
+          state.isGetFirst = false
+          if (loading) rootState.$loadingGet = false
+        })
     },
     async GetNavigation({ commit, rootGetters, state, rootState }, loading = true) {
       // Loading
       if (loading) rootState.$loadingGet = true
       // http
-      await vnptbkn.get(collection).then(function(res) {
+      await vnptbkn.get(collection).then(function (res) {
         if (res.status === 200) {
           if (res.data.msg === 'danger') {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
             return
           }
           if (res.data.data) {
-            state.isGetFirst = false
             // res.data.data.forEach(e => { e.url_plus = e.url_plus ? JSON.parse(e.url_plus) : state.url_plus });
             commit('SET_ITEMS', res.data.data.sortByKey('orders').sortByKey('parent_id'))
           }
         } else commit('SET_CATCH', null, { root: true })
-      }).catch(function(error) {
-        commit('SET_CATCH', error, { root: true })
-      }).finally(() => { if (loading) rootState.$loadingGet = false })
+      }).catch(function (error) { commit('SET_CATCH', error, { root: true }) })
+        .finally(() => {
+          state.isGetFirst = false
+          if (loading) rootState.$loadingGet = false
+        })
     }
   }
 }

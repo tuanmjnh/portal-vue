@@ -107,10 +107,12 @@ export default {
           if (res.data.data) {
             commit('SET_ITEMS', res.data.data)
           }
-          state.isGetFirst = false
         } else { commit('SET_CATCH', null, { root: true }) }
       }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
-        .finally(() => { if (loading) rootState.$loadingGet = false })
+        .finally(() => {
+          state.isGetFirst = false
+          if (loading) rootState.$loadingGet = false
+        })
     },
     async insert({ commit, state, rootGetters, rootState }, loading = true) {
       // Loading

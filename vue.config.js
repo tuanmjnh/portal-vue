@@ -1,26 +1,27 @@
 var webpack = require("webpack");
 var path = require("path");
+var _package = require('./package.json');
+const env = { //environment
+  dev: { // development
+    publicPath: '/',
+    outputDir: '/dist',
+  },
+  prod: { // production
+    publicPath: '/portal/',
+    outputDir: '/Application/portal-vue',
+  }
+}
+
+process.env.VUE_APP_VERSION = _package.version
+process.env.VUE_APP_TITLE = _package.name
 module.exports = {
   configureWebpack: {
-    //devtool: 'source-map',
-    // plugins: [
-    //   new webpack.ProvidePlugin({
-    //     $: "jquery",
-    //     jQuery: "jquery",
-    //     jquery: "jquery"
-    //   })
-    // ],
-    // resolve: {
-    //   extensions: [".js", ".vue", ".json"],
-    //   alias: {
-    //     jquery: "jquery/src/jquery.js",
-    //     "jquery-ui": "jquery-ui",
-    //     d3: "d3",
-    //     modules: path.join(__dirname, "node_modules")
-    //   }
-    // }
+    devtool: 'source-map',
+    // filename: 'dist/js/[name].[hash:8].js',
+    // chunkFilename: 'dist/js/[name].[hash:8].js',
   },
-  outputDir: 'D:/Application/portal-vue',
-  // publicPath: 'portal',
-  publicPath: process.env.NODE_ENV === 'production' ? '/portal/' : '/'
+  // publicPath: '/portal/',
+  // outputDir: 'dist',
+  publicPath: process.env.NODE_ENV === 'production' ? env.prod.publicPath : env.dev.publicPath,
+  outputDir: process.env.NODE_ENV === 'production' ? env.prod.outputDir : env.dev.outputDir,
 }
