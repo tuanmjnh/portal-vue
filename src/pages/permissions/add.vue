@@ -20,7 +20,7 @@
                   </v-flex>
                   <v-flex xs12 sm4 md4>
                     <v-text-field v-model.trim="item.code" class="text-color-initial"
-                      :disabled="item.id?true:false" :label="$store.getters.languages('global.code')"
+                      @keyup="onExistCode()" :disabled="item.id?true:false" :label="$store.getters.languages('global.code')"
                       :rules="[v => !!v  || $store.getters.languages('error.required'),$store.state.permissions.exist_code||$store.getters.languages('error.exist')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
@@ -82,22 +82,26 @@ export default {
     dialog(val) {
       if (!val) this.reset()
     },
-    item: {
-      handler(val) {
-        if (this.item.code) {
-          this.item.code = this.item.code.toString().toLowerCase()
-          if (!this.item.id) this.$store.dispatch('permissions/exist_code')
-        }
-      },
-      deep: true
-    }
+    // item: {
+    //   handler(val) {
+    //     if (this.item.code) {
+    //       this.item.code = this.item.code.toString().toLowerCase()
+    //       if (!this.item.id) this.$store.dispatch('permissions/exist_code')
+    //     }
+    //   },
+    //   deep: true
+    // }
   },
   methods: {
     onSave() {
       if (this.$store.state.permissions.valid) {
         if (this.item.id) this.$store.dispatch('permissions/update')
-        else this.$store.dispatch('permissions/insert')
+        else this.$store.dispatch('permissions/insert').then(this.reset())
       }
+    },
+    onExistCode() {
+      this.item.code = this.item.code.toString().toLowerCase()
+      if (!this.item.id) this.$store.dispatch('permissions/exist_code')
     },
     reset() {
       this.$store.commit('permissions/SET_ITEM')

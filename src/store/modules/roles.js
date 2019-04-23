@@ -54,8 +54,8 @@ export default {
       let rs = [...state.items]
       if (pagination && pagination.find) rs = rs.filterValue(pagination.find)
       else rs = rs.filterValue(state.pagination.find)
-      if (pagination && pagination.search) rs = rs.searchValue(pagination.find)
-      else rs = rs.searchValue(state.pagination.find)
+      if (pagination && pagination.search) rs = rs.searchValue(pagination.search)
+      else rs = rs.searchValue(state.pagination.search)
       if (pagination && pagination.sortBy) rs = rs.sortByKey(pagination.sortBy)
       else rs = rs.sortByKey(state.pagination.sortBy)
       return rs
@@ -98,7 +98,7 @@ export default {
       // Loading
       if (loading) rootState.$loadingGet = true
       // http
-      await vnptbkn.get(collection).then(function (res) {
+      await vnptbkn().get(collection).then(function (res) {
         if (res.status === 200) {
           if (res.data.msg === 'danger') {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
@@ -118,11 +118,11 @@ export default {
       // Loading
       if (loading) rootState.$loadingCommit = true
       // http
-      state.item.created_by = vnptbkn.defaults.headers.Author
+      state.item.created_by = vnptbkn().defaults.headers.Author
       state.item.created_at = new Date()
       state.item.roles = `,${state.roles_selected.join(',')},`
       state.item.color = JSON.stringify(state.color)
-      await vnptbkn.post(collection, state.item).then(function (res) {
+      await vnptbkn().post(collection, state.item).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'exist') {
             commit('SET_MESSAGE', { text: rootGetters.languages('modules.err_exist'), color: 'warning' }, { root: true })
@@ -146,7 +146,7 @@ export default {
       // http
       state.item.roles = `,${state.roles_selected.join(',')},`
       state.item.color = JSON.stringify(state.color)
-      await vnptbkn.put(collection, state.item).then(function (res) {
+      await vnptbkn().put(collection, state.item).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'danger') {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
@@ -165,7 +165,7 @@ export default {
       if (loading) rootState.$loadingCommit = true
       // http
       const data = state.selected.map(x => ({ id: x.id, flag: x.flag === 0 ? 1 : 0 }))
-      await vnptbkn.put(collection + '/delete', data).then(function (res) {
+      await vnptbkn().put(collection + '/delete', data).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'danger') {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
@@ -185,7 +185,7 @@ export default {
       // Loading
       if (loading) rootState.$loadingCommit = true
       // http
-      await vnptbkn.delete(collection, state.item).then(function (res) {
+      await vnptbkn().delete(collection, state.item).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'danger') {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })

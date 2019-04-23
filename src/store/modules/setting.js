@@ -110,7 +110,7 @@ export default {
       // Loading
       if (loading) rootState.$loadingGet = true
       // http
-      await vnptbkn.get(collection).then(function (res) {
+      await vnptbkn().get(collection).then(function (res) {
         if (res.status === 200) {
           if (res.data.data) commit(SET_ITEMS, res.data.data)
         } else commit(SET_CATCH, null, { root: true })
@@ -121,9 +121,9 @@ export default {
         })
     },
     async insert({ commit, state }) {
-      state.item.created_by = vnptbkn.defaults.headers.Author
+      state.item.created_by = vnptbkn().defaults.headers.Author
       state.item.created_at = new Date()
-      await vnptbkn.post(collection, state.item).then(function (res) {
+      await vnptbkn().post(collection, state.item).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'exist') {
             commit(SET_MESSAGE, { text: 'Mã ngôn ngữ tồn tại!', color: 'warning' }, { root: true })
@@ -141,9 +141,9 @@ export default {
         .catch(function (error) { commit(SET_CATCH, error, { root: true }) })
     },
     async update({ commit, state }) {
-      state.item.updated_by = vnptbkn.defaults.headers.Author
+      state.item.updated_by = vnptbkn().defaults.headers.Author
       state.item.updated_at = new Date()
-      await vnptbkn.put(collection, state.item).then(function (res) {
+      await vnptbkn().put(collection, state.item).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'danger') {
             commit(SET_MESSAGE, { text: 'Lỗi dữ liệu, vui lòng thử lại!', color: res.data.msg }, { root: true })
@@ -159,7 +159,7 @@ export default {
     async delete({ commit }, selected) {
       var _selected = [...selected]
       for (let i = 0; i < _selected.length; i++) _selected[i].flag = _selected[i].flag === 0 ? 1 : 0
-      await vnptbkn.put(collection + '/delete', _selected).then(function (res) {
+      await vnptbkn().put(collection + '/delete', _selected).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'danger') {
             commit(SET_MESSAGE, { text: 'Lỗi dữ liệu, vui lòng thử lại!', color: res.data.msg }, { root: true })
@@ -173,7 +173,7 @@ export default {
         .catch(function (error) { commit(SET_CATCH, error, { root: true }) })
     },
     async remove({ commit, state }) {
-      await vnptbkn.delete(collection, state.item).then(function (res) {
+      await vnptbkn().delete(collection, state.item).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'danger') {
             commit(SET_MESSAGE, { text: 'Lỗi dữ liệu, vui lòng thử lại!', color: res.data.msg }, { root: true })
@@ -190,7 +190,7 @@ export default {
       commit(SET_ITEM, item)
     },
     existCode({ commit, state }) {
-      return vnptbkn.get(collection + '/ExistCode/' + state.item.code, { timeout: 1000 }).then(function (res) { //, { timeout: 3000 }
+      return vnptbkn().get(collection + '/ExistCode/' + state.item.code, { timeout: 1000 }).then(function (res) { //, { timeout: 3000 }
         if (res.status === 200) {
           if (res.data.msg === 'exist') return false
           else return true

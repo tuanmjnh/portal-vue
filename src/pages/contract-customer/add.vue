@@ -60,19 +60,19 @@
             </v-flex> -->
                   <v-flex xs12 sm12 md12 v-if="khachhang.id">
                     {{$store.getters.languages('global.contract')}}: <a class="mx-0 v-btn v-btn--icon theme--info"
-                      :href="vnptbkn.defaults.baseURL.replace('api','')+khachhang.attach"
-                      target="_blank"><i class="material-icons">attachment</i></a>
+                      :href="`${http.defaults.host}/${khachhang.attach}`" target="_blank"><i
+                        class="material-icons">attachment</i></a>
                   </v-flex>
                   <template v-else>
                     <v-flex xs12 sm6 md6 v-if="khachhang.hdkh_id">
                       <upload-files @handleUpload="uploadFiles=$event" :buttonUse="false"
                         :basePath="uploadFiles.basePath" :multiple="false" :autoName="true"
-                        :fileName="khachhang.hdkh_id.toString()" :http="vnptbkn"
-                        extension="application/pdf" :buttonText="$store.getters.languages('contract_customer.upload_btn')"></upload-files>
+                        :fileName="khachhang.hdkh_id.toString()" :http="http" extension="application/pdf"
+                        :buttonText="$store.getters.languages('contract_customer.upload_btn')"></upload-files>
                       <!-- :fileName="khachhang.ma_gd.replace(/\//g,'_')" -->
                     </v-flex>
                     <v-flex xs12 sm6 md6 v-if="khachhang.ma_gd">
-                      <display-files :files="uploadFiles.files" :baseUrl="vnptbkn.defaults.baseURL.replace('api','')"
+                      <display-files :files="uploadFiles.files" :baseUrl="http.defaults.host"
                         :isShowName="false" classes="w-x"></display-files>
                     </v-flex>
                   </template>
@@ -154,7 +154,7 @@
               <v-tab-item>
                 <v-layout wrap class="pt-2">
                   <v-flex xs12 sm12 md12>
-                    <vue-quill-editor v-model.trim="khachhang.details" ref="details">
+                    <vue-quill-editor v-model.trim="khachhang.descs" ref="descs">
                     </vue-quill-editor>
                     <!-- <tinymce id="desc" v-model="khachhang.desc"></tinymce> -->
                   </v-flex>
@@ -182,22 +182,18 @@
 </template>
 
 <script>
-// import 'quill/dist/quill.core.css'
-// import 'quill/dist/quill.snow.css'
-// import 'quill/dist/quill.bubble.css'
 import { quillEditor } from 'vue-quill-editor'
 import uploadFiles from '@/components/upload-files'
 import displayFiles from '@/components/display-files'
-import { vnptbkn } from '@/plugins/axios-config'
 export default {
   components: {
     'vue-quill-editor': quillEditor,
     'upload-files': uploadFiles,
     'display-files': displayFiles
   },
+  props: { http: null },
   data: () => ({
     uploadFiles: { files: [], basePath: 'Uploads/HopDong' },
-    vnptbkn: vnptbkn,
     headers: [
       { text: 'contract_customer.ma_tb', align: 'left', value: 'ma_tb' },
       { text: 'contract_customer.ten_tb', value: 'ten_tb' },

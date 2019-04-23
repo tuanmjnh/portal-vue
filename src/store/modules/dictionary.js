@@ -94,7 +94,7 @@ export default {
       // Loading
       if (loading) rootState.$loadingGet = true
       // http
-      await vnptbkn.get(collection).then(function (res) {
+      await vnptbkn().get(collection).then(function (res) {
         if (res.status === 200) {
           if (res.data.msg === 'danger') {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
@@ -115,7 +115,7 @@ export default {
       if (loading) rootState.$loadingGet = true
       // http
       state.lang_code = state.lang_code || state.default.lang_code
-      await vnptbkn.get(`${collection}/GetByLanguage/${state.lang_code}`).then(function (res) {
+      await vnptbkn().get(`${collection}/GetByLanguage/${state.lang_code}`).then(function (res) {
         if (res.status === 200) {
           if (res.data.msg === 'danger') {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
@@ -134,7 +134,7 @@ export default {
       if (loading) rootState.$loadingCommit = true
       // http
       const data = { ...state.item, ...{ lang_code: state.lang_code } }
-      await vnptbkn.post(collection, data).then(function (res) {
+      await vnptbkn().post(collection, data).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'exist') {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.exist'), color: 'warning' }, { root: true })
@@ -158,7 +158,7 @@ export default {
       if (loading) rootState.$loadingCommit = true
       // http
       const data = { ...state.item, ...{ lang_code: state.lang_code } }
-      await vnptbkn.put(collection, data).then(function (res) {
+      await vnptbkn().put(collection, data).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'danger') {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
@@ -175,7 +175,7 @@ export default {
       // Loading
       if (loading) rootState.$loadingCommit = true
       // http
-      await vnptbkn.put(`${collection}/delete`, state.selected.map(x => ({ id: x.id, flag: x.flag === 0 ? 1 : 0 }))).then(function (res) {
+      await vnptbkn().put(`${collection}/delete`, state.selected.map(x => ({ id: x.id, flag: x.flag === 0 ? 1 : 0 }))).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'danger') {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })

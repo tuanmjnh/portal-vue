@@ -295,6 +295,54 @@ const routes = [
       }
     ]
   },
+  {
+    path: '/category',
+    name: 'category',
+    alias: '',
+    // redirect: { name: 'category-list' },
+    meta: { desc: 'category', auth: true, roles: ['category.select'] },
+    component: () => import('@/pages/category/index'),
+    children: [
+      {
+        path: 'list',
+        name: 'category-list',
+        props: true,
+        meta: { desc: 'category-list', auth: true, roles: ['category.select'] },
+        component: () => import('@/pages/category/list')
+      },
+      {
+        path: 'add/:id?',
+        name: 'category-add',
+        props: true,
+        meta: { desc: 'category-add', auth: true, roles: ['category.insert', 'category.update'] },
+        component: () => import('@/pages/category/add')
+      }
+    ]
+  },
+  {
+    path: '/news',
+    name: 'news',
+    alias: '',
+    // redirect: { name: 'category-list' },
+    meta: { desc: 'news', auth: true, roles: ['news.select'] },
+    component: () => import('@/pages/news/index'),
+    children: [
+      {
+        path: 'list',
+        name: 'news-list',
+        props: true,
+        meta: { desc: 'news-list', auth: true, roles: ['news.select'] },
+        component: () => import('@/pages/news/list')
+      },
+      {
+        path: 'add/:id?',
+        name: 'news-add',
+        props: true,
+        meta: { desc: 'news-add', auth: true, roles: ['news.insert', 'news.update'] },
+        component: () => import('@/pages/news/add')
+      }
+    ]
+  },
   // {
   //   path: '/languages',
   //   name: 'languages',

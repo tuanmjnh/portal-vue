@@ -11,6 +11,8 @@ import './plugins/vuetify'
 // import * as Storage from './plugins/storage'
 // Helpers
 import helpers from './plugins/helpers'
+// Local IP
+import localIP from './plugins/local-ip'
 // Mixins
 import mixins from './plugins/mixins'
 // Store

@@ -95,7 +95,8 @@ export default {
   },
   watch: {
     pagination: {
-      handler() {
+      handler(val) {
+        console.log(val)
         this.getDataFromApi().then(data => {
           this.desserts = data.items
           this.totalDesserts = data.total

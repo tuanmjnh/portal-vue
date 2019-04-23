@@ -16,10 +16,13 @@ import donvi from './modules/donvi'
 import setting from './modules/setting'
 import modules from './modules/modules'
 import languages from './modules/languages'
+import dictionary from './modules/dictionary'
+import category from './modules/category'
+import news from './modules/news'
 import navigation from './modules/navigation'
 import permissions from './modules/permissions'
 import notification from './modules/notification'
-import dictionary from './modules/dictionary'
+import informations from './modules/informations'
 import contract_customer from './modules/contract_customer'
 import contract_enterprise from './modules/contract_enterprise'
 Vue.use(Vuex)
@@ -33,9 +36,12 @@ export default new Vuex.Store({
     nguoidung: nguoidung,
     languages: languages,
     dictionary: dictionary,
+    category: category,
+    news: news,
     navigation: navigation,
     permissions: permissions,
     notification: notification,
+    informations: informations,
     contract_customer: contract_customer,
     contract_enterprise: contract_enterprise
   },
@@ -61,7 +67,7 @@ export default new Vuex.Store({
     // _language: 'vi-VN',
     // _dictionary: JSON.parse(_store.Get('language'))
     // _axios: {
-    //   vnptbkn: { host: vnptbkn.defaults.host, api: vnptbkn.defaults.api }
+    //   vnptbkn: { host: vnptbkn().defaults.host, api: vnptbkn().defaults.api }
     // }
   }, // State
   getters: {
@@ -167,7 +173,7 @@ export default new Vuex.Store({
       let lang_data = {}
       commit('SET_LANGUAGE', state.$language)
       // commit('SET_LANGUAGES', lang_data)
-      await vnptbkn.get(`dictionary/GetByLanguage/${state.$language}`).then(function (res) {
+      await vnptbkn().get(`dictionary/GetByLanguage/${state.$language}`).then(function (res) {
         if (res.status == 200) {
           _languages.SetLanguage(state.$language)
           if (res.data.data) {
@@ -185,7 +191,7 @@ export default new Vuex.Store({
 
       // Data Json
       // commit('SET_LANGUAGE', state.$language)
-      // await vnptbkn.get(`dictionary/getlang/${state.$language}`).then(function(res) {
+      // await vnptbkn().get(`dictionary/getlang/${state.$language}`).then(function(res) {
       //     if (res.status == 200) {
       //       let lang_data = ''
       //       _languages.SetLanguage(state.$language)
@@ -198,7 +204,7 @@ export default new Vuex.Store({
       //   .catch(function(error) { commit('SET_CATCH', error) })
 
       // Json File
-      // await vnptbkn.get(`../Languages/${state.$language}.json`).then(function(res) {
+      // await vnptbkn().get(`../Languages/${state.$language}.json`).then(function(res) {
       //     if (res.status == 200) {
       //       commit('SET_LANGUAGES', res.data)
       //       _languages.SetLanguage(state.$language)

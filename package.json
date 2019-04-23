@@ -55,6 +55,7 @@
       "semi": 0,
       "space-before-function-paren": 0,
       "no-useless-escape": 0,
+      "no-redeclare": 0,
       "vue/no-unused-vars": 1
     },
     "parserOptions": {

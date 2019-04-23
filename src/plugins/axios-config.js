@@ -3,16 +3,21 @@ import * as storageAuth from './storage-auth'
 import { env } from '@/environment.js';
 // console.log(environment.production)
 const source = axios.CancelToken.source();
-const vnptbkn = axios.create({
-  upload: env.upload,
-  baseURL: env.api.join('/'), //'http://localhost:5000/',
-  // timeout: 5000,
-  headers: {
-    Authorization: storageAuth.GetToken() || '',
-    Author: storageAuth.GetUid() || '',
-    Remember: storageAuth.GetRemember()
-  }
-})
+
+const vnptbkn = () => {
+  return axios.create({
+    upload: env.upload,
+    host: env.api[0],
+    baseURL: env.api.join('/'), //'http://localhost:5000/',
+    // timeout: 5000,
+    headers: {
+      Authorization: storageAuth.GetToken() || '',
+      Author: storageAuth.GetUid() || '',
+      Remember: storageAuth.GetRemember(),
+      LocalIP: document.getElementById('local-ip').value
+    }
+  })
+}
 // vnptbkn.CancelToken = axios.CancelToken;
 // vnptbkn.isCancel = axios.isCancel;
 const localhost = axios.create({
@@ -25,11 +30,12 @@ const localhost = axios.create({
     Remember: storageAuth.GetRemember()
   }
 })
-const setHeaderAuth = function () {
-  vnptbkn.defaults.headers.Author = storageAuth.GetUid() || ''
-  vnptbkn.defaults.headers.Authorization = storageAuth.GetToken() || ''
-  vnptbkn.defaults.headers.Remember = storageAuth.GetRemember()
-}
+// const setHeaderAuth = function () {
+//   vnptbkn.defaults.headers.Author = storageAuth.GetUid() || ''
+//   vnptbkn.defaults.headers.Authorization = storageAuth.GetToken() || ''
+//   vnptbkn.defaults.headers.Remember = storageAuth.GetRemember()
+// }
+
 // another api service
 // const amazonApi = axios.create({
 //   baseURL: 'https://amazon-domain.com/api/',
@@ -39,4 +45,4 @@ const setHeaderAuth = function () {
 //   }
 // });
 
-export { vnptbkn, setHeaderAuth, localhost, source }
+export { vnptbkn, localhost, source }

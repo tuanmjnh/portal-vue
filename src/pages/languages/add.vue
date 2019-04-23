@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="$store.state.languages.dialog" max-width="1024px" persistent>
+  <v-dialog v-model="$store.state.languages.dialog" max-width="1024px" persistent>
     <v-card>
       <v-card-title class="headline grey lighten-2">
         {{ item.id ?
@@ -20,7 +20,7 @@
                   </v-flex>
                   <v-flex xs12 sm4 md4>
                     <v-text-field v-model.trim="item.code" class="text-color-initial"
-                      :disabled="item.id?true:false" :label="$store.getters.languages('global.code')"
+                      @keyup="onExistCode()" :disabled="item.id?true:false" :label="$store.getters.languages('global.code')"
                       :rules="[v => !!v  || $store.getters.languages('error.required'),$store.state.languages.exist_code||$store.getters.languages('error.exist')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6 class="text-append-icon">
@@ -40,13 +40,13 @@
                       :label="$store.getters.languages('global.attach')"></v-text-field>
                   </v-flex>
                   <v-flex xs6 sm6 md4>
-                    <display-files :files="uploadFiles.files" :baseUrl="vnptbkn.defaults.host"
+                    <display-files :files="uploadFiles.files" :baseUrl="http.defaults.host"
                       :isShowName="false" classes="w-x"></display-files>
                   </v-flex>
                   <v-flex xs12 sm6 md4 v-if="item.code">
                     <upload-files @handleUpload="uploadFiles=$event" :buttonUse="false"
                       :basePath="uploadFiles.basePath" :multiple="false" :autoName="false"
-                      :fileName="item.code" :http="vnptbkn" extension="application/json"
+                      :fileName="item.code" :http="http" extension="application/json"
                       :buttonText="$store.getters.languages('global.upload_drag')"></upload-files>
                   </v-flex>
                 </v-layout>
@@ -78,22 +78,21 @@
 </template>
 
 <script>
-import 'quill/dist/quill.core.css'
-import 'quill/dist/quill.snow.css'
-import 'quill/dist/quill.bubble.css'
+// import 'quill/dist/quill.core.css'
+// import 'quill/dist/quill.snow.css'
+// import 'quill/dist/quill.bubble.css'
 import { quillEditor } from 'vue-quill-editor'
 import uploadFiles from '@/components/upload-files'
 import displayFiles from '@/components/display-files'
-import { vnptbkn } from '@/plugins/axios-config'
 export default {
   components: {
     'vue-quill-editor': quillEditor,
     'upload-files': uploadFiles,
     'display-files': displayFiles
   },
+  props: { http: null },
   data: () => ({
-    vnptbkn: vnptbkn,
-    uploadFiles: { files: [], basePath: 'Languages' }
+    uploadFiles: { files: [], basePath: 'Uploads/Languages' }
   }),
   mounted() {
     this.reset()
@@ -110,13 +109,13 @@ export default {
     dialog(val) {
       if (!val) this.reset()
     },
-    item: {
-      handler(val) {
-        if (this.item.attach) this.item.attach_file = this.item.attach.replace('Languages/', '')
-        if (this.item.code && !this.item.id) this.$store.dispatch('languages/exist_code')
-      },
-      deep: true
-    },
+    // item: {
+    //   handler(val) {
+    //     if (this.item.attach) this.item.attach_file = this.item.attach.replace('Languages/', '')
+    //     if (this.item.code && !this.item.id) this.$store.dispatch('languages/exist_code')
+    //   },
+    //   deep: true
+    // },
     uploadFiles: {
       handler(val) {
         if (val.files && val.files.length > 0)
@@ -129,8 +128,12 @@ export default {
     onSave() {
       if (this.$store.state.languages.valid) {
         if (this.item.id) this.$store.dispatch('languages/update')
-        else this.$store.dispatch('languages/insert')
+        else this.$store.dispatch('languages/insert').then(this.reset())
       }
+    },
+    onExistCode() {
+      this.item.code = this.item.code.toString().toLowerCase()
+      if (!this.item.id) this.$store.dispatch('category/exist_code')
     },
     reset() {
       this.$store.commit('languages/SET_ITEM')

@@ -8,7 +8,6 @@ export default {
     item: {},
     khachhang: {},
     thuebao: [],
-    donvi_id: 0,
     tabs: null,
     selected: [],
     valid: false,
@@ -16,6 +15,7 @@ export default {
     confirm: false,
     exist_code: true,
     isGetFirst: true,
+    totalItems: 0,
     headers: [
       { text: 'contract_customer.contract_code', value: 'contract_code' },
       { text: 'contract_customer.customer_name', value: 'customer_name' },
@@ -27,8 +27,13 @@ export default {
     pagination: {
       search: '',
       sortBy: 'created_at',
+      descending: true,
       toggle: 0,
-      find: { flag: 1 }
+      flag: 1,
+      donvi_id: 0,
+      // filter: { flag: 1, donvi_id: 0 },
+      page: 1,
+      rowsPerPage: 10
     },
     df_khachhang: {
       hdkh_id: '',
@@ -83,13 +88,16 @@ export default {
     },
     getFilter: state => pagination => {
       let rs = [...state.items]
-      if (pagination && pagination.find) rs = rs.filterValue(pagination.find)
-      else rs = rs.filterValue(state.pagination.find)
-      if (pagination && pagination.search) rs = rs.searchValue(pagination.find)
-      else rs = rs.searchValue(state.pagination.find)
+      let filter = { ...state.pagination.filter }
+      if (state.pagination.filter.donvi_id === 0)
+        delete filter.donvi_id
+      if (pagination && pagination.filter) rs = rs.filterValue(pagination.filter)
+      else rs = rs.filterValue(filter)
+      if (pagination && pagination.search) rs = rs.searchValue(pagination.search)
+      else rs = rs.searchValue(state.pagination.search)
       if (pagination && pagination.sortBy) rs = rs.sortByKey(pagination.sortBy)
       else rs = rs.sortByKey(state.pagination.sortBy)
-      // console.log(state.pagination.find)
+      // console.log(state.pagination.filter)
       return rs
     },
     headers: (state, getters, rootState, rootGetters) => {
@@ -130,19 +138,23 @@ export default {
     }
   },
   actions: {
-    async select({ commit, state, rootGetters, rootState }, loading = true) {
+    async select({ commit, state, rootGetters, rootState }, isExport = false, loading = true) {
       // Loading
       if (loading && !rootState.$loadingGet) rootState.$loadingGet = true
       // http
-      await vnptbkn.get(`${collection}/GetByDonVi`).then(function (res) {
+      return await vnptbkn().get(`${collection}/GetByDonVi`, { params: { ...state.pagination, ...{ isExport: isExport } } }).then(function (res) {
         if (res.status === 200) {
+          if (res.data.msg === 'error_token') {
+            commit('SET_CATCH', { response: { status: 401 } }, { root: true })
+            return
+          }
           if (res.data.msg === 'danger') {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
             return
           }
-          if (res.data.data) {
-            commit('SET_ITEMS', res.data.data)
-          }
+          if (res.data.data) commit('SET_ITEMS', res.data.data)
+          if (res.data.total) state.totalItems = res.data.total
+          return res.data.data
         } else { commit('SET_CATCH', null, { root: true }) }
       }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
         .finally(() => {
@@ -154,8 +166,16 @@ export default {
       // Loading
       if (loading) rootState.$loadingCommit = true
       // http
-      await vnptbkn.get(`${collection}/getThuebao/${state.khachhang.hdkh_id}`).then(function (res) {
+      await vnptbkn().get(`${collection}/getThuebao/${state.khachhang.hdkh_id}`).then(function (res) {
         if (res.status === 200) {
+          if (res.data.msg === 'error_token') {
+            commit('SET_CATCH', { response: { status: 401 } }, { root: true })
+            return
+          }
+          if (res.data.msg === 'danger') {
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            return
+          }
           if (res.data.data) commit('SET_THUEBAO', res.data.data)
         } else commit('SET_CATCH', null, { root: true })
       }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
@@ -166,12 +186,16 @@ export default {
       if (loading) rootState.$loadingCommit = true
       // http
       // const khachhang = { ...state.khachhang } // Object.assign({}, state.khachhang)
-      // state.khachhang.created_by = vnptbkn.defaults.headers.Author
+      // state.khachhang.created_by = vnptbkn().defaults.headers.Author
       // state.khachhang.created_at = new Date()
       // const thuebao = [...state.thuebao]
       // const data = { khachhang: { ...state.khachhang }, thuebao: [...state.thuebao] }
-      await vnptbkn.post(collection, state.khachhang).then(function (res) {
+      await vnptbkn().post(collection, state.khachhang).then(function (res) {
         if (res.status == 200) {
+          if (res.data.msg === 'error_token') {
+            commit('SET_CATCH', { response: { status: 401 } }, { root: true })
+            return
+          }
           if (res.data.msg === 'exist') {
             commit('SET_MESSAGE', { text: rootGetters.languages('contract_customer.msg_err_exist'), color: 'warning' }, { root: true })
             return
@@ -192,7 +216,7 @@ export default {
     },
     async update({ commit, state }) {
       // const item = { ...state.khachhang } // Object.assign({}, state.khachhang)
-      // item.updated_by = vnptbkn.defaults.headers.Author
+      // item.updated_by = vnptbkn().defaults.headers.Author
       // item.updated_at = new Date()
       // FBStore.collection(collection).doc(item.id).set(item)
       //   .then(docRef => {
@@ -206,8 +230,12 @@ export default {
       if (loading) rootState.$loadingCommit = true
       // http
       const data = state.selected.map(x => ({ id: x.id, flag: 4 }))
-      await vnptbkn.put(`${collection}/delete`, data).then(function (res) {
+      await vnptbkn().put(`${collection}/delete`, data).then(function (res) {
         if (res.status == 200) {
+          if (res.data.msg === 'error_token') {
+            commit('SET_CATCH', { response: { status: 401 } }, { root: true })
+            return
+          }
           if (res.data.msg === 'danger') {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
             return
@@ -218,7 +246,7 @@ export default {
           state.selected = []
           commit('SET_KHACHHANG')
           commit('SET_THUEBAO')
-          commit('SET_MESSAGE', { text: rootGetters.languages(['contract_customer.cancel',' ','global.success','!']), color: res.data.msg }, { root: true })
+          commit('SET_MESSAGE', { text: rootGetters.languages(['contract_customer.cancel', ' ', 'global.success', '!']), color: res.data.msg }, { root: true })
         } else commit('SET_CATCH', null, { root: true })
       }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
         .finally(() => { if (loading) rootState.$loadingCommit = false })
@@ -237,7 +265,7 @@ export default {
       // Loading
       if (loading) rootState.$loadingCommit = true
       // http
-      await vnptbkn.get(`${collection}/getContract?key=${state.khachhang.ma_gd}`).then(function (res) {
+      await vnptbkn().get(`${collection}/getContract?key=${state.khachhang.ma_gd}`).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'not_exist') {
             commit('SET_MESSAGE', { text: rootGetters.languages('contract_customer.msg_err_not_exist'), color: 'warning' }, { root: true })

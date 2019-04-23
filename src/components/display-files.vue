@@ -4,17 +4,17 @@
       <div class="file-item">
         <div class="file-item-content">
           <div :class="[classes,'file-item-view']">
-            <img :src="baseUrl+item.full_name" :title="item.name" v-if="item.extension.isImage()">
-            <a :href="baseUrl+item.full_name" target="_blank" v-else-if="item.extension.isAudio()">
+            <img :src="`${baseUrl}/${item.full_name}`" :title="item.name" v-if="item.extension.isImage()">
+            <a :href="`${baseUrl}/${item.full_name}`" target="_blank" v-else-if="item.extension.isAudio()">
               <i class="material-icons">audiotrack</i>
             </a>
-            <a :href="baseUrl+item.full_name" target="_blank" v-else-if="item.extension.isVideo()">
+            <a :href="`${baseUrl}/${item.full_name}`" target="_blank" v-else-if="item.extension.isVideo()">
               <i class="material-icons">camera_roll</i>
             </a>
-            <a :href="baseUrl+item.full_name" target="_blank" v-else-if="item.extension.isPdf()">
+            <a :href="`${baseUrl}/${item.full_name}`" target="_blank" v-else-if="item.extension.isPdf()">
               <i class="material-icons">picture_as_pdf</i>
             </a>
-            <a :href="baseUrl+item.full_name" target="_blank" v-else>
+            <a :href="`${baseUrl}/${item.full_name}`" target="_blank" v-else>
               <i class="material-icons">insert_drive_file</i>
             </a>
           </div>

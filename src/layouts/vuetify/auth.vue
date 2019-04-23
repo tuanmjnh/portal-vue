@@ -19,11 +19,11 @@
                     v-focus.vuetify></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm12 md12>
-                  <v-text-field type="password" v-model="item.password" :label="$store.getters.languages(['auth.password'])"></v-text-field>
+                  <v-text-field type="password" v-model="item.matkhau" :label="$store.getters.languages(['auth.password'])"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm12 md12>
                   <div class="spacer"></div>
-                  <v-checkbox v-model="item.matkhau" :label="$store.getters.languages(['auth.remember'])"></v-checkbox>
+                  <v-checkbox v-model="item.remember" :label="$store.getters.languages(['auth.remember'])"></v-checkbox>
                 </v-flex>
               </v-layout>
             </v-container>
