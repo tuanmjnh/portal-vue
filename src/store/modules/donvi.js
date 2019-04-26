@@ -79,11 +79,11 @@ export default {
     }
   },
   actions: {
-    async select({ commit, state, rootGetters, rootState }, loading = true) {
+    async select({ commit, state, rootGetters, rootState }, isExport = false, pagination, loading = true) {
       // Loading
       if (loading) rootState.$loadingGet = true
       // http
-      await vnptbkn().get(collection).then(function (res) {
+      await vnptbkn().get(collection, { params: pagination ? pagination : { ...state.pagination, ...{ isExport: isExport } } }).then(function (res) {
         if (res.status === 200) {
           if (res.data.msg === 'danger') {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })

@@ -1,26 +1,36 @@
 <template>
   <div class="display-file">
     <div :key="index" v-for="(item, index) in files" class="list-file">
-      <div class="file-item">
-        <div class="file-item-content">
-          <div :class="[classes,'file-item-view']">
-            <img :src="`${baseUrl}/${item.full_name}`" :title="item.name" v-if="item.extension.isImage()">
-            <a :href="`${baseUrl}/${item.full_name}`" target="_blank" v-else-if="item.extension.isAudio()">
-              <i class="material-icons">audiotrack</i>
-            </a>
-            <a :href="`${baseUrl}/${item.full_name}`" target="_blank" v-else-if="item.extension.isVideo()">
-              <i class="material-icons">camera_roll</i>
-            </a>
-            <a :href="`${baseUrl}/${item.full_name}`" target="_blank" v-else-if="item.extension.isPdf()">
-              <i class="material-icons">picture_as_pdf</i>
-            </a>
-            <a :href="`${baseUrl}/${item.full_name}`" target="_blank" v-else>
-              <i class="material-icons">insert_drive_file</i>
-            </a>
+      <v-tooltip bottom>
+        <div slot="activator" class="file-item">
+          <div class="file-item-content">
+            <div :class="[classes,'file-item-view']">
+              <img :src="`${baseUrl}/${preFixName}/${item.name}`" :title="item.name" v-if="item.name.getExt().isImage()">
+              <a :href="`${baseUrl}/${preFixName}/${item.name}`" target="_blank"
+                v-else-if="item.name.getExt().isAudio()">
+                <i v-if="icon==='data-type'">{{item.name.getExt().toUpperCase()}}</i>
+                <i v-else class="material-icons">{{icon?icon:'audiotrack'}}</i>
+              </a>
+              <a :href="`${baseUrl}/${preFixName}/${item.name}`" target="_blank"
+                v-else-if="item.name.getExt().isVideo()">
+                <i v-if="icon==='data-type'">{{item.name.getExt().toUpperCase()}}</i>
+                <i v-else class="material-icons">{{icon?icon:'camera_roll'}}</i>
+              </a>
+              <a :href="`${baseUrl}/${preFixName}/${item.name}`" target="_blank"
+                v-else-if="item.name.getExt().isPdf()">
+                <i v-if="icon==='data-type'">{{item.name.getExt().toUpperCase()}}</i>
+                <i v-else class="material-icons">{{icon?icon:'picture_as_pdf'}}</i>
+              </a>
+              <a :href="`${baseUrl}/${preFixName}/${item.name}`" target="_blank" v-else>
+                <i v-if="icon==='data-type'">{{item.name.getExt(false).toUpperCase()}}</i>
+                <i v-else class="material-icons">{{icon?icon:'insert_drive_file'}}</i>
+              </a>
+            </div>
           </div>
+          <div class="file-item-title" v-if="isShowName">{{item.name}}</div>
         </div>
-        <div class="file-item-title" v-if="isShowName">{{item.name}}</div>
-      </div>
+        <span>{{item.name}}</span>
+      </v-tooltip>
     </div>
   </div>
 </template>
@@ -29,10 +39,12 @@
 // import { isImage, isAudio, isVideo, isPdf } from '@/plugins/helpers';
 export default {
   props: {
-    files: { type: Array, default: null },
+    files: { type: Array, default: () => [] },
     baseUrl: { type: String, default: '' },
+    preFixName: { type: String, default: '' },
     classes: { type: String, default: 'w-50' },
     isShowName: { type: Boolean, default: true },
+    icon: { type: String, default: null },
   },
   methods: {
     // getExtension(extension) {
@@ -114,5 +126,8 @@ export default {
     width: 290px;
     padding: 3px;
   }
+}
+.p-10 {
+  padding: 10px !important;
 }
 </style>

@@ -3,8 +3,8 @@
     <v-card>
       <v-card-title class="headline grey lighten-2">
         {{ item.id ?
-        $store.getters.languages(['global.details']) :
-        $store.getters.languages(['global.add']) }}
+        $store.getters.languages('global.details') :
+        $store.getters.languages('global.add') }}
       </v-card-title>
       <v-card-text class="p-0">
         <v-form v-model="$store.state.dictionary.valid" ref="form">
@@ -31,11 +31,11 @@
         <v-spacer></v-spacer>
         <v-btn color="primary" flat @click.native="onSave" :disabled="!$store.state.dictionary.valid"
           :loading="$store.state.$loadingCommit">
-          {{$store.getters.languages(['global.update'])}}
+          {{$store.getters.languages('global.update')}}
         </v-btn>
         <v-btn color="secondary" flat @click.native="$store.state.dictionary.dialog=false"
           :disabled="$store.state.$loadingCommit">
-          {{$store.getters.languages(['global.back'])}}
+          {{$store.getters.languages('global.back')}}
         </v-btn>
       </v-card-actions>
     </v-card>

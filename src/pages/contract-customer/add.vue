@@ -174,7 +174,7 @@
         </v-btn>
         <v-btn color="secondary" flat @click.native="$store.state.contract_customer.dialog=false"
           :disabled="$store.state.$loadingCommit">
-          {{$store.getters.languages(['global.back'])}}
+          {{$store.getters.languages('global.back')}}
         </v-btn>
       </v-card-actions>
     </v-card>

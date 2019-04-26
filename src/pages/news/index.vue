@@ -19,7 +19,9 @@ export default {
   }),
   beforeCreate() {
     // if (this.$store.state.navigation.isGetFirst) 
-    this.$store.dispatch('category/select')
+    this.$store.dispatch('news/select')
+    if (this.$store.state.category.items < 1)
+      this.$store.dispatch('category/select', false, { rowsPerPage: 0 }, false)
   }
 }
 </script>

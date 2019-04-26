@@ -5,7 +5,7 @@
         <v-layout wrap>
           <v-flex xs6 sm4 md4 class="mr-3" v-if="this.$store.getters['auth/inRoles']('donvi.select')">
             <v-select :items="donvi" v-model="$store.state.contract_customer.pagination.donvi_id"
-              :hide-selected="true" item-text="ten_dv" item-value="donvi_id" :label="$store.getters.languages(['global.local'])"></v-select>
+              :hide-selected="true" item-text="ten_dv" item-value="donvi_id" :label="$store.getters.languages('global.local')"></v-select>
           </v-flex>
           <v-flex xs6 sm5 md5>
             <v-text-field v-model="$store.state.contract_customer.pagination.search"
@@ -39,7 +39,7 @@
       </v-card-title>
       <v-data-table class="elevation-1" v-model="$store.state.contract_customer.selected"
         select-all item-key="id" :headers="this.$store.getters['contract_customer/headers']"
-        :items="items" :rows-per-page-text="$store.getters.languages(['global.rows_per_page'])"
+        :items="items" :rows-per-page-text="$store.getters.languages('global.rows_per_page')"
         :pagination.sync="$store.state.contract_customer.pagination" :rows-per-page-items="[8, 25, 50, 100, 200, 500]"
         :total-items="$store.state.contract_customer.totalItems" :loading="$store.state.$loadingGet">
         <!-- select-all :loading="loading" :total-items="totalItems" :search="$store.state.contract_customer.pagination.search"-->
@@ -86,9 +86,9 @@
       </v-data-table>
     </v-card>
     <tpl-confirm :dialog.sync="$store.state.contract_customer.confirm" @onAccept="onCFMAccept"
-      @onCancel="onCFMCancel" :title="$store.getters.languages(['global.message'])"
-      :content="$store.getters.languages(['messages.confirm_content'])" :btnAcceptText="$store.getters.languages(['global.accept'])"
-      :btnCancelText="$store.getters.languages(['global.cancel'])" />
+      @onCancel="onCFMCancel" :title="$store.getters.languages('global.message')"
+      :content="$store.getters.languages('messages.confirm_content')" :btnAcceptText="$store.getters.languages('global.accept')"
+      :btnCancelText="$store.getters.languages('global.cancel')" />
   </div>
 </template>
 

@@ -5,28 +5,13 @@ export default {
   state: {
     items: [],
     item: {},
-    tabs: null,
     selected: [],
-    valid: false,
     dialog: false,
-    confirm: false,
-    exist_code: true,
     isGetFirst: true,
-    url_plus: { push: '', go: '', store: '' },
-    headers: [
-      // { text: 'ID', value: 'id', align: 'left' },
-      { text: 'category.name', value: 'title', align: 'left' },
-      { text: 'global.code', value: 'code' },
-      // { text: 'global.dependent', value: 'dependent', align: 'left' },
-      { text: 'global.url', value: 'url' },
-      { text: 'global.orders', value: 'orders' },
-      // { text: 'global.created_at', value: 'created_at' },
-      { text: 'Icon', value: 'icon' },
-      { text: '#', value: '#', sortable: false }
-    ],
+    totalItems: 0,
     pagination: {
       search: '',
-      sortBy: 'title',
+      sortBy: 'code,dependent,orders',
       descending: false,
       toggle: 0,
       flag: 1,
@@ -40,7 +25,7 @@ export default {
       dependent: '',
       levels: 0,
       title: '',
-      icon: '<i class="material-icons">view_module</i>',
+      icon: '<i class="material-icons">class</i>',
       image: '',
       url: '',
       orders: 1,
@@ -139,11 +124,11 @@ export default {
     }
   },
   actions: {
-    async select({ commit, rootGetters, state, rootState }, isExport = false, loading = true) {
+    async select({ commit, rootGetters, state, rootState }, isExport = false, pagination, loading = true) {
       // Loading
       if (loading) rootState.$loadingGet = true
       // http
-      return await vnptbkn().get(collection, { params: { ...state.pagination, ...{ isExport: isExport } } }).then(function (res) {
+      return await vnptbkn().get(collection, { params: pagination ? pagination : { ...state.pagination, ...{ isExport: isExport } } }).then(function (res) {
         if (res.status === 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -157,11 +142,35 @@ export default {
           if (res.data.total) state.totalItems = res.data.total
           return res.data.data
         } else commit('SET_CATCH', null, { root: true })
-      }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
-        .finally(() => {
-          state.isGetFirst = false
-          if (loading) rootState.$loadingGet = false
-        })
+      }).catch((error) => {
+        commit('SET_CATCH', error, { root: true })
+      }).finally(() => {
+        state.isGetFirst = false
+        if (loading) rootState.$loadingGet = false
+      })
+    },
+    async GetByKey({ commit, rootGetters, state, rootState }, params = null, loading = true) {
+      // Loading
+      if (loading) rootState.$loadingGet = true
+      // http
+      return await vnptbkn().get(`${collection}/GetByKey`, { params: params }).then(function (res) {
+        if (res.status === 200) {
+          if (res.data.msg === 'error_token') {
+            commit('SET_CATCH', { response: { status: 401 } }, { root: true })
+            return
+          }
+          if (res.data.msg === 'danger') {
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            return
+          }
+          return res.data.data
+        } else commit('SET_CATCH', null, { root: true })
+      }).catch((error) => {
+        commit('SET_CATCH', error, { root: true })
+      }).finally(() => {
+        state.isGetFirst = false
+        if (loading) rootState.$loadingGet = false
+      })
     },
     async insert({ commit, state, rootGetters, rootState }, loading = true) {
       // Loading
@@ -190,8 +199,11 @@ export default {
           commit('SET_MESSAGE', { text: rootGetters.languages('success.add'), color: res.data.msg }, { root: true })
           state.url_plus = { push: '', go: '', store: '' }
         } else commit('SET_CATCH', null, { root: true })
-      }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
-        .finally(() => { if (loading) rootState.$loadingCommit = false })
+      }).catch((error) => {
+        commit('SET_CATCH', error, { root: true })
+      }).finally(() => {
+        if (loading) rootState.$loadingCommit = false
+      })
     },
     async update({ commit, state, rootGetters, rootState }, loading = true) {
       // Loading
@@ -214,8 +226,11 @@ export default {
           commit('UPDATE_ITEMS', state.item)
           commit('SET_MESSAGE', { text: rootGetters.languages('success.update'), color: res.data.msg }, { root: true })
         } else commit('SET_CATCH', null, { root: true })
-      }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
-        .finally(() => { if (loading) rootState.$loadingCommit = false })
+      }).catch((error) => {
+        commit('SET_CATCH', error, { root: true })
+      }).finally(() => {
+        if (loading) rootState.$loadingCommit = false
+      })
     },
     async delete({ commit, state, rootGetters, rootState }, loading = true) {
       // Loading
@@ -239,8 +254,11 @@ export default {
           commit('SET_ITEM')
           commit('SET_MESSAGE', { text: rootGetters.languages('success.delete'), color: res.data.msg }, { root: true })
         } else commit('SET_CATCH', null, { root: true })
-      }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
-        .finally(() => { if (loading) rootState.$loadingCommit = false })
+      }).catch((error) => {
+        commit('SET_CATCH', error, { root: true })
+      }).finally(() => {
+        if (loading) rootState.$loadingCommit = false
+      })
     },
     async remove({ commit, state, rootGetters, rootState }, loading = true) {
       // Loading
@@ -261,22 +279,11 @@ export default {
           commit('SET_ITEM')
           commit('SET_MESSAGE', { text: rootGetters.languages('success.delete'), color: res.data.msg }, { root: true })
         } else commit('SET_CATCH', null, { root: true })
-      }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
-        .finally(() => { if (loading) rootState.$loadingCommit = false })
-    },
-    async exist_code({ commit, state, rootState }, loading = true) {
-      // Loading
-      if (loading) rootState.$loadingCommit = true
-      // http
-      await vnptbkn().get(`${collection}/ExistCode/${state.item.code}`, { timeout: 1000 }).then(function (res) { //, { timeout: 3000 }
-        if (res.status === 200) {
-          if (res.data.msg === 'exist') state.exist_code = false
-          else state.exist_code = true
-        } else commit('SET_CATCH', null, { root: true })
       }).catch((error) => {
         commit('SET_CATCH', error, { root: true })
-        return Promise.reject(error)
-      }).finally(() => { if (loading) rootState.$loadingCommit = false })
+      }).finally(() => {
+        if (loading) rootState.$loadingCommit = false
+      })
     },
     open_dialog({ state }) {
       state.dialog = true

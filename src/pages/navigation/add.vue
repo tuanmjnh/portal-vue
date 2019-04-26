@@ -15,28 +15,28 @@
               <v-tab-item>
                 <v-layout wrap class="pt-2">
                   <v-flex xs12 sm6 md6>
-                    <v-text-field v-model.trim="item.title" :rules="[v => !!v || $store.getters.languages('error.required')]"
+                    <v-text-field v-model.trim="item.title" :rules="[v=>!!v||$store.getters.languages('error.required')]"
                       :label="$store.getters.languages('global.navigation_title')"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
                     <v-select :items="items" v-model="dependent_selected" multiple
-                      :menu-props="{ maxHeight: '400' }" item-value="id" item-text="title"
-                      persistent-hint :hint="$store.getters.languages(['global.dependent_select'])"
-                      :label="$store.getters.languages('global.dependent')" :rules="[v => v.length>0 || $store.getters.languages('error.required_select')]"></v-select>
+                      :menu-props="{maxHeight:'400'}" item-value="id" item-text="title"
+                      persistent-hint :hint="$store.getters.languages('global.dependent_select')"
+                      :label="$store.getters.languages('global.dependent')" :rules="[v=>v.length>0||$store.getters.languages('error.required_select')]"></v-select>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
                     <v-text-field v-model.trim="item.code" class="text-color-initial"
-                      @keyup="onExistCode()" :disabled="item.id?true:false" :label="$store.getters.languages(['global.code'])"
-                      :rules="[v => !!v || $store.getters.languages('error.required'),$store.state.navigation.exist_code||$store.getters.languages('error.exist')]"></v-text-field>
+                      @keyup="onExistCode()" :disabled="item.id?true:false" :label="$store.getters.languages('global.code')"
+                      :rules="[v=>!!v||$store.getters.languages('error.required'),$store.state.navigation.exist_code||$store.getters.languages('error.exist')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field v-model.trim="item.url" :rules="[v => !!v || $store.getters.languages('error.required')]"
+                    <v-text-field v-model.trim="item.url" :rules="[v=>!!v||$store.getters.languages('error.required')]"
                       :label="$store.getters.languages('global.url')"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
                     <v-select v-model.trim="item.app_key" :items="$store.state.navigation.app_key"
-                      item-value="id" item-text="title" :hide-selected="true" :label="$store.getters.languages(['global.position'])"
-                      :rules="[v => !!v || $store.getters.languages('error.required_select')]"></v-select>
+                      item-value="id" item-text="title" :hide-selected="true" :label="$store.getters.languages('global.position')"
+                      :rules="[v=>!!v||$store.getters.languages('error.required_select')]"></v-select>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
                     <v-text-field v-model.trim="item.push" label="Push"></v-text-field>

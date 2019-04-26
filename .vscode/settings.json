@@ -19,9 +19,17 @@
       "indent_size": 2,
     }
   },
+  // "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis": true,
+  // "typescript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": true,
+  // "typescript.format.insertSpaceAfterOpeningAndBeforeClosingTemplateStringBraces": true,
+  // "javascript.format.insertSpaceAfterKeywordsInControlFlowStatements": false,
+  // "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
+  // "javascript.format.insertSpaceAfterSemicolonInForStatements": false,
   // "beautify.config": {
-  //   "brace_style": "collapse,preserve-inline",
+  //   "brace_style": "none",
   //   "indent_size": 2,
   //   "end_with_newline": true,
+  //   "preserve_newlines": false,
+  //   "max_preserve_newlines": 20,
   // }
 }

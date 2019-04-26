@@ -17,14 +17,15 @@ import setting from './modules/setting'
 import modules from './modules/modules'
 import languages from './modules/languages'
 import dictionary from './modules/dictionary'
-import category from './modules/category'
-import news from './modules/news'
 import navigation from './modules/navigation'
 import permissions from './modules/permissions'
 import notification from './modules/notification'
 import informations from './modules/informations'
+import news from './modules/news'
+import category from './modules/category'
 import contract_customer from './modules/contract_customer'
 import contract_enterprise from './modules/contract_enterprise'
+import kehoach from './modules/kehoach'
 Vue.use(Vuex)
 export default new Vuex.Store({
   modules: {
@@ -36,14 +37,15 @@ export default new Vuex.Store({
     nguoidung: nguoidung,
     languages: languages,
     dictionary: dictionary,
-    category: category,
-    news: news,
     navigation: navigation,
     permissions: permissions,
     notification: notification,
     informations: informations,
+    news: news,
+    category: category,
     contract_customer: contract_customer,
-    contract_enterprise: contract_enterprise
+    contract_enterprise: contract_enterprise,
+    kehoach: kehoach
   },
   state: {
     $loadingApp: false,

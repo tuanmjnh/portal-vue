@@ -7,7 +7,7 @@
             <v-flex xs12 sm5 md5>
               <v-select :items="roles" v-model="roles_selected" item-value="id" item-text="name"
                 :hide-selected="true" :label="$store.getters.languages('global.roles')"
-                :rules="[v=>v.length>0||$store.getters.languages(['error.required_select'])]"></v-select>
+                :rules="[v=>v.length>0||$store.getters.languages('error.required_select')]"></v-select>
             </v-flex>
             <v-spacer></v-spacer>
             <v-btn color="primary" flat @click.native="onSave" :disabled="!valid"
@@ -15,7 +15,7 @@
               {{$store.getters.languages('global.update')}}
             </v-btn>
             <v-btn color="secondary" flat @click="$router.push('/nguoidung')" :disabled="$store.state.$loadingCommit">
-              {{$store.getters.languages(['global.back'])}}
+              {{$store.getters.languages('global.back')}}
             </v-btn>
           </v-layout>
         </v-card-title>

@@ -20,6 +20,7 @@ import {
   VSwitch,
   VCheckbox,
   VCombobox,
+  VRadioGroup,
   VSelect,
   VTextField,
   VTextarea,
@@ -31,7 +32,9 @@ import {
   VSnackbar,
   transitions,
   VChip,
-  VProgressCircular
+  VAvatar,
+  VProgressCircular,
+  VProgressLinear
 } from 'vuetify'
 Vue.use(Vuetify, {
   components: {
@@ -53,6 +56,7 @@ Vue.use(Vuetify, {
     VSwitch,
     VCheckbox,
     VCombobox,
+    VRadioGroup,
     VSelect,
     VTextField,
     VTextarea,
@@ -64,7 +68,9 @@ Vue.use(Vuetify, {
     VSnackbar,
     transitions,
     VChip,
-    VProgressCircular
+    VAvatar,
+    VProgressCircular,
+    VProgressLinear
   },
   theme: {
     primary: '#1976D2',

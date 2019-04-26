@@ -69,7 +69,7 @@ export default {
         //   res.color = 'danger'
         //   res.text = 'Tài khoản không tồn tại!'
         // }
-        else if (res.data.msg == 'danger') {
+        else if (res.data.msg == 'wrong') {
           res.color = 'danger'
           res.text = rootGetters.languages('auth.msg_err_login')
         } // else {

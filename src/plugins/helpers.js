@@ -26,12 +26,12 @@ export function NewGuid() {
   );
 }
 String.prototype.convertToAscii = function () {
-  let $this = String(this)
-  if (!$this) return $this;
-  return $this
-    //.toLowerCase()
-    .replace('[', '')
-    .replace(']', '')
+  // let $this = String(this)
+  if (!this) return this;
+  return this.toLowerCase()
+    .replace(/[ ]/g, '_')
+    // .replace('[', '')
+    // .replace(']', '')
     .replace(/[áàãạảâầấậẫẩăằắẵặẳ]/g, 'a')
     .replace(/[èéẹẽẻêếềễểệ]/g, 'e')
     .replace(/[ìíịỉĩ]/g, 'e')
@@ -39,7 +39,7 @@ String.prototype.convertToAscii = function () {
     .replace(/[ùúụũủưừứựữử]/g, 'u')
     .replace(/[ýỳỹỷỵ]/g, 'y')
     .replace(/[đ]/g, 'd')
-    .replace(/[~\`!@#$%^&*()-_+={}\\|;:\'\"<,>.?/”“‘’„‰‾–—]/g, '');
+    .replace(/[~\`!@#$%^&*()--+={}\\|;:\'\"<,>.?/”“‘’„‰‾–—]/g, '')
 }
 String.prototype.removeChars = function () {
   let $this = String(this)
@@ -82,7 +82,7 @@ export function StringToFiles(str, chars = ',') {
       rs.push({
         url: x,
         name: this.StringToName(x),
-        extension: this.getExtension(x)
+        extension: this.getExt(x)
       })
     })
   return rs
@@ -150,6 +150,54 @@ if (!String.prototype.formatNumber) {
       return typeof args[number] != 'undefined' ? args[number] : match
     })
   }
+}
+String.prototype.getExt = function (dot = true) {
+  let $this = this
+  if (!$this) return ''
+  let regx = /(?:\.([^.]+))?$/;
+  $this = regx.exec($this)
+  return $this ? (dot ? $this[0] : $this[1]) : '';
+}
+String.prototype.isImage = function () {
+  let $this = this
+  if (!$this) return false
+  return /\.(gif|jpg|jpeg|tiff|png)$/i.test($this.toLowerCase())
+}
+String.prototype.isAudio = function () {
+  let $this = this
+  if (!$this) return false
+  return /\.(mp3|wav|wave|ogg|m4a|3ga|4mp|aa3)$/i.test($this.toLowerCase())
+}
+String.prototype.isVideo = function () {
+  let $this = this
+  if (!$this) return false
+  return /\.(3g2|3gp|3gp2|3gpp|3gpp2|amv|flv|gom|mp4|mov|mpe|mpeg|mpg||kmv|mkv|wvm|wmv)$/i.test($this.toLowerCase())
+}
+String.prototype.isPdf = function () {
+  let $this = this
+  if (!$this) return false
+  return /\.(pdf)$/i.test($this.toLowerCase());
+}
+export function GetImage(file) {
+  return new Promise((resolve, reject) => {
+    const fReader = new FileReader();
+    const img = document.createElement('img');
+    fReader.onload = () => {
+      img.src = fReader.result;
+      resolve(GetBase64Image(img));
+    };
+    fReader.readAsDataURL(file);
+  });
+}
+export function GetBase64Image(img) {
+  const canvas = document.createElement('canvas');
+  canvas.width = img.width;
+  canvas.height = img.height;
+
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0);
+  const dataURL = img.src;
+  return dataURL;
 }
 
 function sprintf() {
@@ -334,54 +382,6 @@ export function distinctArry(arr) {
 }
 export function distinctArrayObject(arr, key) {
   return [...new Set(arr.map(x => x[key]))]
-}
-String.prototype.isImage = function () {
-  let $this = this
-  if (!$this) return false
-  return /\.(gif|jpg|jpeg|tiff|png)$/i.test($this.toLowerCase())
-}
-String.prototype.isAudio = function () {
-  let $this = this
-  if (!$this) return false
-  return /\.(mp3|wav|wave|ogg|m4a|3ga|4mp|aa3)$/i.test($this.toLowerCase())
-}
-String.prototype.isVideo = function () {
-  let $this = this
-  if (!$this) return false
-  return /\.(3g2|3gp|3gp2|3gpp|3gpp2|amv|flv|gom|mp4|mov|mpe|mpeg|mpg||kmv|mkv|wvm|wmv)$/i.test($this.toLowerCase())
-}
-String.prototype.isPdf = function () {
-  let $this = this
-  if (!$this) return false
-  return /\.(pdf)$/i.test($this.toLowerCase());
-}
-String.prototype.getExt = function (dot = true) {
-  let $this = this
-  if (!$this) return ''
-  let regx = /(?:\.([^.]+))?$/;
-  $this = regx.exec($this)
-  return $this ? (dot ? $this[0] : $this[1]) : '';
-}
-export function GetImage(file) {
-  return new Promise((resolve, reject) => {
-    const fReader = new FileReader();
-    const img = document.createElement('img');
-    fReader.onload = () => {
-      img.src = fReader.result;
-      resolve(GetBase64Image(img));
-    };
-    fReader.readAsDataURL(file);
-  });
-}
-export function GetBase64Image(img) {
-  const canvas = document.createElement('canvas');
-  canvas.width = img.width;
-  canvas.height = img.height;
-
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(img, 0, 0);
-  const dataURL = img.src;
-  return dataURL;
 }
 export function ConvertObject(data, ignore = 'id', removeNull = true) {
   let obj = {}

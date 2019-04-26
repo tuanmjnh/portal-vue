@@ -15,10 +15,10 @@
               <v-tab-item>
                 <v-layout wrap class="pt-2">
                   <v-flex xs12 md8 sm8>
-                    <v-select :items="db_donvi" v-model="item.donvi_id" :menu-props="{ maxHeight: '400' }"
-                      item-text="ten_donvi" item-value="donvi_id" :label="$store.getters.languages(['global.local'])"
-                      persistent-hint :hint="$store.getters.languages(['global.local'])"
-                      :rules="[v =>!!v||$store.getters.languages(['error.required_select'])]"></v-select>
+                    <v-select :items="db_donvi" v-model="item.donvi_id" :menu-props="{maxHeight:'400'}"
+                      item-text="ten_donvi" item-value="donvi_id" :label="$store.getters.languages('global.local')"
+                      persistent-hint :hint="$store.getters.languages('global.local')"
+                      :rules="[v=>!!v||$store.getters.languages('error.required_select')]"></v-select>
                   </v-flex>
                   <v-flex xs12 md8 sm8>
                   </v-flex>
@@ -29,23 +29,23 @@
                   </v-flex>
                   <v-flex xs12 sm4 md4>
                     <v-text-field v-model.trim="item.email" :label="$store.getters.languages('users.email')"
-                      :rules="[v =>!!v||$store.getters.languages('error.required')]"></v-text-field>
+                      :rules="[v=>!!v||$store.getters.languages('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
                     <v-text-field v-model.trim="item.password" :label="$store.getters.languages('users.password')"
-                      :rules="[v =>!!v||$store.getters.languages('error.required')]"></v-text-field>
+                      :rules="[v=>!!v||$store.getters.languages('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
                     <v-text-field v-model.trim="repassword" :label="$store.getters.languages('users.repassword')"
-                      :rules="[v =>!!v||$store.getters.languages('error.required')]"></v-text-field>
+                      :rules="[v=>!!v||$store.getters.languages('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
                     <v-text-field v-model.trim="item.full_name" :label="$store.getters.languages('users.full_name')"
-                      :rules="[v =>!!v||$store.getters.languages('error.required')]"></v-text-field>
+                      :rules="[v=>!!v||$store.getters.languages('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
                     <v-text-field v-model.trim="item.mobile" :label="$store.getters.languages('users.mobile')"
-                      :rules="[v =>!!v||$store.getters.languages('error.required')]"></v-text-field>
+                      :rules="[v=>!!v||$store.getters.languages('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm3 md3>
                     <v-switch color="primary" :label="item.flag===1?$store.getters.languages('global.show'):$store.getters.languages('global.hide')"

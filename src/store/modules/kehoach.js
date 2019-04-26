@@ -1,10 +1,13 @@
 import { vnptbkn } from '@/plugins/axios-config'
-const collection = 'items'
+const collection = 'kehoach'
 export default {
   namespaced: true,
   state: {
-    items: [],
+    kehoach_tb: [],
+    kehoach_th: [],
+    nhom_kh: [],
     item: {},
+    import_tb: { nhomkh_id: 0, file_name: '', file_upload: '' },
     selected: [],
     dialog: false,
     isGetFirst: true,
@@ -51,6 +54,9 @@ export default {
     getById: state => id => {
       return state.items.find(x => x.id === id)
     },
+    getNhomKH: state => {
+      return state.nhom_kh.filter(x => { if (x.dependent !== ',0,') return x })
+    },
     getFilter: state => pagination => {
       let rs = [...state.items]
       if (pagination && pagination.find) rs = rs.filterValue(pagination.find)
@@ -61,30 +67,6 @@ export default {
       else rs = rs.sortByKey(state.pagination.sortBy)
       return rs
     },
-    headers: (state, getters, rootState, rootGetters) => {
-      state.headers.forEach(e => { e.text = rootGetters.languages(e.text) })
-      return state.headers
-    },
-    getDependent: state => {
-      return state.items.filterValue({ flag: 1 }).filter(e => { return e.id != state.item.id })
-        // .sortByKey('app_key')
-        .map(e => ({ 'id': e.id, 'title': e.title }))
-    },
-    getRender: state => filter => {
-      let items = state.items.filter(row => { return row.flag === 1 }).filter(row => { return row.app_key === filter.position })
-      if (filter.roles && filter.roles.length > 0) items = items.filter(row => { return filter.roles.indexOfArray(row.url.trim(',').split(',')) > -1 })
-      //items = items.filter(row => { return filter.roles.indexOfArray(row.url.trim(',').split(',')) > -1 })
-      const rs = items.filter(row => { return row.dependent.indexOf(',0,') > -1 })
-      // get children
-      rs.forEach(e => {
-        const _child = items.filter(row => { return row.dependent.indexOf(`,${e.id},`) > -1 })
-        if (_child) _child.forEach(ee => {
-          ee.children = items.filter(row => { return row.dependent.indexOf(`,${ee.id},`) > -1 })
-        })
-        e.children = _child
-      })
-      return rs
-    }
   },
   mutations: {
     SET_ITEMS(state, items) {
@@ -138,14 +120,11 @@ export default {
         if (loading) rootState.$loadingGet = false
       })
     },
-    async insert({ commit, state, rootGetters, rootState }, loading = true) {
+    async import_tb({ commit, state, rootGetters, rootState }, loading = true) {
       // Loading
       if (loading) rootState.$loadingCommit = true
       // http
-      state.item.created_by = vnptbkn().defaults.headers.Author
-      state.item.created_at = new Date()
-      //state.item.url_plus = JSON.stringify(state.url_plus)
-      await vnptbkn().post(collection, state.item).then(function (res) {
+      await vnptbkn().post(collection, state.import_tb).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -160,10 +139,10 @@ export default {
             return
           }
           // Success
-          commit('SET_ITEM')
-          commit('PUSH_ITEMS', res.data.data)
-          commit('SET_MESSAGE', { text: rootGetters.languages('success.add'), color: res.data.msg }, { root: true })
-          state.url_plus = { push: '', go: '', store: '' }
+          commit('SET_MESSAGE', { text: rootGetters.languages('success.import'), color: res.data.msg }, { root: true })
+          state.import_tb.success = res.data.success
+          state.import_tb.error = res.data.error
+          return res.data.error
         } else { commit('SET_CATCH', null, { root: true }) }
       }).catch((error) => {
         commit('SET_CATCH', error, { root: true })

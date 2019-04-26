@@ -7,35 +7,43 @@
         $store.getters.languages('global.add') }}
       </v-card-title>
       <v-card-text class="p-0">
-        <v-form v-model="$store.state.category.valid" ref="form">
+        <v-form v-model="valid" ref="form">
           <v-container grid-list-md>
-            <v-tabs v-model="$store.state.category.tabs" color="secondary" dark>
+            <v-tabs v-model="tabs" color="secondary" dark>
               <v-tab>{{$store.getters.languages('global.main_info')}}</v-tab>
+              <v-tab>{{$store.getters.languages('global.image')}}</v-tab>
               <v-tab>{{$store.getters.languages('global.note')}}</v-tab>
               <v-tab-item>
                 <v-layout wrap class="pt-2">
                   <v-flex xs12 sm6 md6>
-                    <v-text-field v-model.trim="item.title" :rules="[v => !!v || $store.getters.languages('error.required')]"
+                    <v-text-field v-model.trim="item.title" :rules="[v=>!!v||$store.getters.languages('error.required')]"
                       :label="$store.getters.languages('category.name')"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
                     <v-select :items="items" v-model="dependent_selected" multiple
-                      :menu-props="{ maxHeight: '400' }" item-value="id" item-text="title"
-                      persistent-hint :hint="$store.getters.languages(['global.dependent_select'])"
-                      :label="$store.getters.languages('global.dependent')" :rules="[v => v.length>0 || $store.getters.languages('error.required_select')]"></v-select>
+                      :menu-props="{maxHeight:'400'}" item-value="id" item-text="title"
+                      persistent-hint :hint="$store.getters.languages('global.dependent_select')"
+                      :label="$store.getters.languages('global.dependent')" :rules="[v=>v.length>0||$store.getters.languages('error.required_select')]"></v-select>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field v-model.trim="item.code" class="text-color-initial"
-                      @keyup="onExistCode()" :disabled="item.id?true:false" :label="$store.getters.languages(['global.code'])"
-                      :rules="[v => !!v || $store.getters.languages('error.required'),$store.state.category.exist_code||$store.getters.languages('error.exist')]"></v-text-field>
+                    <v-select :items="key_category" v-model="item.app_key" :label="$store.getters.languages('category.app_key')"
+                      :rules="[v=>!!v||$store.getters.languages('error.required_select')]"></v-select>
+                    <!-- <v-combobox :items="key_category" v-model.trim="item.app_key" :rules="[v=>!!v||$store.getters.languages('error.required')]"
+                      :label="$store.getters.languages('category.app_key')"></v-combobox> -->
                   </v-flex>
-                  <v-flex xs12 sm8 md8>
-                    <v-text-field v-model.trim="item.url" :rules="[v => !!v || $store.getters.languages('error.required')]"
+                  <v-flex xs12 sm4 md4>
+                    <v-select :items="code_category" v-model="item.code" :label="$store.getters.languages('category.group')"
+                      :rules="[v=>!!v||$store.getters.languages('error.required_select')]"></v-select>
+                    <!-- <v-combobox :items="code_category" v-model.trim="item.code" :rules="[v=>!!v||$store.getters.languages('error.required')]"
+                      :label="$store.getters.languages('category.group')"></v-combobox> -->
+                  </v-flex>
+                  <v-flex xs12 sm4 md4>
+                    <v-text-field v-model.trim="item.url" :rules="[v =>!!v||$store.getters.languages('error.required')]"
                       :label="$store.getters.languages('global.url')"></v-text-field>
                   </v-flex>
                   <!-- <v-flex xs12 sm4 md4>
                     <v-select v-model.trim="item.app_key" :items="$store.state.category.app_key"
-                      item-value="id" item-text="title" :hide-selected="true" :label="$store.getters.languages(['global.position'])"
+                      item-value="id" item-text="title" :hide-selected="true" :label="$store.getters.languages('global.position'])"
                       :rules="[v => !!v || $store.getters.languages('error.required_select')]"></v-select>
                   </v-flex> -->
                   <v-flex xs12 sm6 md6 class="text-append-icon">
@@ -51,7 +59,7 @@
                   </v-flex> -->
                   <v-flex xs6 sm3 md3>
                     <v-text-field type="number" v-model.trim="item.orders" :label="$store.getters.languages('global.orders')"
-                      :rules="[v => !!v || $store.getters.languages('error.required')]"></v-text-field>
+                      :rules="[v =>!!v||$store.getters.languages('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs6 sm3 md3>
                     <v-switch color="primary" :label="item.flag===1?$store.getters.languages('global.show'):$store.getters.languages('global.hide')"
@@ -62,14 +70,41 @@
                       :href="`${http.defaults.host}/${item.attach}`" target="_blank"><i
                         class="material-icons">attachment</i></a>
                   </v-flex> -->
+                  <!-- <v-flex xs10 sm6 md6 v-if="item.attach">
+                    <v-text-field v-model="item.attach" :label="" :disabled="true" class="text-color-initial"
+                      prepend-icon="attachment"></v-text-field>
+                  </v-flex> -->
+                  <v-flex xs1 sm1 md1 v-if="item.title">
+                    <upload-files :files.sync="attach_upload.files" :http="http"
+                      :fileName="item.title.convertToAscii()" :autoName="false"
+                      :buttonUse="true" :loading.sync="attach_upload.loading" :buttonText="item.id?$store.getters.languages('global.upload_btn'):$store.getters.languages('global.upload_drag')"
+                      :basePath="attach_upload.basePath" :multiple="false"></upload-files>
+                  </v-flex>
+                  <v-flex xs12 sm6 md6 v-if="item.attach">
+                    <p style="position:relative;top:13px;">
+                      {{$store.getters.languages('global.attach')}}:
+                      <a :href="`${http.defaults.host}/${attach_upload.basePath}/${item.attach}`"
+                        target="_blank">{{item.attach}}</a>
+                    </p>
+                  </v-flex>
+                  <!-- <v-flex xs12 sm6 md8>
+                    <display-files :files="attach_upload.files" :preFixName="attach_upload.basePath"
+                      :baseUrl="http.defaults.host" icon="data-type" :isShowName="false"
+                      classes="p-10"></display-files>
+                  </v-flex> -->
+                </v-layout>
+              </v-tab-item>
+              <v-tab-item>
+                <v-layout wrap class="pt-2">
                   <v-flex xs12 sm6 md4>
-                    <upload-files @handleUpload="uploadFiles=$event" :buttonUse="false"
-                      :multiple="false" :http="http" extension="image/*" :basePath="uploadFiles.basePath"
-                      :autoName="true" :buttonText="$store.getters.languages('global.upload_drag')"></upload-files>
+                    <upload-files :files.sync="image_upload.files" :buttonUse="false"
+                      :multiple="false" :loading.sync="image_upload.loading" :http="http"
+                      extension="image/*" :basePath="image_upload.basePath" :autoName="true"
+                      :buttonText="$store.getters.languages('global.upload_drag')" />
                   </v-flex>
                   <v-flex xs12 sm6 md8>
-                    <display-files :files="uploadFiles.files" :baseUrl="http.defaults.host"
-                      :isShowName="false" classes="w-50"></display-files>
+                    <display-files :files="image_upload.files" :preFixName="image_upload.basePath"
+                      :baseUrl="http.defaults.host" :isShowName="false" classes="p-10" />
                   </v-flex>
                 </v-layout>
               </v-tab-item>
@@ -87,8 +122,7 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" flat @click.native="onSave" :disabled="!$store.state.category.valid"
-          :loading="$store.state.$loadingCommit">
+        <v-btn color="primary" flat @click.native="onSave" :disabled="!valid" :loading="$store.state.$loadingCommit">
           {{$store.getters.languages('global.update')}}
         </v-btn>
         <v-btn color="secondary" flat @click.native="$store.state.category.dialog=false"
@@ -110,8 +144,28 @@ export default {
   },
   props: { http: null },
   data: () => ({
+    valid: false,
+    tabs: null,
+    attach_upload: {
+      files: [],
+      basePath: 'Uploads/Groups/Attach',
+      loading: false//true
+    },
+    image_upload: {
+      files: [],
+      basePath: 'Uploads/Groups/Attach',
+      loading: false
+    },
     dependent_selected: [],
-    uploadFiles: { files: [], basePath: 'category' },
+    key_category: [
+      { value: 'news', text: 'Tin tức' },
+      { value: 'data', text: 'Dữ liệu' },
+    ],
+    code_category: [
+      { value: 'guide', text: 'Guide' },
+      { value: 'contact', text: 'Contact' },
+      { value: 'kehoach', text: 'Kế hoạch' },
+    ]
   }),
   mounted() {
     this.reset()
@@ -124,39 +178,51 @@ export default {
       return this.$store.state.category.item
     },
     items() {
+      var rs = this.$store.getters['category/getDependent']
       return [
         ...[{ id: 0, title: `-- ${this.$store.getters.languages('global.category_main')} --` }],
-        ...this.$store.getters['category/getDependent']
+        ...rs
       ]
     }
   },
   watch: {
     dialog(val) {
       if (!val) this.reset()
+      if (this.item.id) this.dependent_selected = this.item.dependent.trim(',').split(',').map(e => parseInt(e))
     },
-    uploadFiles: {
+    attach_upload: {
       handler(val) {
-        if (val.files && val.files.length > 0)
-          this.item.image = val.files[0].full_name
+        // console.log(val)
+        if (val.files.length > 0)
+          this.item.attach = val.files[0].name
+      },
+      deep: true
+    },
+    image_files: {
+      handler(val) {
+        if (val.files.length > 0)
+          this.item.image = val.files[0].name
       },
       deep: true
     }
   },
   methods: {
     onSave() {
-      if (this.$store.state.category.valid) {
+      if (this.valid) {
         this.item.dependent = `,${this.dependent_selected.join(',')},`
         if (this.item.id) this.$store.dispatch('category/update')
         else this.$store.dispatch('category/insert').then(this.reset())
       }
     },
-    onExistCode() {
+    onCheckCode() {
       this.item.code = this.item.code.toString().toLowerCase()
-      if (!this.item.id) this.$store.dispatch('category/exist_code')
+      console.log(this.item.code)
     },
     reset() {
       this.$store.commit('category/SET_ITEM')
       this.dependent_selected = [0]
+      this.attach_upload.files = []
+      this.attach_upload.files = []
       this.$refs.form.resetValidation()
     }
   }

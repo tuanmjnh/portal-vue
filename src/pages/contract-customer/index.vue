@@ -21,7 +21,7 @@ export default {
     // if (this.$store.state.contract_customer.isGetFirst) 
     this.$store.dispatch('contract_customer/select')
     // if (!this.$store.state.donvi.items)
-    this.$store.dispatch('donvi/select', false, false)
+    this.$store.dispatch('donvi/select', false, { rowsPerPage: 0 }, false)
   }
 }
 </script>

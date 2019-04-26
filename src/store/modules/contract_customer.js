@@ -138,11 +138,11 @@ export default {
     }
   },
   actions: {
-    async select({ commit, state, rootGetters, rootState }, isExport = false, loading = true) {
+    async select({ commit, state, rootGetters, rootState }, isExport = false, pagination, loading = true) {
       // Loading
       if (loading && !rootState.$loadingGet) rootState.$loadingGet = true
       // http
-      return await vnptbkn().get(`${collection}/GetByDonVi`, { params: { ...state.pagination, ...{ isExport: isExport } } }).then(function (res) {
+      return await vnptbkn().get(`${collection}/GetByDonVi`, { params: pagination ? pagination : { ...state.pagination, ...{ isExport: isExport } } }).then(function (res) {
         if (res.status === 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })

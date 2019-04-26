@@ -2,7 +2,7 @@
   <v-menu bottom left>
     <template v-slot:activator="{on}">
       <v-tooltip bottom>
-        <v-btn slot="activator" icon v-on="on">
+        <v-btn slot="activator" v-on="on" flat icon :color="color">
           <v-icon>{{icon}}</v-icon>
         </v-btn>
         <span>{{tooltip}}</span>
@@ -23,6 +23,7 @@ export default {
     getData: { type: Function },
     icon: { type: String, default: 'save_alt' }, //more_vert
     tooltip: { type: String, default: 'Export' },
+    color: { type: String, default: 'default' }, //more_vert
     items: {
       type: Array,
       default: () => [
@@ -44,14 +45,18 @@ export default {
         if (item.type === 'csv') this.ExportCSV(x)
       })
     },
-    ExportCSV(data) {
+    ExportCSV(data = []) {
+      // console.log(data)
+      if (data.length < 1) {
+        console.log('No data available!')
+        return
+      }
       let csvContent = ''//"data:text/csv;charset=utf-8,"
       csvContent += [
         `"${Object.keys(data[0]).join('","')}"`,
         ...data.map(item => `"${Object.values(item).join('","')}"`)
       ].join('\n').replace(/(^\[)|(\]$)/gm, '')
       // const data = encodeURI(csvContent)
-      // console.log(data)
       var BOM = '\uFEFF'
       var csv = BOM + csvContent
       var blob = new Blob([csv], { type: 'text/csvcharset=utf-8' })

@@ -5,7 +5,7 @@
         <v-layout wrap class="pt-2">
           <v-flex xs6 sm3 md3 class="mr-3">
             <v-select :items="donvi" v-model="$store.state.nguoidung.donvi_id"
-              :hide-selected="true" item-text="ten_dv" item-value="donvi_id" :label="$store.getters.languages(['global.local'])"></v-select>
+              :hide-selected="true" item-text="ten_dv" item-value="donvi_id" :label="$store.getters.languages('global.local')"></v-select>
           </v-flex>
           <v-flex xs6 sm5 md5>
             <v-text-field v-model="$store.state.nguoidung.pagination.search" append-icon="search"

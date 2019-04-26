@@ -343,6 +343,30 @@ const routes = [
       }
     ]
   },
+  {
+    path: '/kehoach',
+    name: 'kehoach',
+    alias: '',
+    redirect: { name: 'thuebao' },
+    meta: { desc: 'kehoach', auth: true, roles: ['kehoach.select'] },
+    component: () => import('@/pages/kehoach/index'),
+    children: [
+      {
+        path: 'thuebao',
+        name: 'kehoach-thuebao',
+        props: true,
+        meta: { desc: 'kehoach-thuebao', auth: true, roles: ['kehoach.select'] },
+        component: () => import('@/pages/kehoach/thuebao')
+      },
+      {
+        path: 'import',
+        name: 'kehoach-import',
+        props: true,
+        meta: { desc: 'kehoach-import', auth: true, roles: ['kehoach.insert'] },
+        component: () => import('@/pages/kehoach/import')
+      },
+    ]
+  },
   // {
   //   path: '/languages',
   //   name: 'languages',
