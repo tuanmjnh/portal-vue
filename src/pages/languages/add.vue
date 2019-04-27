@@ -128,7 +128,7 @@ export default {
     onSave() {
       if (this.$store.state.languages.valid) {
         if (this.item.id) this.$store.dispatch('languages/update')
-        else this.$store.dispatch('languages/insert').then(this.reset())
+        else this.$store.dispatch('languages/insert').then(() => { this.reset() })
       }
     },
     onExistCode() {

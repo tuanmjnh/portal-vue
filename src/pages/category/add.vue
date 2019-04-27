@@ -83,8 +83,9 @@
                   <v-flex xs12 sm6 md6 v-if="item.attach">
                     <p style="position:relative;top:13px;">
                       {{$store.getters.languages('global.attach')}}:
-                      <a :href="`${http.defaults.host}/${attach_upload.basePath}/${item.attach}`"
-                        target="_blank">{{item.attach}}</a>
+                      <a :href="`${http.defaults.host}/${item.attach}`" target="_blank">
+                        {{item.attach.replace(attach_upload.basePath+'/','')}}
+                      </a>
                     </p>
                   </v-flex>
                   <!-- <v-flex xs12 sm6 md8>
@@ -194,14 +195,15 @@ export default {
       handler(val) {
         // console.log(val)
         if (val.files.length > 0)
-          this.item.attach = val.files[0].name
+          this.item.attach = `${this.attach_upload.basePath}/${val.files[0].name}`
+        console.log(this.item.attach)
       },
       deep: true
     },
-    image_files: {
+    image_upload: {
       handler(val) {
         if (val.files.length > 0)
-          this.item.image = val.files[0].name
+          this.item.image = `${this.image_upload.basePath}/${val.files[0].name}`
       },
       deep: true
     }
@@ -211,7 +213,7 @@ export default {
       if (this.valid) {
         this.item.dependent = `,${this.dependent_selected.join(',')},`
         if (this.item.id) this.$store.dispatch('category/update')
-        else this.$store.dispatch('category/insert').then(this.reset())
+        else this.$store.dispatch('category/insert').then(() => { this.reset() })
       }
     },
     onCheckCode() {
@@ -222,7 +224,7 @@ export default {
       this.$store.commit('category/SET_ITEM')
       this.dependent_selected = [0]
       this.attach_upload.files = []
-      this.attach_upload.files = []
+      this.image_upload.files = []
       this.$refs.form.resetValidation()
     }
   }

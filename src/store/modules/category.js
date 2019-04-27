@@ -11,7 +11,7 @@ export default {
     totalItems: 0,
     pagination: {
       search: '',
-      sortBy: 'code,dependent,orders',
+      sortBy: 'code,dependent,orders,title,id',
       descending: false,
       toggle: 0,
       flag: 1,

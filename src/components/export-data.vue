@@ -23,7 +23,8 @@ export default {
     getData: { type: Function },
     icon: { type: String, default: 'save_alt' }, //more_vert
     tooltip: { type: String, default: 'Export' },
-    color: { type: String, default: 'default' }, //more_vert
+    color: { type: String, default: 'default' },
+    filename: { type: String, default: 'export' },
     items: {
       type: Array,
       default: () => [
@@ -63,7 +64,7 @@ export default {
       var csvUrl = window.webkitURL.createObjectURL(blob)
       const link = document.createElement('a')
       link.setAttribute('href', csvUrl)
-      link.setAttribute('download', 'export.csv')
+      link.setAttribute('download', `${this.filename}.csv`)
       link.click()
       // const link = document.createElement("a")
       // link.setAttribute("href", data)

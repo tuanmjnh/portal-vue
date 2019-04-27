@@ -125,8 +125,12 @@ export default {
     onSave() {
       if (this.$store.state.users.valid) {
         if (this.item.id) this.$store.dispatch('users/update')
-        else this.$store.dispatch('users/insert')
+        else this.$store.dispatch('users/insert').then(() => { this.reset() })
       }
+    },
+    reset() {
+      this.$store.commit('users/SET_ITEM')
+      this.$refs.form.resetValidation()
     }
   }
 }

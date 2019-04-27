@@ -238,7 +238,7 @@ export default {
       // if (this.khachhang.id) this.$store.dispatch('contract_customer/update')
       // else this.$store.dispatch('contract_customer/insert')
       if (this.$store.state.contract_customer.valid) {
-        this.$store.dispatch('contract_customer/insert').then(this.reset())
+        this.$store.dispatch('contract_customer/insert').then(() => { this.reset() })
       }
     },
     getContract() {

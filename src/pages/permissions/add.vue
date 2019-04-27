@@ -96,7 +96,7 @@ export default {
     onSave() {
       if (this.$store.state.permissions.valid) {
         if (this.item.id) this.$store.dispatch('permissions/update')
-        else this.$store.dispatch('permissions/insert').then(this.reset())
+        else this.$store.dispatch('permissions/insert').then(() => { this.reset() })
       }
     },
     onExistCode() {

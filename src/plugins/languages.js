@@ -8,20 +8,20 @@ import * as _store from '@/plugins/storage'
 //   return rs.length > 0 ? rs[0].value ? rs[0].value : key : key
 // };
 // let language = _store.Get('language')
-const GetLanguage = function() {
+const GetLanguage = function () {
   return _store.Get('language')
 }
-const SetLanguage = function(language) {
-  return new Promise(function(resolve, reject) {
+const SetLanguage = function (language) {
+  return new Promise((resolve, reject) => {
     _store.Set('language', language)
   });
 }
-const GetDictionary = function() {
+const GetDictionary = function () {
   const rs = _store.Get('dictionary')
   return rs && rs !== 'undefined' ? JSON.parse(rs) : null
 }
-const SetDictionary = function(dictionary) {
-  return new Promise(function(resolve, reject) {
+const SetDictionary = function (dictionary) {
+  return new Promise((resolve, reject) => {
     _store.Set('dictionary', JSON.stringify(dictionary))
   });
 }

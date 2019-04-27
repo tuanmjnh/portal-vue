@@ -7,11 +7,17 @@ export default {
     kehoach_th: [],
     nhom_kh: [],
     item: {},
-    import_tb: { nhomkh_id: 0, file_name: '', file_upload: '' },
     selected: [],
     dialog: false,
     isGetFirst: true,
     totalItems: 0,
+    import_tb: {
+      nhomkh_id: 0,
+      file_name: '',
+      file_upload: '',
+      success: '',
+      error: []
+    },
     pagination: {
       search: '',
       sortBy: 'title',
@@ -124,7 +130,7 @@ export default {
       // Loading
       if (loading) rootState.$loadingCommit = true
       // http
-      await vnptbkn().post(collection, state.import_tb).then(function (res) {
+      return await vnptbkn().post(collection, state.import_tb).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -142,11 +148,14 @@ export default {
           commit('SET_MESSAGE', { text: rootGetters.languages('success.import'), color: res.data.msg }, { root: true })
           state.import_tb.success = res.data.success
           state.import_tb.error = res.data.error
+          state.import_tb.nhomkh_id = 0
           return res.data.error
         } else { commit('SET_CATCH', null, { root: true }) }
       }).catch((error) => {
         commit('SET_CATCH', error, { root: true })
       }).finally(() => {
+        state.import_tb.file_name = ''
+        state.import_tb.file_upload = ''
         if (loading) rootState.$loadingCommit = false
       })
     },

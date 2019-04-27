@@ -167,7 +167,7 @@ export default {
     onSave() {
       if (this.$store.state.roles.valid) {
         if (this.item.id) this.$store.dispatch('roles/update')
-        else this.$store.dispatch('roles/insert')
+        else this.$store.dispatch('roles/insert').then(() => { this.reset() })
       }
     },
     selectAll(event, item) {

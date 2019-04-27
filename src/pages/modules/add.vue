@@ -160,7 +160,7 @@ export default {
       if (this.$store.state.modules.valid) {
         // this.item.permissions = `,${this.permissions_selected.join(',')},`
         if (this.item.id) this.$store.dispatch('modules/update')
-        else this.$store.dispatch('modules/insert').then(this.reset())
+        else this.$store.dispatch('modules/insert').then(() => { this.reset() })
       }
     },
     onExistCode() {

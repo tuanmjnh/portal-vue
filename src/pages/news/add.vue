@@ -198,7 +198,7 @@ export default {
         // if (this.dependent_selected) this.item.code = `,${this.dependent_selected.join(',')},`
         if (this.tags) this.item.tags = `,${this.tags.join(',')},`
         if (this.item.id) this.$store.dispatch('news/update')
-        else this.$store.dispatch('news/insert').then(this.reset())
+        else this.$store.dispatch('news/insert').then(() => { this.reset() })
       }
     },
     onExistCode() {

@@ -166,7 +166,7 @@ export default {
       if (this.$store.state.navigation.valid) {
         this.item.dependent = `,${this.dependent_selected.join(',')},`
         if (this.item.id) this.$store.dispatch('navigation/update')
-        else this.$store.dispatch('navigation/insert').then(this.reset())
+        else this.$store.dispatch('navigation/insert').then(() => { this.reset() })
       }
     },
     onExistCode() {

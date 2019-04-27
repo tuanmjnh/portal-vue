@@ -226,6 +226,11 @@ function sprintf() {
   });
 }
 // Array prototype
+Array.prototype.last = function () {
+  if (this.length > 0)
+    return this[this.length - 1]
+  return this
+};
 Array.prototype.indexOfArray = function (element) {
   let $this = this
   for (let i = 0; i < element.length; i++) {
