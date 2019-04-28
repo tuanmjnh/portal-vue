@@ -67,7 +67,7 @@ export default {
   },
   methods: {
     signIn() {
-      this.$store.dispatch('auth/signIn', true).then(() => { this.$router.push('/') })
+      this.$store.dispatch('auth/signIn', true).then(() => { this.$router.push(this.$route.query.redirect) })
     }
   }
 }

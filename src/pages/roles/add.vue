@@ -55,7 +55,8 @@
                     <table class="v-datatable v-table theme--light custom-v-checkbox">
                       <thead>
                         <tr>
-                          <th class="column text-xs-left">#</th>
+                          <th class="column text-xs-left">{{$store.getters.languages('roles.name')}}</th>
+                          <th class="column text-xs-left">{{$store.getters.languages('roles.code')}}</th>
                           <th class="column text-xs-left" v-for="(item,index) in permissions"
                             :key="index">
                             <v-checkbox :label="$store.getters.languages(`roles.${item.code}`)"
@@ -66,6 +67,7 @@
                       <tbody>
                         <tr v-for="(item,index) in modules" :key="index">
                           <td>{{$store.getters.languages(`modules.${item.code}`)}}</td>
+                          <td>{{item.code}}</td>
                           <td v-for="(per,index) in permissions" :key="index">
                             <v-checkbox v-model="$store.state.roles.roles_selected"
                               :value="`${item.code}.${per.code}`" :label="$store.getters.languages(`roles.${per.code}`)"></v-checkbox>

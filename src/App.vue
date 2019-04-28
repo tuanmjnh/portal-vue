@@ -5,7 +5,7 @@
       <v-progress-circular :size="130" :width="10" color="primary" indeterminate></v-progress-circular>
     </div>
     <template v-else>
-      <template-main v-if="isAuth"></template-main>
+      <template-main v-if="$store.state.auth.isAuth"></template-main>
       <template-auth v-else></template-auth>
     </template>
   </v-app>
@@ -38,7 +38,7 @@ export default {
     // this.$store.commit('SET_CATCH', { response: { status: 401 } })
   },
   computed: {
-    isAuth() {
+    // isAuth() {
       // if (_auth.GetRemember()) 
       // this.$store.dispatch('auth/item', {
       //   username: _auth.GetUser(),
@@ -46,10 +46,9 @@ export default {
       //   token: _auth.GetToken(),
       //   remember: _auth.GetRemember()
       // })
-      var x = this.$store.state.auth.isAuth
       // console.log(this.$store.state._message)
-      return x
-    }
+      // return this.$store.state.auth.isAuth
+    // }
   }
 }
 </script>

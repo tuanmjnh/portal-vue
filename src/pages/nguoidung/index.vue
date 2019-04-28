@@ -1,17 +1,19 @@
 <template>
   <div>
     <loading :loading.sync="loading"></loading>
-    <router-view v-if="$route.name==='set-roles'"></router-view>
-    <list :class="loading?'hide':''"></list>
-    <add :class="loading?'hide':''"></add>
+    <div :class="loading?'hide':''">
+      <router-view></router-view>
+    </div>
+    <!-- <list :class="loading?'hide':''"></list>
+    <add :class="loading?'hide':''"></add> -->
   </div>
 </template>
 <script>
 import loading from '@/components/loading-content'
-import list from './list'
-import add from './add'
+// import list from './list'
+// import add from './add'
 export default {
-  components: { loading, list, add },
+  components: { loading },
   data: () => ({ loading: true }),
   beforeCreate() {
     // if (this.$store.state.nguoidung.isGetFirst) 

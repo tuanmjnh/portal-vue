@@ -1,6 +1,7 @@
 import Vue from 'vue'
-// import store from '@/store'
 import VueRouter from 'vue-router'
+// import store from '@/store'
+import * as storageAuth from '@/plugins/storage-auth'
 Vue.use(VueRouter)
 // Routes
 const routes = [
@@ -28,7 +29,7 @@ const routes = [
     path: '/nguoidung',
     name: 'nguoidung',
     alias: '',
-    // redirect: { name: 'nguoidung-list' },
+    redirect: { name: 'nguoidung-list' },
     meta: { desc: 'nguoidung', auth: true, roles: ['nguoidung.select'] },
     component: () => import('@/pages/nguoidung/index'),
     children: [
@@ -39,13 +40,13 @@ const routes = [
         meta: { desc: 'nguoidung-list', auth: true, roles: ['nguoidung.select'] },
         component: () => import('@/pages/nguoidung/list')
       },
-      {
-        path: 'add/:id?',
-        name: 'nguoidung-add',
-        props: true,
-        meta: { desc: 'nguoidung-add', auth: true, roles: ['nguoidung.insert', 'nguoidung.update'] },
-        component: () => import('@/pages/nguoidung/add')
-      },
+      // {
+      //   path: 'add/:id?',
+      //   name: 'nguoidung-add',
+      //   props: true,
+      //   meta: { desc: 'nguoidung-add', auth: true, roles: ['nguoidung.insert', 'nguoidung.update'] },
+      //   component: () => import('@/pages/nguoidung/add')
+      // },
       {
         path: 'set-roles',
         name: 'set-roles',
@@ -406,18 +407,21 @@ var router = new VueRouter({
   mode: 'history',
   linkExactActiveClass: 'active',
   scrollBehavior: function (to, from, savedPosition) {
+    // console.log(router)
+    // if(!store.state.auth.isAuth)
+    // route.push('auth')
     // console.log(to, from)
     return savedPosition || { x: 0, y: 0 }
   }
 })
 // Some middleware to help us ensure the user is authenticated.
-// router.beforeEach((to, from, next) => {
-//   if (to.matched.some(record => record.meta.requiresAuth) && (!store.state._auth.token || store.state._auth.token === 'null')) {
-//     // this route requires auth, check if logged in
-//     // if not, redirect to login page.
-//     window.console.log('Not authenticated')
-//     next({ path: '/auth', query: { // redirect: to.fullPath } })
-//   } else next()
-// })
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.auth) && !storageAuth.Authenticated()) {
+    // this route requires auth, check if logged in
+    // if not, redirect to login page.
+    window.console.log('Not authenticated')
+    next({ path: '/auth', query: { redirect: to.fullPath } })
+  } else next()
+})
 
 export default router

@@ -25,6 +25,16 @@ export function NewGuid() {
     s4()
   );
 }
+export function NewDate(format = 'DD/MM/YYYY hh:mm:ss') {
+  if (format === 'full') return moment().format()
+  if (format === 'datetime') return moment().format('DD/MM/YYYY hh:mm:ss')
+  if (format === 'date') return moment().format('DD/MM/YYYY')
+  if (format === 'time') return moment().format('hh:mm:ss')
+  else return moment().format(format)
+}
+export function FixEditor($this) {
+  $this.$refs.modalCRUD.$el.children[0].children[0].children[0].children[0].removeAttribute('tabindex')
+}
 String.prototype.convertToAscii = function () {
   // let $this = String(this)
   if (!this) return this;
@@ -46,22 +56,12 @@ String.prototype.removeChars = function () {
   if (!$this) return $this;
   return $this.replace(/[~`!@#$%^&*()\[{}\]\\|;:\'\",<>./?]/g, '');
 }
-export function NewDate(format = 'DD/MM/YYYY hh:mm:ss') {
-  if (format === 'full') return moment().format()
-  if (format === 'datetime') return moment().format('DD/MM/YYYY hh:mm:ss')
-  if (format === 'date') return moment().format('DD/MM/YYYY')
-  if (format === 'time') return moment().format('hh:mm:ss')
-  else return moment().format(format)
-}
-export function FormatDate(val, format = 'DD/MM/YYYY hh:mm') {
-  if (!val) return ''
-  if (typeof val === 'object' && val.constructor.name === 'Timestamp')
-    return moment(val.toDate()).format(format)
+String.prototype.formatDate = function (format = 'DD/MM/YYYY hh:mm') {
+  if (!this) return this
+  if (typeof val === 'object' && this.constructor.name === 'Timestamp')
+    return moment(this.toDate()).format(format)
   else
-    return moment(val).format(format)
-}
-export function FixEditor($this) {
-  $this.$refs.modalCRUD.$el.children[0].children[0].children[0].children[0].removeAttribute('tabindex')
+    return moment(this).format(format)
 }
 export function FilesToString(files, chars = ',') {
   let rs = ''

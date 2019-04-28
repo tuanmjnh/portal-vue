@@ -196,7 +196,7 @@ export default {
         // console.log(val)
         if (val.files.length > 0)
           this.item.attach = `${this.attach_upload.basePath}/${val.files[0].name}`
-        console.log(this.item.attach)
+        // console.log(this.item.attach)
       },
       deep: true
     },

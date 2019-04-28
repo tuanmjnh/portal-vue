@@ -97,7 +97,7 @@ export default {
       // commit('SET_MESSAGE', res, { root: true })
       setTimeout(() => {
         rootState.$loadingApp = false
-        router.push('/auth')
+        router.push({ path: '/auth', query: { redirect: window.location.pathname } })
       }, 200)
     },
     async setIsAuth({ commit, state }, val = false) {

@@ -119,13 +119,18 @@ export default {
         .map(e => ({ 'id': e.id, 'title': e.title }))
     },
     getRender: state => filter => {
+      if (!filter.roles) filter.roles = ['dashboard.select','auth.select']
       let items = state.items
         .filter(row => { return row.flag === 1 })
         .filter(row => { return row.app_key === filter.position })
+
       if (filter.roles && filter.roles.length > 0)
         items = items.filter(row => { return filter.roles.indexOfArray(row.url.trim(',').split(',')) > -1 })
       //items = items.filter(row => { return filter.roles.indexOfArray(row.url.trim(',').split(',')) > -1 })
       const rs = items.filter(row => { return row.dependent.indexOf(',0,') > -1 })
+      if (rs === 'head-right') {
+        console.log(rs)
+      }
       // get children
       rs.forEach(e => {
         const _child = items.filter(row => { return row.dependent.indexOf(`,${e.id},`) > -1 })
@@ -134,6 +139,7 @@ export default {
         })
         e.children = _child
       })
+
       return rs
     }
   },

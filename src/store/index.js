@@ -2,7 +2,6 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import { vnptbkn } from '@/plugins/axios-config'
 import * as _languages from '@/plugins/languages'
-//
 // import state from './state'
 // import actions from './actions'
 // import mutations from './mutations'

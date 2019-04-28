@@ -102,7 +102,7 @@
       <!-- <v-btn icon @click.stop="rightDrawer = !rightDrawer">
         <v-icon>apps</v-icon>
       </v-btn> -->
-      <template v-for="(item, index) in $store.getters['navigation/getRender']({position: 'head-right'})">
+      <template v-for="(item, index) in $store.getters['navigation/getRender']({position: 'head-right',roles:$store.state.auth.user.roles})">
         <template v-if="item.children.length>0">
           <v-menu :key="item.id" bottom :min-width="166">
             <v-tooltip slot="activator" bottom :key="index" v-if="item.icon">
@@ -325,7 +325,7 @@ export default {
       return rs
     },
     navHeadLeft() {
-      const rs = this.$store.getters['navigation/getRender']({ position: 'head-left' })
+      const rs = this.$store.getters['navigation/getRender']({ position: 'head-left', roles: this.$store.state.auth.user.roles })
       if (rs.length > 0) return rs[0]
       else return {
         title: 'Portal',
@@ -348,7 +348,7 @@ export default {
       this.$store.dispatch('message', { text: 'Hello, I\'m a snackbar' })
     },
     signOut() {
-      this.$store.dispatch('auth/signOut', true).then(() => { this.$router.push('/auth') })
+      this.$store.dispatch('auth/signOut', true)//.then(() => { this.$router.push('/auth') })
     },
     getAuth(key) {
       return storageAuth.GetStorage()[key]

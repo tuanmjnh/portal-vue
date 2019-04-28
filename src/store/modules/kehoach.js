@@ -6,57 +6,37 @@ export default {
     kehoach_tb: [],
     kehoach_th: [],
     nhom_kh: [],
+    nguoidung: [],
     item: {},
     selected: [],
     dialog: false,
     isGetFirst: true,
     totalItems: 0,
+    thuebao_nguoidung: {},
     import_tb: {
+      donvi_id: 5588,
       nhomkh_id: 0,
+      nhomkh_attach: '',
       file_name: '',
       file_upload: '',
+      thang_bd: 0,
       success: '',
       error: []
     },
     pagination: {
       search: '',
-      sortBy: 'title',
+      sortBy: 'donvi_id,nhom_kh,thang_bd,id',
       descending: false,
       toggle: 0,
       flag: 1,
       page: 1,
-      rowsPerPage: 10
+      rowsPerPage: 10,
+      donvi_id: 0,
+      nhomkh_id: 0
     },
-    default: {
-      id: 0,
-      app_key: 'news',
-      code: '',
-      title: '',
-      icon: '<i class="material-icons">view_module</i>',
-      image: '',
-      url: '',
-      orders: 1,
-      quantity: 0,
-      descs: '',
-      content: '',
-      attach: '',
-      tags: '',
-      created_ip: '',
-      created_by: '',
-      created_at: new Date(),
-      updated_ip: '',
-      updated_by: '',
-      updated_at: null,
-      deleted_ip: '',
-      deleted_by: '',
-      deleted_at: null,
-      flag: 1
-    }
+    default: {}
   },
   getters: {
-    getAll(state) {
-      return state.items
-    },
     getById: state => id => {
       return state.items.find(x => x.id === id)
     },
@@ -77,6 +57,7 @@ export default {
   mutations: {
     SET_ITEMS(state, items) {
       state.items = items
+      // console.log(state.items)
     },
     SET_ITEM(state, item) {
       if (item) {
@@ -103,11 +84,11 @@ export default {
     }
   },
   actions: {
-    async select({ commit, rootGetters, state, rootState }, isExport = false, pagination = null, loading = true) {
+    async select({ commit, rootGetters, state, rootState }, loading = true) {
       // Loading
       if (loading) rootState.$loadingGet = true
       // http
-      return await vnptbkn().get(collection, { params: pagination ? pagination : { ...state.pagination, ...{ isExport: isExport } } }).then(function (res) {
+      return await vnptbkn().get(collection, { params: state.pagination }).then(function (res) {
         if (res.status === 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -117,13 +98,58 @@ export default {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
             return
           }
-          if (res.data.data) commit('SET_ITEMS', res.data.data)
+          if (res.data.data) state.kehoach_tb = res.data.data
           if (res.data.total) state.totalItems = res.data.total
           return res.data.data
         } else commit('SET_CATCH', null, { root: true })
-      }).catch((error) => { commit('SET_CATCH', error, { root: true }) }).finally(() => {
+      }).catch((error) => {
+        commit('SET_CATCH', error, { root: true })
+      }).finally(() => {
         state.isGetFirst = false
         if (loading) rootState.$loadingGet = false
+      })
+    },
+    async export_data({ commit, rootGetters, state, rootState }, params) {
+      // Loading
+      if (params.loading) rootState.$loadingGet = true
+      console.log(params)
+      // http
+      return await vnptbkn().get(collection, { params: params }).then(function (res) {
+        if (res.status === 200) {
+          if (res.data.msg === 'error_token') {
+            commit('SET_CATCH', { response: { status: 401 } }, { root: true })
+            return
+          }
+          if (res.data.msg === 'danger') {
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            return
+          }
+          return res.data.data
+        } else commit('SET_CATCH', null, { root: true })
+      }).catch((error) => {
+        commit('SET_CATCH', error, { root: true })
+      }).finally(() => {
+        if (params.loading) rootState.$loadingGet = false
+      })
+    },
+    async GetNguoidung({ commit, state, rootGetters, rootState }, params) {
+      // Loading
+      if (params.loading) rootState.$loadingGet = true
+      // http
+      return await vnptbkn().get(`${collection}/GetNguoidung/${state.pagination.donvi_id}`).then(function (res) {
+        if (res.status === 200) {
+          if (res.data.msg === 'danger') {
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            return
+          }
+          if (res.data.data) state.nguoidung = res.data.data
+          else state.nguoidung = []
+          return state.nguoidung
+        } else commit('SET_CATCH', null, { root: true })
+      }).catch((error) => {
+        commit('SET_CATCH', error, { root: true })
+      }).finally(() => {
+        if (params.loading) rootState.$loadingGet = false
       })
     },
     async import_tb({ commit, state, rootGetters, rootState }, loading = true) {
