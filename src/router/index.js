@@ -360,6 +360,13 @@ const routes = [
         component: () => import('@/pages/kehoach/thuebao')
       },
       {
+        path: 'thuchien',
+        name: 'kehoach-thuchien',
+        props: true,
+        meta: { desc: 'kehoach-thuchien', auth: true, roles: ['kehoach_th.select'] },
+        component: () => import('@/pages/kehoach/thuchien')
+      },
+      {
         path: 'import',
         name: 'kehoach-import',
         props: true,

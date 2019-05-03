@@ -21,7 +21,8 @@
                 <v-layout wrap class="pt-2">
                   <v-flex xs12 sm6 md4>
                     <v-text-field v-model.trim="khachhang.ma_gd" :label="$store.getters.languages('contract_customer.ma_gd')"
-                      class="text-color-initial" v-on:keyup.enter="getContract" :disabled="khachhang.id?true:false"
+                      class="text-color-initial" :persistent-hint="true" hint="Nhập Mã GD, Mã HD, Mã KH, Mã TB, Số GT"
+                      v-on:keyup.enter="getContract" :disabled="khachhang.id?true:false"
                       :rules="[v=>!!v||$store.getters.languages('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
@@ -65,15 +66,15 @@
                   </v-flex>
                   <template v-else>
                     <v-flex xs12 sm6 md6 v-if="khachhang.hdkh_id">
-                      <upload-files @handleUpload="uploadFiles=$event" :buttonUse="false"
-                        :basePath="uploadFiles.basePath" :multiple="false" :autoName="true"
-                        :fileName="khachhang.hdkh_id.toString()" :http="http" extension="application/pdf"
-                        :buttonText="$store.getters.languages('contract_customer.upload_btn')"></upload-files>
+                      <upload-files :files.sync="attach_upload.files" :http="http"
+                        :autoName="true" :buttonUse="false" :loading.sync="attach_upload.loading"
+                        :basePath="attach_upload.basePath" :multiple="false" :fileName="khachhang.hdkh_id.toString()"
+                        extension="application/pdf" :buttonText="$store.getters.languages('contract_customer.upload_btn')"></upload-files>
                       <!-- :fileName="khachhang.ma_gd.replace(/\//g,'_')" -->
                     </v-flex>
                     <v-flex xs12 sm6 md6 v-if="khachhang.ma_gd">
-                      <display-files :files="uploadFiles.files" :baseUrl="http.defaults.host"
-                        :isShowName="false" classes="w-x"></display-files>
+                      <display-files :files="attach_upload.files" :baseUrl="http.defaults.host"
+                        :preFixName="attach_upload.basePath" :isShowName="false" classes="w-x"></display-files>
                     </v-flex>
                   </template>
                   <!-- <v-flex xs12 sm6 md4>
@@ -167,7 +168,7 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn v-if="!khachhang.id&&uploadFiles.files.length>0" color="primary" flat
+        <v-btn v-if="!khachhang.id&&attach_upload.files.length>0" color="primary" flat
           @click.native="onSave" :disabled="!$store.state.contract_customer.valid"
           :loading="$store.state.$loadingCommit">
           {{$store.getters.languages('global.update')}}
@@ -193,7 +194,12 @@ export default {
   },
   props: { http: null },
   data: () => ({
-    uploadFiles: { files: [], basePath: 'Uploads/HopDong' },
+    attach_upload: {
+      files: [],
+      basePath: 'Uploads/HopDong',
+      loading: false
+    },
+    // uploadFiles: { files: [], basePath: 'Uploads/HopDong' },
     headers: [
       { text: 'contract_customer.ma_tb', align: 'left', value: 'ma_tb' },
       { text: 'contract_customer.ten_tb', value: 'ten_tb' },
@@ -225,10 +231,10 @@ export default {
     dialog(val) {
       if (!val) this.reset()
     },
-    uploadFiles: {
+    attach_upload: {
       handler(val) {
         if (val.files && val.files.length > 0)
-          this.khachhang.attach = val.files[0].full_name
+          this.khachhang.attach = `${this.attach_upload.basePath}/${val.files[0].name}`
       },
       deep: true
     }
@@ -254,7 +260,7 @@ export default {
       return new Promise(function (resolve, reject) {
         $this.$store.commit('contract_customer/SET_KHACHHANG')
         $this.$store.commit('contract_customer/SET_THUEBAO')
-        $this.uploadFiles.files = []
+        $this.attach_upload.files = []
         $this.$refs.form.resetValidation()
         resolve()
         reject()

@@ -8,10 +8,10 @@ export default {
     nhom_kh: [],
     nguoidung: [],
     item: {},
-    selected: [],
+    selected_tb: [],
+    selected_th: {},
     dialog: false,
     isGetFirst: true,
-    totalItems: 0,
     thuebao_nguoidung: {},
     import_tb: {
       donvi_id: 5588,
@@ -22,17 +22,6 @@ export default {
       thang_bd: 0,
       success: '',
       error: []
-    },
-    pagination: {
-      search: '',
-      sortBy: 'donvi_id,nhom_kh,thang_bd,id',
-      descending: false,
-      toggle: 0,
-      flag: 1,
-      page: 1,
-      rowsPerPage: 10,
-      donvi_id: 0,
-      nhomkh_id: 0
     },
     default: {}
   },
@@ -77,18 +66,18 @@ export default {
       state.items.push(item)
     },
     UPDATE_ITEMS(state, item) {
-      state.items.update(item, 'id')
+      state.kehoach_tb.update(item, 'id')
     },
     REMOVE_ITEMS(state, item) {
       state.items.remove(item, 'id')
     }
   },
   actions: {
-    async select({ commit, rootGetters, state, rootState }, loading = true) {
+    async select_tb({ commit, rootGetters, state, rootState }, params) {
       // Loading
-      if (loading) rootState.$loadingGet = true
+      if (params.loading) rootState.$loadingGet = true
       // http
-      return await vnptbkn().get(collection, { params: state.pagination }).then(function (res) {
+      return await vnptbkn().get(collection, { params: params.pagination }).then(function (res) {
         if (res.status === 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -99,22 +88,67 @@ export default {
             return
           }
           if (res.data.data) state.kehoach_tb = res.data.data
-          if (res.data.total) state.totalItems = res.data.total
-          return res.data.data
+          // if (res.data.total) params.totalItems = res.data.total
+          return res.data
         } else commit('SET_CATCH', null, { root: true })
       }).catch((error) => {
         commit('SET_CATCH', error, { root: true })
       }).finally(() => {
         state.isGetFirst = false
-        if (loading) rootState.$loadingGet = false
+        if (params.loading) rootState.$loadingGet = false
       })
     },
-    async export_data({ commit, rootGetters, state, rootState }, params) {
+    async export_data_tb({ commit, rootGetters, state, rootState }, params) {
       // Loading
       if (params.loading) rootState.$loadingGet = true
-      console.log(params)
       // http
       return await vnptbkn().get(collection, { params: params }).then(function (res) {
+        if (res.status === 200) {
+          if (res.data.msg === 'error_token') {
+            commit('SET_CATCH', { response: { status: 401 } }, { root: true })
+            return
+          }
+          if (res.data.msg === 'danger') {
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            return
+          }
+          return res.data.data
+        } else commit('SET_CATCH', null, { root: true })
+      }).catch((error) => {
+        commit('SET_CATCH', error, { root: true })
+      }).finally(() => {
+        if (params.loading) rootState.$loadingGet = false
+      })
+    },
+    async select_th({ commit, state, rootGetters, rootState }, params) {
+      // Loading
+      if (params.loading) rootState.$loadingGet = true
+      // http
+      return await vnptbkn().get(`${collection}/GetThucHienTB`, { params: params.pagination }).then(function (res) {
+        if (res.status === 200) {
+          if (res.data.msg === 'error_token') {
+            commit('SET_CATCH', { response: { status: 401 } }, { root: true })
+            return
+          }
+          if (res.data.msg === 'danger') {
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            return
+          }
+          if (res.data.data) state.kehoach_th = res.data.data
+          // if (res.data.total) params.totalItems = res.data.total
+          return res.data
+        } else commit('SET_CATCH', null, { root: true })
+      }).catch((error) => {
+        commit('SET_CATCH', error, { root: true })
+      }).finally(() => {
+        if (params.loading) rootState.$loadingGet = false
+      })
+    },
+    async export_data_th({ commit, rootGetters, state, rootState }, params) {
+      // Loading
+      if (params.loading) rootState.$loadingGet = true
+      // http
+      return await vnptbkn().get(`${collection}/GetThucHienTB`, { params: params }).then(function (res) {
         if (res.status === 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -136,13 +170,22 @@ export default {
       // Loading
       if (params.loading) rootState.$loadingGet = true
       // http
-      return await vnptbkn().get(`${collection}/GetNguoidung/${state.pagination.donvi_id}`).then(function (res) {
+      return await vnptbkn().get(`${collection}/GetNguoidung/${params.donvi_id}`).then(function (res) {
         if (res.status === 200) {
+          if (res.data.msg === 'error_token') {
+            commit('SET_CATCH', { response: { status: 401 } }, { root: true })
+            return
+          }
           if (res.data.msg === 'danger') {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
             return
           }
-          if (res.data.data) state.nguoidung = res.data.data
+          if (res.data.data) {
+            state.nguoidung = res.data.data.sortByKey('donvi_id')
+            state.nguoidung.forEach(e => {
+              e.ten_nd_dv = `${e.ten_nd} - ${e.ma_dv}`
+            })
+          }
           else state.nguoidung = []
           return state.nguoidung
         } else commit('SET_CATCH', null, { root: true })
@@ -185,13 +228,70 @@ export default {
         if (loading) rootState.$loadingCommit = false
       })
     },
+    async insert_th({ commit, state, rootGetters, rootState }, params) {
+      // Loading
+      if (params.loading) rootState.$loadingCommit = true
+      // http
+      await vnptbkn().post(`${collection}/GanThueBaoTH/${state.thuebao_nguoidung.nguoidung_id}`, state.selected_tb).then(function (res) {
+        if (res.status == 200) {
+          if (res.data.msg === 'error_token') {
+            commit('SET_CATCH', { response: { status: 401 } }, { root: true })
+            return
+          }
+          if (res.data.msg === 'danger') {
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            return
+          }
+          if (res.data.msg === 'exist') {
+            commit('SET_MESSAGE', { text: 'Chưa có thuê bao được chọn!', color: 'warning' }, { root: true })
+            return
+          }
+          state.kehoach_tb.remove(state.selected_tb)
+          // Success
+          commit('SET_MESSAGE', { text: rootGetters.languages('success.update'), color: res.data.msg }, { root: true })
+        } else commit('SET_CATCH', null, { root: true })
+      }).catch((error) => {
+        commit('SET_CATCH', error, { root: true })
+      }).finally(() => {
+        state.selected_tb = []
+        if (params.loading) rootState.$loadingCommit = false
+      })
+    },
+    async update_th({ commit, state, rootGetters, rootState }, params) {
+      // Loading
+      if (params.loading) rootState.$loadingCommit = true
+      // http
+      await vnptbkn().post(`${collection}/GanThueBaoTH/${state.thuebao_nguoidung.nguoidung_id}`, state.selected_th).then(function (res) {
+        if (res.status == 200) {
+          if (res.data.msg === 'error_token') {
+            commit('SET_CATCH', { response: { status: 401 } }, { root: true })
+            return
+          }
+          if (res.data.msg === 'danger') {
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            return
+          }
+          if (res.data.msg === 'exist') {
+            commit('SET_MESSAGE', { text: 'Chưa có thuê bao được chọn!', color: 'warning' }, { root: true })
+            return
+          }
+          state.kehoach_tb.remove(state.selected_th)
+          // Success
+          commit('SET_MESSAGE', { text: rootGetters.languages('success.update'), color: res.data.msg }, { root: true })
+        } else commit('SET_CATCH', null, { root: true })
+      }).catch((error) => {
+        commit('SET_CATCH', error, { root: true })
+      }).finally(() => {
+        state.selected_th = []
+        if (params.loading) rootState.$loadingCommit = false
+      })
+    },
     async update({ commit, state, rootGetters, rootState }, loading = true) {
       // Loading
       if (loading) rootState.$loadingCommit = true
       // http
       state.item.updated_by = vnptbkn().defaults.headers.Author
       state.item.updated_at = new Date()
-      // state.item.url_plus = JSON.stringify(state.url_plus)
       await vnptbkn().put(collection, state.item).then(function (res) {
         if (res.status == 200) {
           if (res.data.msg === 'error_token') {

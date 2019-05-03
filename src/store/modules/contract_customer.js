@@ -128,7 +128,7 @@ export default {
       state.thuebao = id ? { ...state.items.find(x => x.hdtb_id == id) } : { ...state.df_thuebao }
     },
     PUSH_ITEMS(state, khachhang) {
-      state.items.push(khachhang)
+      state.items.unshift(khachhang)
     },
     UPDATE_ITEMS(state, item) {
       state.items.update(item, 'id')
@@ -156,11 +156,12 @@ export default {
           if (res.data.total) state.totalItems = res.data.total
           return res.data.data
         } else { commit('SET_CATCH', null, { root: true }) }
-      }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
-        .finally(() => {
-          state.isGetFirst = false
-          if (loading) rootState.$loadingGet = false
-        })
+      }).catch((error) => {
+        commit('SET_CATCH', error, { root: true })
+      }).finally(() => {
+        state.isGetFirst = false
+        if (loading) rootState.$loadingGet = false
+      })
     },
     async getThuebao({ commit, state, rootGetters, rootState }, loading = true) {
       // Loading
@@ -178,8 +179,11 @@ export default {
           }
           if (res.data.data) commit('SET_THUEBAO', res.data.data)
         } else commit('SET_CATCH', null, { root: true })
-      }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
-        .finally(() => { if (loading) rootState.$loadingCommit = false })
+      }).catch((error) => {
+        commit('SET_CATCH', error, { root: true })
+      }).finally(() => {
+        if (loading) rootState.$loadingCommit = false
+      })
     },
     async insert({ commit, state, rootGetters, rootState }, loading = true) {
       // Loading
@@ -211,8 +215,11 @@ export default {
           }
           commit('SET_MESSAGE', { text: rootGetters.languages('success.add'), color: res.data.msg }, { root: true })
         } else commit('SET_CATCH', null, { root: true })
-      }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
-        .finally(() => { if (loading) rootState.$loadingCommit = false })
+      }).catch((error) => {
+        commit('SET_CATCH', error, { root: true })
+      }).finally(() => {
+        if (loading) rootState.$loadingCommit = false
+      })
     },
     async update({ commit, state }) {
       // const item = { ...state.khachhang } // Object.assign({}, state.khachhang)
@@ -248,8 +255,11 @@ export default {
           commit('SET_THUEBAO')
           commit('SET_MESSAGE', { text: rootGetters.languages(['contract_customer.cancel', ' ', 'global.success', '!']), color: res.data.msg }, { root: true })
         } else commit('SET_CATCH', null, { root: true })
-      }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
-        .finally(() => { if (loading) rootState.$loadingCommit = false })
+      }).catch((error) => {
+        commit('SET_CATCH', error, { root: true })
+      }).finally(() => {
+        if (loading) rootState.$loadingCommit = false
+      })
     },
     async remove({ commit, state }) {
       // const item = { ...state.khachhang } // Object.assign({}, state.khachhang)
@@ -287,8 +297,11 @@ export default {
             commit('SET_THUEBAO', res.data.data.thuebao)//ObjectToLowerKey(res.data.data.thuebao))
           }
         } else commit('SET_CATCH', null, { root: true })
-      }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
-        .finally(() => { if (loading) rootState.$loadingCommit = false })
+      }).catch((error) => {
+        commit('SET_CATCH', error, { root: true })
+      }).finally(() => {
+        if (loading) rootState.$loadingCommit = false
+      })
     }
   }
 }

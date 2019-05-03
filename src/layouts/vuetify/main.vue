@@ -81,9 +81,9 @@
       </v-list>
     </v-navigation-drawer>
     <v-toolbar app :clipped-left="clipped">
-      <v-toolbar-side-icon v-if="clipped" @click.stop="drawer = !drawer"></v-toolbar-side-icon>
-      <v-btn v-if="!clipped" icon @click.stop="miniVariant = !miniVariant">
-        <v-icon v-html="miniVariant ? 'chevron_right' : 'chevron_left'"></v-icon>
+      <v-toolbar-side-icon v-if="clipped" @click.stop="drawer=!drawer"></v-toolbar-side-icon>
+      <v-btn v-if="!clipped" icon @click.stop="miniVariant=!miniVariant">
+        <v-icon v-html="miniVariant?'chevron_right':'chevron_left'"></v-icon>
       </v-btn>
       <!-- <v-btn icon @click.stop="clipped = !clipped">
         <v-icon>web</v-icon>

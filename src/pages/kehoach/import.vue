@@ -75,9 +75,9 @@
               </p>
             </v-flex>
             <v-flex xs12 sm6 md6>
-              <upload-files :files.sync="attach_upload.files" :http="http" :autoName="false"
-                :buttonUse="false" :loading.sync="attach_upload.loading" :buttonText="$store.getters.languages('global.upload_drag')"
-                :basePath="attach_upload.basePath" :multiple="false"></upload-files>
+              <upload-files :http="http" :autoName="false" :buttonUse="false" :multiple="false"
+                extension=".csv" :files.sync="attach_upload.files" :loading.sync="attach_upload.loading"
+                :buttonText="$store.getters.languages('global.upload_drag')" :basePath="attach_upload.basePath"></upload-files>
             </v-flex>
           </v-layout>
         </v-container>
@@ -120,12 +120,6 @@ export default {
       loading: false//true
     },
   }),
-  created() {
-    const $this = this
-    $this.$store.dispatch('category/GetByKey', ({ key: 'data', code: 'kehoach' })).then(x => {
-      $this.$store.state.kehoach.nhom_kh = x
-    })
-  },
   computed: {
     donvi() {
       return this.$store.getters['donvi/getFilter']({ sortBy: 'ma_dvi' })

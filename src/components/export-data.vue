@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import { NewDate } from '@/plugins/helpers'
 export default {
   props: {
     data: { type: Array, default: null },
@@ -25,6 +26,7 @@ export default {
     tooltip: { type: String, default: 'Export' },
     color: { type: String, default: 'default' },
     filename: { type: String, default: 'export' },
+    suffixFileName: { type: Boolean, default: false },
     items: {
       type: Array,
       default: () => [
@@ -64,7 +66,7 @@ export default {
       var csvUrl = window.webkitURL.createObjectURL(blob)
       const link = document.createElement('a')
       link.setAttribute('href', csvUrl)
-      link.setAttribute('download', `${this.filename}.csv`)
+      link.setAttribute('download', `${this.suffixFileName ? `${this.filename}_${NewDate('YYYYMMDDhhmmss')}` : this.filename}.csv`)
       link.click()
       // const link = document.createElement("a")
       // link.setAttribute("href", data)
