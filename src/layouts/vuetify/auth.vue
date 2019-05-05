@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- {{$store.getters.languages(['auth.title')}} -->
+    <!-- {{this.$languages.get('auth.title')}} -->
     <!-- {{$store.state.$languages.auth.title}} -->
     <v-layout wrap class="align-center justify-center">
       <v-flex xs12 sm4>
@@ -8,29 +8,31 @@
           <!-- <v-img src="https://cdn.vuetifyjs.com/images/cards/desert.jpg" aspect-ratio="2.75"></v-img> -->
           <v-card-title primary-title>
             <div>
-              <h3 class="headline mb-0">{{$store.getters.languages(['auth.title'])}}</h3>
+              <h3 class="headline mb-0">{{$languages.get('auth.title')}}</h3>
             </div>
           </v-card-title>
           <v-card-text>
             <v-container grid-list-md>
               <v-layout wrap>
                 <v-flex xs12 sm12 md12>
-                  <v-text-field v-model="item.ma_nd" :label="$store.getters.languages(['auth.username'])"
-                    v-focus.vuetify></v-text-field>
+                  <v-text-field persistent-hint v-model="item.ma_nd" :hint="$languages.get('auth.hit_username')"
+                    :label="$languages.get('auth.username')" v-focus.vuetify></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm12 md12>
-                  <v-text-field type="password" v-model="item.matkhau" :label="$store.getters.languages(['auth.password'])"></v-text-field>
+                  <v-text-field persistent-hint :type="show?'text':'password'" v-model="item.matkhau"
+                    :hint="$languages.get('auth.hit_pass')" :label="$languages.get('auth.password')"
+                    :append-icon="show?'visibility':'visibility_off'" @click:append="show=!show"></v-text-field>
                 </v-flex>
                 <v-flex xs12 sm12 md12>
                   <div class="spacer"></div>
-                  <v-checkbox v-model="item.remember" :label="$store.getters.languages(['auth.remember'])"></v-checkbox>
+                  <v-checkbox v-model="item.remember" :label="$languages.get('auth.remember')"></v-checkbox>
                 </v-flex>
               </v-layout>
             </v-container>
           </v-card-text>
           <v-card-actions>
             <div class="spacer"></div>
-            <v-btn flat color="primary" @click="signIn">{{$store.getters.languages(['global.signin'])}}</v-btn>
+            <v-btn flat color="primary" @click="signIn">{{$languages.get('global.signin')}}</v-btn>
           </v-card-actions>
         </v-card>
       </v-flex>
@@ -47,10 +49,13 @@
 
 <script>
 export default {
-  data: () => ({}),
+  data: () => ({
+    show: false
+  }),
   beforeCreate() {
     this.$store.commit('auth/SET_ITEM')
     // this.$store.dispatch('TEST')
+    // console.log(this.$languages.all)
   },
   computed: {
     item() {
@@ -62,7 +67,9 @@ export default {
   },
   watch: {
     language(val) {
-      this.$store.dispatch('setLanguage')
+      this.$store.state.$language = val
+      this.$languages.setLang(val)
+      // this.$store.dispatch('setLanguage')
     }
   },
   methods: {

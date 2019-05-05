@@ -2,9 +2,18 @@
   <div>
     <v-card>
       <v-card-title>
-        <v-text-field v-model="$store.state.news.pagination.search" append-icon="search"
-          :label="$store.getters.languages('global.search')" single-line hide-details></v-text-field>
-        <v-spacer></v-spacer>
+        <v-layout wrap>
+          <v-flex xs12 sm4 md4 class="pr-3">
+            <v-select :items="app_key" v-model="$store.state.news.pagination.app_key"
+              :label="$store.getters.languages('category.app_key')" :rules="[v=>!!v||$store.getters.languages('error.required_select')]"
+              item-text="title" item-value="app_key"></v-select>
+          </v-flex>
+          <v-flex xs12 sm4 md4>
+            <v-text-field v-model="$store.state.news.pagination.search" append-icon="search"
+              :label="$store.getters.languages('global.search')" single-line hide-details></v-text-field>
+          </v-flex>
+        </v-layout>
+        <!-- <v-spacer></v-spacer> -->
         <v-tooltip bottom>
           <v-btn flat icon slot="activator" color="primary" @click="$store.state.news.dialog=true">
             <v-icon>add</v-icon>
@@ -110,10 +119,13 @@ export default {
   },
   computed: {
     items() {
-      return this.$store.getters['news/getAll']
+      return this.$store.getters['news/All']
     },
     pagination() {
       return this.$store.state.news.pagination
+    },
+    app_key() {
+      return this.$store.getters['app_key/getFilter']()
     }
   },
   watch: {

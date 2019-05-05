@@ -82,7 +82,8 @@
               <v-tab-item>
                 <v-layout wrap class="pt-2">
                   <v-flex xs12 sm12 md12>
-                    <v-textarea v-model.trim="item.descs" auto-grow box :placeholder="$store.getters.languages(['global.input',' ','global.descs'])"></v-textarea>
+                    <v-divider></v-divider>
+                    <v-textarea v-model.trim="item.descs" auto-grow :placeholder="$store.getters.languages(['global.input',' ','global.descs'])"></v-textarea>
                   </v-flex>
                 </v-layout>
               </v-tab-item>

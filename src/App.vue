@@ -29,8 +29,9 @@ export default {
   beforeCreate() {
     // Get Languages
     if (this.$store.state.languages.isGetFirst) this.$store.dispatch('languages/select')
-    // Get Language Items
-    if (!this.$store.state.$language || !this.$store.state.$languages) this.$store.dispatch('setLanguage')
+    // Get Dictionary
+    // if (!this.$store.state.$language || !this.$store.state.$dictionary) this.$store.dispatch('setLanguage')
+    // if (!this.$store.state.$language) this.$store.dispatch('setLanguage')
     // Get Navigation
     if (this.$store.state.navigation.isGetFirst) this.$store.dispatch('navigation/select')
     // Check Authenticated Refresh
@@ -39,15 +40,15 @@ export default {
   },
   computed: {
     // isAuth() {
-      // if (_auth.GetRemember()) 
-      // this.$store.dispatch('auth/item', {
-      //   username: _auth.GetUser(),
-      //   password: '',
-      //   token: _auth.GetToken(),
-      //   remember: _auth.GetRemember()
-      // })
-      // console.log(this.$store.state._message)
-      // return this.$store.state.auth.isAuth
+    // if (_auth.GetRemember()) 
+    // this.$store.dispatch('auth/item', {
+    //   username: _auth.GetUser(),
+    //   password: '',
+    //   token: _auth.GetToken(),
+    //   remember: _auth.GetRemember()
+    // })
+    // console.log(this.$store.state._message)
+    // return this.$store.state.auth.isAuth
     // }
   }
 }

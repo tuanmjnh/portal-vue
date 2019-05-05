@@ -1,5 +1,42 @@
 <template>
   <div>
+    <v-dialog v-model="dialogFilter" max-width="512px" persistent>
+      <v-card>
+        <v-card-title class="headline grey lighten-2">
+          {{$languages.get('global.filter_data')}}
+        </v-card-title>
+        <v-card-text>
+          <v-layout wrap>
+            <v-flex xs12 sm12 md12 v-if="this.$store.getters['auth/inRoles']('donvi.select')">
+              <v-select :items="donvi" v-model="pagination.donvi_id" :hide-selected="true"
+                item-text="ten_dv" item-value="donvi_id" :label="$languages.get('global.local')"></v-select>
+            </v-flex>
+            <v-flex xs12 sm12 md12>
+              <v-select :items="nhom_kh" v-model="pagination.nhomkh_id" :hide-selected="true"
+                item-text="title" item-value="id" label="Nhóm kế hoạch"></v-select>
+            </v-flex>
+            <v-flex xs12 sm12 md12 v-if="this.$store.getters['auth/inRoles']('kehoach.select')">
+              <v-select :items="nguoidung" v-model="pagination.ma_nd" item-value="ma_nd"
+                item-text="ten_nd_dv" :hide-selected="true" label="Nhân viên"></v-select>
+            </v-flex>
+            <v-flex xs12 sm12 md12>
+              <v-text-field v-model="pagination.search" append-icon="search" :label="$languages.get('global.search')"
+                single-line hide-details></v-text-field>
+            </v-flex>
+          </v-layout>
+        </v-card-text>
+        <v-divider></v-divider>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <!-- <v-btn color="primary" flat @click.native="onSave">
+                {{$languages.get('global.accept')}}
+              </v-btn> -->
+          <v-btn color="primary" flat @click.native="dialogFilter=false">
+            {{$languages.get('global.back')}}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-card>
       <v-card-title>
         <span class="title">Danh sách thuê bao kế hoạch</span>
@@ -8,48 +45,10 @@
           <v-btn slot="activator" flat icon color="primary" @click="dialogFilter=true">
             <v-icon>filter_list</v-icon>
           </v-btn>
-          <span>{{$store.getters.languages('global.filter_data')}}</span>
+          <span>{{$languages.get('global.filter_data')}}</span>
         </v-tooltip>
         <export-data :getData="getDataExport" filename="kehoach_thuchien" :suffixFileName="true"
-          :tooltip="$store.getters.languages('global.export')" color="success" :items="[{title:$store.getters.languages(['global.export',' ',' .csv']),type:'csv'}]" />
-        <v-dialog v-model="dialogFilter" max-width="600px" persistent>
-          <v-card>
-            <v-card-title class="headline grey lighten-2">
-              {{$store.getters.languages('global.filter_data')}}
-            </v-card-title>
-            <v-card-text>
-              <v-layout wrap>
-                <v-flex xs12 sm12 md12 v-if="this.$store.getters['auth/inRoles']('donvi.select')">
-                  <v-select :items="donvi" v-model="pagination.donvi_id" :hide-selected="true"
-                    item-text="ten_dv" item-value="donvi_id" :label="$store.getters.languages('global.local')"></v-select>
-                </v-flex>
-                <v-flex xs12 sm12 md12>
-                  <v-select :items="nhom_kh" v-model="pagination.nhomkh_id"
-                    :hide-selected="true" item-text="title" item-value="id" label="Nhóm kế hoạch"></v-select>
-                </v-flex>
-                <v-flex xs12 sm12 md12 v-if="this.$store.getters['auth/inRoles']('kehoach.select')">
-                  <v-select :items="nguoidung" v-model="pagination.ma_nd" item-value="ma_nd"
-                    item-text="ten_nd_dv" :hide-selected="true" label="Nhân viên"></v-select>
-                </v-flex>
-                <v-flex xs12 sm12 md12>
-                  <v-text-field v-model="pagination.search" append-icon="search" :label="$store.getters.languages('global.search')"
-                    single-line hide-details></v-text-field>
-                </v-flex>
-              </v-layout>
-            </v-card-text>
-            <v-divider></v-divider>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <!-- <v-btn color="primary" flat @click.native="onSave">
-                {{$store.getters.languages('global.accept')}}
-              </v-btn> -->
-              <v-btn color="primary" flat @click.native="dialogFilter=false">
-                {{$store.getters.languages('global.back')}}
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-
+          :tooltip="$languages.get('global.export')" color="success" :items="[{title:`${$languages.get('global.export')} .csv`,type:'csv'}]" />
         <v-dialog v-model="dialogThuchien" max-width="600px" persistent>
           <v-card>
             <v-card-title class="headline grey lighten-2">
@@ -59,7 +58,7 @@
               <v-form v-model="valid" ref="form">
                 <v-layout wrap>
                   <v-flex xs12 sm12 md12>
-                    <v-radio-group v-model="item.ket_qua" :column="false" :rules="[v=>v>1||$store.getters.languages('error.required_select')]">
+                    <v-radio-group v-model="item.ket_qua" :column="false" :rules="[v=>v>1||$languages.get('error.required_select')]">
                       <v-radio :key="index" v-for="(item,index) in ket_qua" :label="item.label"
                         :color="item.color" :value="item.value"></v-radio>
                     </v-radio-group>
@@ -83,10 +82,10 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn color="primary" flat @click.native="onSave" :disabled="!valid">
-                {{$store.getters.languages('global.accept')}}
+                {{$languages.get('global.accept')}}
               </v-btn>
               <v-btn color="secondary" flat @click.native="dialogThuchien=false">
-                {{$store.getters.languages('global.back')}}
+                {{$languages.get('global.back')}}
               </v-btn>
             </v-card-actions>
           </v-card>
@@ -95,19 +94,19 @@
           <v-btn flat icon slot="activator" color="primary" @click="$store.state.kehoach.dialog=true">
             <v-icon>add</v-icon>
           </v-btn>
-          <span>{{$store.getters.languages('global.add')}}</span>
+          <span>{{$languages.get('global.add')}}</span>
         </v-tooltip> -->
         <!-- <v-tooltip bottom v-if="$store.state.kehoach.selected.length>0 && $store.state.kehoach.pagination.flag===1">
           <v-btn flat icon slot="activator" color="danger" @click="onDelete()">
             <v-icon>delete</v-icon>
           </v-btn>
-          <span>{{$store.getters.languages('global.delete_selected')}}</span>
+          <span>{{$languages.get('global.delete_selected')}}</span>
         </v-tooltip>
         <v-tooltip bottom v-if="$store.state.kehoach.selected.length>0 && $store.state.kehoach.pagination.flag===0">
           <v-btn flat icon slot="activator" color="info" @click="onDelete()">
             <v-icon>refresh</v-icon>
           </v-btn>
-          <span>{{$store.getters.languages('global.recover_selected')}}</span>
+          <span>{{$languages.get('global.recover_selected')}}</span>
         </v-tooltip> -->
 
         <!-- <v-btn-toggle v-model="$store.state.kehoach.pagination.toggle" mandatory>
@@ -115,19 +114,19 @@
             <v-btn slot="activator" flat @click="$store.state.kehoach.pagination.flag=1">
               <v-icon>view_list</v-icon>
             </v-btn>
-            <span>{{$store.getters.languages('global.using')}}</span>
+            <span>{{$languages.get('global.using')}}</span>
           </v-tooltip>
           <v-tooltip bottom>
             <v-btn slot="activator" flat @click="$store.state.kehoach.pagination.flag=0">
               <v-icon>delete</v-icon>
             </v-btn>
-            <span>{{$store.getters.languages('global.deleted')}}</span>
+            <span>{{$languages.get('global.deleted')}}</span>
           </v-tooltip>
         </v-btn-toggle> -->
       </v-card-title>
       <!-- <v-form ref="form" v-model="valid" lazy-validation> -->
       <v-data-table class="elevation-1" item-key="id" :headers="headers" :items="items"
-        :rows-per-page-items="[10, 25, 50, 100, 200, 500]" :rows-per-page-text="$store.getters.languages('global.rows_per_page')"
+        :rows-per-page-items="[10, 25, 50, 100, 200, 500]" :rows-per-page-text="$languages.get('global.rows_per_page')"
         :pagination.sync="pagination" :loading="$store.state.$loadingGet" :total-items="totalItems">
         <!--:loading="loading" :pagination.sync="pagination" :total-items="totalItems" v-model="$store.state.kehoach.selected_th" -->
         <template slot="items" slot-scope="props">
@@ -152,13 +151,13 @@
                 <v-btn flat icon slot="activator" color="error" class="mx-0" @click="onDelete(props.item)">
                   <v-icon>delete</v-icon>
                 </v-btn>
-                <span>{{$store.getters.languages('global.delete')}}</span>
+                <span>{{$languages.get('global.delete')}}</span>
               </v-tooltip>
               <v-tooltip bottom v-else>
                 <v-btn flat icon slot="activator" color="info" class="mx-0" @click="onDelete(props.item)">
                   <v-icon>refresh</v-icon>
                 </v-btn>
-                <span>{{$store.getters.languages('global.recover')}}</span>
+                <span>{{$languages.get('global.recover')}}</span>
               </v-tooltip> -->
             </td>
           </tr>
@@ -167,8 +166,8 @@
       <!-- </v-form> -->
     </v-card>
     <tpl-confirm :dialog.sync="dialogConfirm" @onAccept="onCFMAccept" @onCancel="onCFMCancel"
-      :title="$store.getters.languages('global.message')" :content="$store.getters.languages('messages.confirm_content')"
-      :btnAcceptText="$store.getters.languages('global.accept')" :btnCancelText="$store.getters.languages('global.cancel')"></tpl-confirm>
+      :title="$languages.get('global.message')" :content="$languages.get('messages.confirm_content')"
+      :btnAcceptText="$languages.get('global.accept')" :btnCancelText="$languages.get('global.cancel')"></tpl-confirm>
   </div>
 </template>
 
@@ -225,7 +224,7 @@ export default {
     this.$store.dispatch('kehoach/GetNguoidung', { loading: false, donvi_id: this.pagination.donvi_id })
   },
   mounted() {
-    this.headers.forEach(e => { e.text = this.$store.getters.languages(e.text) })
+    this.headers.forEach(e => { e.text = this.$languages.get(e.text) })
   },
   computed: {
     items() {
@@ -237,19 +236,19 @@ export default {
     donvi() {
       const rs = this.$store.getters['donvi/getFilter']({ sortBy: 'ma_dvi' })
       return [
-        ...[{ donvi_id: 0, ten_dv: this.$store.getters.languages('global.select_all') }],
+        ...[{ donvi_id: 0, ten_dv: this.$languages.get('global.select_all') }],
         ...rs]
     },
     nhom_kh() {
       const rs = this.$store.getters['kehoach/getNhomKH']
       return [
-        ...[{ id: 0, title: this.$store.getters.languages('global.select_all') }],
+        ...[{ id: 0, title: this.$languages.get('global.select_all') }],
         ...rs]
     },
     nguoidung() {
       const rs = this.$store.state.kehoach.nguoidung.map((x) => ({ ma_nd: x.ma_nd, ten_nd_dv: x.ten_nd_dv }))
       return [
-        ...[{ ma_nd: '', ten_nd_dv: this.$store.getters.languages('global.select_all') }],
+        ...[{ ma_nd: '', ten_nd_dv: this.$languages.get('global.select_all') }],
         ...rs]
     }
   },

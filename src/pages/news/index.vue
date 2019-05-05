@@ -22,6 +22,8 @@ export default {
     this.$store.dispatch('news/select')
     if (this.$store.state.category.items < 1)
       this.$store.dispatch('category/select', false, { rowsPerPage: 0 }, false)
+    if (this.$store.state.app_key.items.length < 1)
+      this.$store.dispatch('app_key/select')
   }
 }
 </script>

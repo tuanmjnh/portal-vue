@@ -23,6 +23,9 @@ import router from './router'
 import filters from './plugins/filters'
 // Directive
 import directive from './plugins/directive'
+// Languages
+import languages from './languages'
+Vue.prototype.$languages = languages
 // VeeValidate
 // import veeValidate from './plugins/vee-validate'
 // import * as _store from '@/plugins/storage'

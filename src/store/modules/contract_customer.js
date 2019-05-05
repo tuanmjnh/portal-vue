@@ -1,5 +1,6 @@
 import { ObjectToLowerKey } from '@/plugins/helpers'
 import { vnptbkn } from '@/plugins/axios-config'
+import TMLanguage from '@/languages'
 const collection = 'contract-customer'
 export default {
   namespaced: true,
@@ -15,26 +16,6 @@ export default {
     confirm: false,
     exist_code: true,
     isGetFirst: true,
-    totalItems: 0,
-    headers: [
-      { text: 'contract_customer.contract_code', value: 'contract_code' },
-      { text: 'contract_customer.customer_name', value: 'customer_name' },
-      { text: 'nguoidung.mobile', value: 'customer_phone' },
-      { text: 'global.created_by', value: 'created_by' },
-      { text: 'global.created_at', value: 'created_at' },
-      { text: '#', value: '#', sortable: false }
-    ],
-    pagination: {
-      search: '',
-      sortBy: 'created_at',
-      descending: true,
-      toggle: 0,
-      flag: 1,
-      donvi_id: 0,
-      // filter: { flag: 1, donvi_id: 0 },
-      page: 1,
-      rowsPerPage: 10
-    },
     df_khachhang: {
       hdkh_id: '',
       khachhang_id: '',
@@ -92,17 +73,13 @@ export default {
       if (state.pagination.filter.donvi_id === 0)
         delete filter.donvi_id
       if (pagination && pagination.filter) rs = rs.filterValue(pagination.filter)
-      else rs = rs.filterValue(filter)
+      else rs = rs.filterValue({ flag: state.pagination.flag, donvi_id: state.pagination.donvi_id })
       if (pagination && pagination.search) rs = rs.searchValue(pagination.search)
       else rs = rs.searchValue(state.pagination.search)
       if (pagination && pagination.sortBy) rs = rs.sortByKey(pagination.sortBy)
       else rs = rs.sortByKey(state.pagination.sortBy)
       // console.log(state.pagination.filter)
       return rs
-    },
-    headers: (state, getters, rootState, rootGetters) => {
-      state.headers.forEach(e => { e.text = rootGetters.languages(e.text) })
-      return state.headers
     }
   },
   mutations: {
@@ -138,11 +115,11 @@ export default {
     }
   },
   actions: {
-    async select({ commit, state, rootGetters, rootState }, isExport = false, pagination, loading = true) {
+    async select({ commit, state, rootGetters, rootState }, params) {
       // Loading
-      if (loading && !rootState.$loadingGet) rootState.$loadingGet = true
+      if (params.loading && !rootState.$loadingGet) rootState.$loadingGet = true
       // http
-      return await vnptbkn().get(`${collection}/GetByDonVi`, { params: pagination ? pagination : { ...state.pagination, ...{ isExport: isExport } } }).then(function (res) {
+      return await vnptbkn().get(`${collection}/GetByDonVi`, { params: params.pagination }).then(function (res) {
         if (res.status === 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -153,14 +130,44 @@ export default {
             return
           }
           if (res.data.data) commit('SET_ITEMS', res.data.data)
-          if (res.data.total) state.totalItems = res.data.total
+          // if (res.data.total) state.totalItems = res.data.total
+          return res.data
+        } else { commit('SET_CATCH', null, { root: true }) }
+      }).catch((error) => {
+        commit('SET_CATCH', error, { root: true })
+      }).finally(() => {
+        state.isGetFirst = false
+        if (params.loading) rootState.$loadingGet = false
+      })
+    },
+    async export_contract({ commit, state, rootGetters, rootState }, params) {
+      // Loading
+      if (params.loading) rootState.$loadingGet = true
+      // http
+      return await vnptbkn().get(`${collection}/GetByDonVi`, {
+        params: {
+          ...params.pagination,
+          ...{ isExport: true }
+        }
+      }).then(function (res) {
+        if (res.status === 200) {
+          if (res.data.msg === 'error_token') {
+            commit('SET_CATCH', { response: { status: 401 } }, { root: true })
+            return
+          }
+          if (res.data.msg === 'danger') {
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            return
+          }
+          if (res.data.data.length < 1)
+            commit('SET_MESSAGE', { text: TMLanguage.get('error.no_data'), color: 'warning' }, { root: true })
           return res.data.data
         } else { commit('SET_CATCH', null, { root: true }) }
       }).catch((error) => {
         commit('SET_CATCH', error, { root: true })
       }).finally(() => {
         state.isGetFirst = false
-        if (loading) rootState.$loadingGet = false
+        if (params.loading) rootState.$loadingGet = false
       })
     },
     async getThuebao({ commit, state, rootGetters, rootState }, loading = true) {

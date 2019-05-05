@@ -17,7 +17,7 @@ export default {
     const $this = this
     if ($this.$store.state.donvi.items < 1)
       $this.$store.dispatch('donvi/select', false, null, false)
-    $this.$store.dispatch('category/GetByKey', ({ key: 'data', code: 'kehoach' })).then(x => {
+    $this.$store.dispatch('category/GetByKey', ({ key: 'kehoach' })).then(x => {
       $this.$store.state.kehoach.nhom_kh = x
     })
   }

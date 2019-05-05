@@ -1,5 +1,5 @@
 import { vnptbkn } from '@/plugins/axios-config'
-const collection = 'items'
+const collection = 'appkey'
 export default {
   namespaced: true,
   state: {
@@ -8,7 +8,6 @@ export default {
     selected: [],
     dialog: false,
     isGetFirst: true,
-    totalItems: 0,
     pagination: {
       search: '',
       sortBy: 'title',
@@ -16,32 +15,11 @@ export default {
       toggle: 0,
       flag: 1,
       page: 1,
-      rowsPerPage: 10,
-      app_key: 'guide'
+      rowsPerPage: 10
     },
     default: {
-      id: 0,
       app_key: 'news',
-      code: '',
       title: '',
-      icon: '<i class="material-icons">view_module</i>',
-      image: '',
-      url: '',
-      orders: 1,
-      quantity: 0,
-      descs: '',
-      content: '',
-      attach: '',
-      tags: '',
-      created_ip: '',
-      created_by: '',
-      created_at: new Date(),
-      updated_ip: '',
-      updated_by: '',
-      updated_at: null,
-      deleted_ip: '',
-      deleted_by: '',
-      deleted_at: null,
       flag: 1
     }
   },
@@ -55,64 +33,29 @@ export default {
     getFilter: state => pagination => {
       let rs = [...state.items]
       if (pagination && pagination.find) rs = rs.filterValue(pagination.find)
-      else rs = rs.filterValue({ flag: state.pagination.flag, app_key: state.pagination.app_key })
+      else rs = rs.filterValue(state.pagination.find)
       if (pagination && pagination.search) rs = rs.searchValue(pagination.search)
       else rs = rs.searchValue(state.pagination.search)
       if (pagination && pagination.sortBy) rs = rs.sortByKey(pagination.sortBy)
       else rs = rs.sortByKey(state.pagination.sortBy)
       return rs
     },
-    headers: (state, getters, rootState, rootGetters) => {
-      state.headers.forEach(e => { e.text = rootGetters.languages(e.text) })
-      return state.headers
-    },
-    getDependent: state => {
-      return state.items.filterValue({ flag: 1 }).filter(e => { return e.id != state.item.id })
-        // .sortByKey('app_key')
-        .map(e => ({ 'id': e.id, 'title': e.title }))
-    },
-    getRender: state => filter => {
-      let items = state.items.filter(row => { return row.flag === 1 }).filter(row => { return row.app_key === filter.position })
-      if (filter.roles && filter.roles.length > 0) items = items.filter(row => { return filter.roles.indexOfArray(row.url.trim(',').split(',')) > -1 })
-      //items = items.filter(row => { return filter.roles.indexOfArray(row.url.trim(',').split(',')) > -1 })
-      const rs = items.filter(row => { return row.dependent.indexOf(',0,') > -1 })
-      // get children
-      rs.forEach(e => {
-        const _child = items.filter(row => { return row.dependent.indexOf(`,${e.id},`) > -1 })
-        if (_child) _child.forEach(ee => {
-          ee.children = items.filter(row => { return row.dependent.indexOf(`,${ee.id},`) > -1 })
-        })
-        e.children = _child
-      })
-      return rs
-    }
   },
   mutations: {
     SET_ITEMS(state, items) {
       state.items = items
     },
     SET_ITEM(state, item) {
-      if (item) {
-        if (item.url_plus) state.url_plus = JSON.parse(item.url_plus)
-        else state.url_plus = { push: '', go: '', store: '' }
-        state.item = { ...item }
-      } else state.item = { ...state.default }
-    },
-    SET_ITEM_ID(state, id) {
-      if (id) {
-        state.item = { ...state.items.find(x => x.id == id) }
-        if (state.item.url_plus) state.url_plus = JSON.parse(state.item.url_plus)
-        else state.url_plus = { push: '', go: '', store: '' }
-      } else state.item = { ...state.default }
+      state.item = item ? { ...item } : { ...state.default }
     },
     PUSH_ITEMS(state, item) {
       state.items.push(item)
     },
     UPDATE_ITEMS(state, item) {
-      state.items.update(item, 'id')
+      state.items.update(item, 'app_key')
     },
     REMOVE_ITEMS(state, item) {
-      state.items.remove(item, 'id')
+      state.items.remove(item, 'app_key')
     }
   },
   actions: {

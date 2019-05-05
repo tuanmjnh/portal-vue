@@ -19,7 +19,7 @@ export default {
   }),
   beforeCreate() {
     // if (this.$store.state.contract_customer.isGetFirst) 
-    this.$store.dispatch('contract_customer/select')
+    // this.$store.dispatch('contract_customer/select')
     // if (!this.$store.state.donvi.items)
     this.$store.dispatch('donvi/select', false, { rowsPerPage: 0 }, false)
   }

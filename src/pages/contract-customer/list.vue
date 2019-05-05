@@ -1,48 +1,90 @@
 <template>
   <div>
+    <v-dialog v-model="dialogFilter" max-width="512px" persistent>
+      <v-card>
+        <v-card-title class="headline grey lighten-2">
+          {{$languages.get('global.filter_data')}}
+        </v-card-title>
+        <v-card-text>
+          <v-layout wrap>
+            <v-flex xs6 sm12 md12>
+              <v-text-field v-model="pagination.search" append-icon="search" :label="$languages.get('global.search')"
+                single-line hide-details></v-text-field>
+            </v-flex>
+            <v-flex xs6 sm12 md12 v-if="this.$store.getters['auth/inRoles']('donvi.select')">
+              <v-select :items="donvi" v-model="pagination.donvi_id" :hide-selected="true"
+                item-text="ten_dv" item-value="donvi_id" :label="$languages.get('global.local')"></v-select>
+            </v-flex>
+            <v-flex xs12 sm6 md6>
+              <v-menu v-model="start_at_menu" :nudge-right="40" lazy transition="scale-transition"
+                offset-y full-width min-width="290px">
+                <template v-slot:activator="{on}">
+                  <v-text-field :value="pagination.start_at.formatDate('DD/MM/YYYY')"
+                    label="Từ ngày" prepend-icon="event" readonly v-on="on"
+                    persistent-hint hint="Định dạng: DD/MM/YYYY"></v-text-field>
+                </template>
+                <v-date-picker v-model="pagination.start_at" @input="menu2=false"></v-date-picker>
+              </v-menu>
+            </v-flex>
+            <v-flex xs12 sm6 md6>
+              <v-menu v-model="end_at_menu" :nudge-right="40" lazy transition="scale-transition"
+                offset-y full-width min-width="290px">
+                <template v-slot:activator="{on}">
+                  <v-text-field :value="pagination.end_at.formatDate('DD/MM/YYYY')" label="Đến ngày"
+                    prepend-icon="event" readonly v-on="on" persistent-hint hint="Định dạng: DD/MM/YYYY"></v-text-field>
+                </template>
+                <v-date-picker v-model="pagination.end_at" @input="menu2=false"></v-date-picker>
+              </v-menu>
+            </v-flex>
+          </v-layout>
+        </v-card-text>
+        <v-divider></v-divider>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" flat @click.native="dialogFilter=false">
+            {{$languages.get('global.back')}}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-card>
       <v-card-title>
-        <v-layout wrap>
-          <v-flex xs6 sm4 md4 class="mr-3" v-if="this.$store.getters['auth/inRoles']('donvi.select')">
-            <v-select :items="donvi" v-model="$store.state.contract_customer.pagination.donvi_id"
-              :hide-selected="true" item-text="ten_dv" item-value="donvi_id" :label="$store.getters.languages('global.local')"></v-select>
-          </v-flex>
-          <v-flex xs6 sm5 md5>
-            <v-text-field v-model="$store.state.contract_customer.pagination.search"
-              append-icon="search" :label="$store.getters.languages('global.search')"
-              single-line hide-details></v-text-field>
-          </v-flex>
-          <v-spacer></v-spacer>
-        </v-layout>
+        <span class="title">Danh sách hợp đồng trên PTTB đã scan</span>
+        <v-spacer></v-spacer>
+        <v-tooltip bottom>
+          <v-btn slot="activator" flat icon color="primary" @click="dialogFilter=true">
+            <v-icon>filter_list</v-icon>
+          </v-btn>
+          <span>{{$languages.get('global.filter_data')}}</span>
+        </v-tooltip>
         <v-tooltip bottom>
           <v-btn slot="activator" color="primary" small fab flat @click="$store.state.contract_customer.dialog=true">
             <i class="material-icons">add</i>
           </v-btn>
-          <span>{{$store.getters.languages('contract_customer.add')}}</span>
+          <span>{{$languages.get('contract_customer.add')}}</span>
         </v-tooltip>
         <!-- <v-btn-toggle v-model="toggle" mandatory>
           <v-tooltip bottom>
-            <v-btn slot="activator" flat @click="$store.state.contract_customer.pagination.flag=1">
+            <v-btn slot="activator" flat @click="pagination.flag=1">
               <i class="material-icons">view_list</i>
             </v-btn>
-            <span>{{$store.getters.languages('contract_customer.use')}}</span>
+            <span>{{$languages.get('contract_customer.use')}}</span>
           </v-tooltip>
           <v-tooltip bottom>
-            <v-btn slot="activator" flat @click="$store.state.contract_customer.pagination.flag=4">
+            <v-btn slot="activator" flat @click="pagination.flag=4">
               <i class="material-icons">delete</i>
             </v-btn>
-            <span>{{$store.getters.languages('contract_customer.deleted')}}</span>
+            <span>{{$languages.get('contract_customer.deleted')}}</span>
           </v-tooltip>
         </v-btn-toggle> -->
-        <export-data :getData="getDataExport" :tooltip="$store.getters.languages('global.export')"
-          :items="[{title:$store.getters.languages(['global.export',' ',' .csv']),type:'csv'}]" />
+        <export-data :getData="getDataExport" :tooltip="$languages.get('global.export')"
+          :items="[{title:`${$languages.get('global.export')} .csv`,type:'csv'}]" />
       </v-card-title>
       <v-data-table class="elevation-1" v-model="$store.state.contract_customer.selected"
-        select-all item-key="id" :headers="this.$store.getters['contract_customer/headers']"
-        :items="items" :rows-per-page-text="$store.getters.languages('global.rows_per_page')"
-        :pagination.sync="$store.state.contract_customer.pagination" :rows-per-page-items="[8, 25, 50, 100, 200, 500]"
-        :total-items="$store.state.contract_customer.totalItems" :loading="$store.state.$loadingGet">
-        <!-- select-all :loading="loading" :total-items="totalItems" :search="$store.state.contract_customer.pagination.search"-->
+        select-all item-key="id" :headers="headers" :items="items" :rows-per-page-text="$languages.get('global.rows_per_page')"
+        :pagination.sync="pagination" :rows-per-page-items="[8, 25, 50, 100, 200, 500]"
+        :total-items="totalItems" :loading="$store.state.$loadingGet">
+        <!-- select-all :loading="loading" :total-items="totalItems" :search="pagination.search"-->
         <template slot="items" slot-scope="props">
           <tr>
             <td>
@@ -60,7 +102,7 @@
                   target="_blank"><i class="material-icons">attachment</i></a>
                 <span>
                   {{
-                  `${$store.getters.languages('contract_customer.details')}:${props.item.ma_gd}`
+                  `${$languages.get('contract_customer.details')}:${props.item.ma_gd}`
                   }}
                 </span>
               </v-tooltip>
@@ -68,16 +110,16 @@
                 <v-btn flat icon slot="activator" color="teal" class="mx-0" @click="onEdit(props.item)">
                   <v-icon>assignment</v-icon>
                 </v-btn>
-                <span>{{$store.getters.languages('contract_customer.details')}}</span>
+                <span>{{$languages.get('contract_customer.details')}}</span>
               </v-tooltip>
-              <v-tooltip left v-if="$store.state.contract_customer.pagination.flag===1">
+              <v-tooltip left v-if="pagination.flag===1">
                 <v-btn flat icon slot="activator" color="danger" class="mx-0" @click="onDelete(props.item)">
                   <v-icon>highlight_off</v-icon>
                 </v-btn>
-                <span>{{$store.getters.languages('contract_customer.cancel')}}</span>
+                <span>{{$languages.get('contract_customer.cancel')}}</span>
               </v-tooltip>
               <!-- <v-btn icon class="mx-0" @click="onDelete(props.item)">
-                <i v-if="$store.state.contract_customer.pagination.flag===1" class="material-icons error--text">delete</i>
+                <i v-if="pagination.flag===1" class="material-icons error--text">delete</i>
                 <i v-else class="material-icons info--text">refresh</i>
               </v-btn> -->
             </td>
@@ -86,9 +128,8 @@
       </v-data-table>
     </v-card>
     <tpl-confirm :dialog.sync="$store.state.contract_customer.confirm" @onAccept="onCFMAccept"
-      @onCancel="onCFMCancel" :title="$store.getters.languages('global.message')"
-      :content="$store.getters.languages('messages.confirm_content')" :btnAcceptText="$store.getters.languages('global.accept')"
-      :btnCancelText="$store.getters.languages('global.cancel')" />
+      @onCancel="onCFMCancel" :title="$languages.get('global.message')" :content="$languages.get('messages.confirm_content')"
+      :btnAcceptText="$languages.get('global.accept')" :btnCancelText="$languages.get('global.cancel')" />
   </div>
 </template>
 
@@ -103,8 +144,36 @@ export default {
   },
   props: { http: null },
   data: () => ({
+    dialogFilter: false,
     toggle: 0,
+    totalItems: 0,
+    start_at_menu: false,
+    end_at_menu: false,
+    headers: [
+      { text: 'contract_customer.contract_code', value: 'contract_code' },
+      { text: 'contract_customer.customer_name', value: 'customer_name' },
+      { text: 'nguoidung.mobile', value: 'customer_phone' },
+      { text: 'global.created_by', value: 'created_by' },
+      { text: 'global.created_at', value: 'created_at' },
+      { text: '#', value: '#', sortable: false }
+    ],
+    pagination: {
+      search: '',
+      sortBy: 'created_at',
+      descending: true,
+      toggle: 0,
+      flag: 1,
+      donvi_id: 0,
+      start_at: new Date().toISOString().substr(0, 10),
+      end_at: new Date().toISOString().substr(0, 10),
+      // filter: { flag: 1, donvi_id: 0 },
+      page: 1,
+      rowsPerPage: 10
+    },
   }),
+  mounted() {
+    this.headers.forEach(e => { e.text = this.$languages.get(e.text) })
+  },
   computed: {
     items() {
       // return this.$store.getters['contract_customer/getFilter']()
@@ -112,22 +181,27 @@ export default {
     },
     donvi() {
       var rs = this.$store.getters['donvi/getFilter']({ sortBy: 'ma_dvi' })
-      return [...[{ donvi_id: 0, ten_dv: this.$store.getters.languages('global.select_all') }], ...rs] //.unshift({ donvi_id: 0, ten_donvi: '-- Tất cả --' })
+      return [...[{ donvi_id: 0, ten_dv: this.$languages.get('global.select_all') }], ...rs] //.unshift({ donvi_id: 0, ten_donvi: '-- Tất cả --' })
     },
-    pagination: {
-      get: function () {
-        return this.$store.state.contract_customer.pagination
-      },
-      set: function (value) {
-        this.$store.state.contract_customer.pagination = value
-      }
-    }
+    // pagination: {
+    //   get: function () {
+    //     return this.pagination
+    //   },
+    //   set: function (value) {
+    //     this.pagination = value
+    //   }
+    // }
   },
   watch: {
     pagination: {
       handler(val) {
         // if (!this.$store.state.$loadingGet)
-        this.$store.dispatch('contract_customer/select')
+        this.$store.dispatch('contract_customer/select', {
+          loading: true,
+          pagination: this.pagination
+        }).then((x) => {
+          this.totalItems = x.total
+        })
       },
       deep: true
     },
@@ -148,12 +222,15 @@ export default {
     onCFMCancel() {
       this.$store.state.contract_customer.selected = []
     },
+    dateStartAtFormat() {
+      return this.start_at.date.formatDate('MM/YYYY')
+    },
     getDataExport() {
-      return this.$store.dispatch('contract_customer/select', true)
+      return this.$store.dispatch('contract_customer/export_contract', {
+        loading: true,
+        pagination: this.pagination
+      })
     }
-  },
-  created() {
-    // console.log(this.$store.getters['auth/inRoles']('donvi.select'))
   }
 }
 </script>

@@ -141,6 +141,25 @@ export default {
         if (params.loading) rootState.$loadingGet = false
       })
     },
+    async GetPassword({ commit, rootGetters, rootState }, params) {
+      // Loading
+      if (params.loading) rootState.$loadingGet = true
+      // http
+      return await vnptbkn().get(`${collection}/GetPassword/${params.ma_nd}`).then(function (res) {
+        if (res.status === 200) {
+          if (res.data.msg === 'danger') {
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            return
+          }
+          if (res.data.data) return res.data.data
+          return []
+        } else commit('SET_CATCH', null, { root: true })
+      }).catch((error) => {
+        commit('SET_CATCH', error, { root: true })
+      }).finally(() => {
+        if (params.loading) rootState.$loadingGet = false
+      })
+    },
     // async GetRoles({ commit, state, rootGetters, rootState }, loading = true) {
     //   // Loading
     //   if (loading) rootState.$loadingCommit = true

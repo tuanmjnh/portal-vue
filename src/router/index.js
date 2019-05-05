@@ -54,6 +54,13 @@ const routes = [
         meta: { desc: 'set-roles', auth: true, roles: ['nguoidung.insert', 'nguoidung.update'] },
         component: () => import('@/pages/nguoidung/set-roles')
       },
+      {
+        path: 'get-pass',
+        name: 'get-pass',
+        props: true,
+        meta: { desc: 'get-pass', auth: true, roles: ['nguoidung.delete'] },
+        component: () => import('@/pages/nguoidung/get-pass')
+      },
     ]
   },
   {

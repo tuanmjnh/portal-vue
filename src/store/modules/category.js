@@ -16,7 +16,8 @@ export default {
       toggle: 0,
       flag: 1,
       page: 1,
-      rowsPerPage: 10
+      rowsPerPage: 10,
+      app_key: 'guide'
     },
     default: {
       id: 0,
@@ -58,7 +59,7 @@ export default {
     getFilter: state => pagination => {
       let rs = [...state.items]
       if (pagination && pagination.find) rs = rs.filterValue(pagination.find)
-      else rs = rs.filterValue(state.pagination.find)
+      else rs = rs.filterValue({ flag: state.pagination.flag, app_key: state.pagination.app_key })
       if (pagination && pagination.search) rs = rs.searchValue(pagination.search)
       else rs = rs.searchValue(state.pagination.search)
       if (pagination && pagination.sortBy) rs = rs.sortByKey(pagination.sortBy)

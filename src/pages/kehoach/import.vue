@@ -15,13 +15,13 @@
             </v-flex>
             <v-flex xs6 sm6 md6 v-if="$store.state.kehoach.import_tb.error.length>0">
               <export-data :getData="getErrorExport" tooltip="Tải danh sách lỗi" color="error"
-                filename="import_error" :items="[{title:$store.getters.languages(['global.export',' ',' .csv']),type:'csv'}]" />
+                filename="import_error" :items="[{title:`${$languages.get('global.export')} .csv`,type:'csv'}]" />
             </v-flex>
           </v-layout>
           <v-layout wrap>
             <v-flex xs12 sm6 md6>
               <v-radio-group v-model="$store.state.kehoach.import_tb.nhomkh_id" column
-                :rules="[v=>!!v||$store.getters.languages('error.required_select')]"
+                :rules="[v=>!!v||$languages.get('error.required_select')]"
                 @click="getNhomKHAttach()">
                 <v-radio :key="index" v-for="(item,index) in nhom_kh" :label="item.title"
                   :value="item.id"></v-radio>
@@ -32,7 +32,7 @@
               <v-layout wrap>
                 <v-flex xs12 sm12 md12>
                   <v-select :items="donvi" v-model="$store.state.kehoach.import_tb.donvi_id"
-                    :hide-selected="true" item-text="ten_dv" item-value="donvi_id" :label="$store.getters.languages('global.local')"></v-select>
+                    :hide-selected="true" item-text="ten_dv" item-value="donvi_id" :label="$languages.get('global.local')"></v-select>
                 </v-flex>
                 <v-flex xs12 sm6 md6>
                   <v-menu v-model="date_picker.menu" :nudge-right="40" lazy transition="scale-transition"
@@ -61,15 +61,15 @@
             </v-flex>
             <!-- <v-flex xs12 sm6 md6>
               <v-text-field v-model.trim="$store.state.kehoach.import_tb.file_name" label="Tệp dữ liệu"
-                :disabled="true" class="text-color-initial" :rules="[v=>!!v||$store.getters.languages('error.required')]"></v-text-field>
+                :disabled="true" class="text-color-initial" :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
             </v-flex> -->
             <v-flex xs12 sm6 md6 class="hide">
               <v-text-field v-model="$store.state.kehoach.import_tb.file_name" :disabled="true"
-                class="text-color-initial" :rules="[v=>!!v||$store.getters.languages('error.required')]"></v-text-field>
+                class="text-color-initial" :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
             </v-flex>
             <v-flex xs12 sm12 md12 v-if="attach_upload.files.length>0">
               <p style="position:relative;top:13px;">
-                {{$store.getters.languages('global.attach')}}:
+                {{$languages.get('global.attach')}}:
                 <a :href="`${http.defaults.host}/${attach_upload.basePath}/${attach_upload.files[0].name}`"
                   target="_blank">{{attach_upload.files[0].name}}</a>
               </p>
@@ -77,7 +77,7 @@
             <v-flex xs12 sm6 md6>
               <upload-files :http="http" :autoName="false" :buttonUse="false" :multiple="false"
                 extension=".csv" :files.sync="attach_upload.files" :loading.sync="attach_upload.loading"
-                :buttonText="$store.getters.languages('global.upload_drag')" :basePath="attach_upload.basePath"></upload-files>
+                :buttonText="$languages.get('global.upload_drag')" :basePath="attach_upload.basePath"></upload-files>
             </v-flex>
           </v-layout>
         </v-container>

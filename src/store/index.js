@@ -1,27 +1,29 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import { vnptbkn } from '@/plugins/axios-config'
-import * as _languages from '@/plugins/languages'
+import TMLanguage from '@/languages'
+// import * as TMLanguage from '@/languages/languages'
 // import state from './state'
 // import actions from './actions'
 // import mutations from './mutations'
 // modules
 // import nav from './modules/nav'
 import auth from './modules/auth'
-import roles from './modules/roles'
+import news from './modules/news'
 // import users from './modules/users'
-import nguoidung from './modules/nguoidung'
 import donvi from './modules/donvi'
+import roles from './modules/roles'
+import app_key from './modules/app_key'
 import setting from './modules/setting'
 import modules from './modules/modules'
+import category from './modules/category'
+import nguoidung from './modules/nguoidung'
 import languages from './modules/languages'
 import dictionary from './modules/dictionary'
 import navigation from './modules/navigation'
 import permissions from './modules/permissions'
 import notification from './modules/notification'
 import informations from './modules/informations'
-import news from './modules/news'
-import category from './modules/category'
 import contract_customer from './modules/contract_customer'
 import contract_enterprise from './modules/contract_enterprise'
 import kehoach from './modules/kehoach'
@@ -29,10 +31,13 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   modules: {
     auth: auth,
-    roles: roles,
+    news: news,
     donvi: donvi,
+    roles: roles,
+    app_key: app_key,
     modules: modules,
     setting: setting,
+    category: category,
     nguoidung: nguoidung,
     languages: languages,
     dictionary: dictionary,
@@ -40,8 +45,6 @@ export default new Vuex.Store({
     permissions: permissions,
     notification: notification,
     informations: informations,
-    news: news,
-    category: category,
     contract_customer: contract_customer,
     contract_enterprise: contract_enterprise,
     kehoach: kehoach
@@ -60,9 +63,9 @@ export default new Vuex.Store({
       color: 'success',
       text: ''
     },
-    $language_def: 'vi-VN',
-    $language: _languages.GetLanguage(),
-    $dictionary: _languages.GetDictionary(),
+    $language: TMLanguage.getLang('vi-VN'),
+    //$dictionary: TMLanguage.GetDictionary(),
+    // $dictionary: TMLanguage.GetDictionary(),
     $notification: false,
     $row_per_page: [10, 25, 50, 100, 200, 500], //  { text: "All", value: -1 }
     // _language: 'vi-VN',
@@ -80,6 +83,7 @@ export default new Vuex.Store({
       var regx = /:([^"]+)/g
       let rs = ''
       for (let index = 0; index < key.length; index++) {
+        if (!state.$dictionary) return key[index]
         const e = key[index].toLowerCase().split('.')
         if (e.length < 2) {
           const e0 = e[0].split(':')
@@ -140,24 +144,26 @@ export default new Vuex.Store({
       state.$message.x = 'right'
       state.$message.y = 'top'
       state.$message.timeout = 6000
-      state.$message.text = state.$dictionary.error && state.$dictionary.error.connection ?
-        state.$dictionary.error.connection : error.message
+      state.$message.text = TMLanguage.get('error.connection')
+      // state.$message.text = state.$dictionary.error && state.$dictionary.error.connection ?
+      //   state.$dictionary.error.connection : error.message
       if (!error.response) {
         console.log(error.message) // Network Error
       } else if (error.response.status === 401) {
         this.dispatch('auth/signOut')
-        state.$message.text = state.$dictionary.auth && state.$dictionary.auth.msg_err_expired ?
-          state.$dictionary.auth.msg_err_expired :
-          error.response ? error.response.statusText : error
+        state.$message.text = TMLanguage.get('auth.msg_err_expired')
+        // state.$message.text = state.$dictionary.auth && state.$dictionary.auth.msg_err_expired ?
+        //   state.$dictionary.auth.msg_err_expired :
+        //   error.response ? error.response.statusText : error
         console.log(error.response.statusText)
       }
       state.$message.color = 'danger'
       state.$message.show = true
     },
     SET_LANGUAGE(state, data) {
-      state.$language = data ? data : state.$language_def
+      state.$language = data // ? data : state.$language_def
     },
-    SET_LANGUAGES(state, data) {
+    SET_DICTIONARY(state, data) {
       state.$dictionary = data
     }
   }, // Mutations
@@ -171,35 +177,46 @@ export default new Vuex.Store({
     async setLanguage({ commit, state }) {
       // Data Items
       state.$loadingApp = true
-      let lang_data = {}
-      commit('SET_LANGUAGE', state.$language)
-      // commit('SET_LANGUAGES', lang_data)
-      await vnptbkn().get(`dictionary/GetByLanguage/${state.$language}`).then(function (res) {
-        if (res.status == 200) {
-          _languages.SetLanguage(state.$language)
-          if (res.data.data) {
-            res.data.data.forEach(e => {
-              if (!lang_data[e.module_code] || lang_data[e.module_code] === undefined) lang_data[e.module_code] = {}
-              Object.assign(lang_data[e.module_code], JSON.parse(`{"${e.key}":"${e.value}"}`))
-            });
-            commit('SET_LANGUAGES', lang_data)
-            // state.$dictionary = _languages.GetDictionary()
-            _languages.SetDictionary(lang_data).then(state.$loadingApp = false)
-          }
-        } else commit('SET_CATCH', null)
-      })
-        .catch(function (error) { commit('SET_CATCH', error) })
+      // let lang_data = {}
+      state.$loadingApp = false
+      // commit('SET_LANGUAGE', state.$language)
+      // TMLanguage.SetLanguage(state.$language)
+
+      // async setLanguage({ commit, state }) {
+      //   // Data Items
+      //   state.$loadingApp = true
+      //   let lang_data = {}
+      //   commit('SET_LANGUAGE', state.$language)
+      //   // commit('SET_DICTIONARY', lang_data)
+      //   await vnptbkn().get(`dictionary/GetByLanguage/${state.$language}`).then(function (res) {
+      //     if (res.status == 200) {
+      //       TMLanguage.SetLanguage(state.$language)
+      //       if (res.data.data) {
+      //         res.data.data.forEach(e => {
+      //           if (!lang_data[e.module_code] || lang_data[e.module_code] === undefined) lang_data[e.module_code] = {}
+      //           Object.assign(lang_data[e.module_code], JSON.parse(`{"${e.key}":"${e.value}"}`))
+      //         });
+      //         commit('SET_DICTIONARY', lang_data)
+      //         // state.$dictionary = TMLanguage.GetDictionary()
+      //         TMLanguage.SetDictionary(lang_data)// .then(state.$loadingApp = false)
+      //       }
+      //     } else commit('SET_CATCH', null)
+      //   }).catch((err) => {
+      //     commit('SET_CATCH', err)
+      //   }).finally(() => {
+      //     state.$loadingApp = false
+      //   })
 
       // Data Json
       // commit('SET_LANGUAGE', state.$language)
       // await vnptbkn().get(`dictionary/getlang/${state.$language}`).then(function(res) {
       //     if (res.status == 200) {
       //       let lang_data = ''
-      //       _languages.SetLanguage(state.$language)
+      //       TMLanguage.SetLanguage(state.$language)
       //       if (res.data.data && res.data.data.length > 0)
       //         lang_data = res.data.data[0].lang_data
-      //       _languages.SetDictionary(lang_data)
-      //       state.$dictionary = _languages.GetDictionary()
+      //       TMLanguage.SetDictionary(lang_data)
+      //       state.$dictionary = TMLanguage.GetDictionary()
       //     } else commit('SET_CATCH', null)
       //   })
       //   .catch(function(error) { commit('SET_CATCH', error) })
@@ -207,9 +224,9 @@ export default new Vuex.Store({
       // Json File
       // await vnptbkn().get(`../Languages/${state.$language}.json`).then(function(res) {
       //     if (res.status == 200) {
-      //       commit('SET_LANGUAGES', res.data)
-      //       _languages.SetLanguage(state.$language)
-      //       _languages.SetDictionary(JSON.stringify(res.data))
+      //       commit('SET_DICTIONARY', res.data)
+      //       TMLanguage.SetLanguage(state.$language)
+      //       TMLanguage.SetDictionary(JSON.stringify(res.data))
       //     } else commit('SET_CATCH', null)
       //   })
       //   .catch(function(error) { commit('SET_CATCH', error) })
