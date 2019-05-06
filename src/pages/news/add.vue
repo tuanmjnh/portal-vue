@@ -173,7 +173,7 @@ export default {
       return this.$store.state.news.item
     },
     category() {
-      return this.$store.getters['category/getAll'].map(x => ({ id: x.id.toString(), title: x.title }))
+      return this.$store.state.category.items.map(x => ({ id: x.id.toString(), title: x.title }))
     }
   },
   watch: {

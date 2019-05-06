@@ -12,8 +12,8 @@
     "reset_password": "Xác nhận mật khẩu",
     "title": "Đăng nhập hệ thống",
     "username": "Tài khoản",
-    "hit_pass":"Mật khẩu hệ thống PTTB",
-    "hit_username":"Tài khoản hệ thống PTTB"
+    "hit_pass": "Mật khẩu hệ thống PTTB",
+    "hit_username": "Tài khoản hệ thống PTTB"
   },
   "category": {
     "app_key": "Loại danh mục",
@@ -52,9 +52,10 @@
     "ten_loaihd": "Loại hợp đồng",
     "ten_loaikh": "Loại khách hàng",
     "ten_tb": "Tên TB",
-    "title": "Danh sách hợp đồng khách hàng cá nhân",
+    "title": "Danh sách hợp đồng trên PTTB đã scan",
     "upload_btn": "Ấn vào đây để chọn hợp đồng",
-    "use": "Hợp đồng hiện hữu"
+    "use": "Hợp đồng hiện hữu",
+    "hit_import": "Nhập Mã GD, Mã HD, Mã KH, Mã TB, Số GT"
   },
   "error": {
     "between": "Dữ liệu phải trong khoảng từ %s - đến %s",
@@ -146,7 +147,10 @@
     "use": "Sử dụng",
     "used": "Đã sử dụng",
     "using": "Đang sử dụng",
-    "yes": "Có"
+    "yes": "Có",
+    "start_at": "Từ ngày",
+    "end_at": "Đến ngày",
+    "format": "Định dạng"
   },
   "languages": { "err_exist": "Mã ngôn ngữ tồn tại!", "title": "Tên ngôn ngữ" },
   "messages": {

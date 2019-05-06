@@ -29,13 +29,13 @@
     "deleted": "Contract canceled",
     "details": "Contract details",
     "diachi_kh": "Customer address",
-    "diachi_tb": "TB Address",
-    "hokhau": "Ho khau",
+    "diachi_tb": "Subscriber address",
+    "hokhau": "Household",
     "loaihinh_tb": "Type",
     "ma_gd": "Transaction code",
     "ma_hd": "Contract code",
     "ma_kh": "Customer code",
-    "ma_tb": "TB code",
+    "ma_tb": "Subscriber code",
     "msg_err_exist": "The contract already exists!",
     "msg_err_not_exist": "The contract does not exist or is incomplete!",
     "mst": "Tax code",
@@ -51,10 +51,11 @@
     "ten_kh": "Customer name",
     "ten_loaihd": "Contract type",
     "ten_loaikh": "Customer type",
-    "ten_tb": "TB name",
-    "title": "List of individual customer contracts",
+    "ten_tb": "Subscriber name",
+    "title": "Contract list on PTTB scanned",
     "upload_btn": "Click here to select a contract",
-    "use": "Existing contract"
+    "use": "Existing contract",
+    "hit_import": "Typing GD, HD, KH, TB, GT"
   },
   "error": {
     "between": "Data must be between% s - and% s",
@@ -106,7 +107,7 @@
     "language": "Language",
     "languages": "Languages",
     "list": "List",
-    "local": "Unit",
+    "local": "Local",
     "main_info": "Main information",
     "message": "Notice",
     "navigation_main": "Main path",
@@ -146,7 +147,10 @@
     "use": "Use",
     "used": "Used",
     "using": "Using",
-    "yes": "Yes"
+    "yes": "Yes",
+    "start_at": "Start date",
+    "end_at": "End date",
+    "format": "Format"
   },
   "languages": {
     "err_exist": "Existing language code!",

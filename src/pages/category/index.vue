@@ -19,7 +19,7 @@ export default {
   }),
   beforeCreate() {
     // if (this.$store.state.navigation.isGetFirst) 
-    this.$store.dispatch('category/select')
+    // this.$store.dispatch('category/select')
     if (this.$store.state.app_key.items.length < 1)
       this.$store.dispatch('app_key/select')
   }

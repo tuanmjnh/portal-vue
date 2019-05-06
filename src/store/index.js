@@ -76,47 +76,51 @@ export default new Vuex.Store({
   }, // State
   getters: {
     languages: state => key => {
-      if (!key || key.length < 1) return
-      // console.log(key)
-      // const _key = key.toLowerCase().split('|') //.split('.')
-      if (typeof key === 'string') key = [key]
-      var regx = /:([^"]+)/g
-      let rs = ''
-      for (let index = 0; index < key.length; index++) {
-        if (!state.$dictionary) return key[index]
-        const e = key[index].toLowerCase().split('.')
-        if (e.length < 2) {
-          const e0 = e[0].split(':')
-          if (!state.$dictionary[e0[0]]) rs += key[index]
-          else rs += (index > 0 ? state.$dictionary[e0[0]].toLowerCaseFirst() : state.$dictionary[e0[0]])
-          if (e0.length > 1) rs = rs.format(e0[1])
-        } else if (e.length < 3) {
-          const e1 = e[1].split(':')
-          // if (e1.length > 1) e[1] = e1[0]
-          if (!state.$dictionary[e[0]] || !state.$dictionary[e[0]][e1[0]]) rs += key[index]
-          else rs += (index > 0 ? state.$dictionary[e[0]][e1[0]].toLowerCaseFirst() : state.$dictionary[e[0]][e1[0]])
-          if (e1.length > 1) rs = rs.format(e1[1].split(','), 'ff')
-        }
-        // if (regx.exec(key[index])) 
-        // regx.exec(key[index])[1].forEach(element => {
-
-        // });
-        // if (regx.exec(key[index])) {
-        //   rs = rs.format(regx.exec(key[index])[1].split(','))
-        // }
-      }
-      // _key.forEach(e => {
-      //   const _tmp = e.split('.')
-      //   if (_tmp.length < 2) {
-      //     if (!state.$dictionary[_tmp[0]]) rs += e
-      //     else rs += state.$dictionary[_tmp[0]]
-      //   } else if (_tmp.length < 3) {
-      //     if (!state.$dictionary[_tmp[0]][_tmp[1]]) rs += e
-      //     else rs += state.$dictionary[_tmp[0]][_tmp[1]]
-      //   }
-      // });
-      return rs
+      return TMLanguage.get(key)
     }
+    // languages: state => key => {
+    //   if (!key || key.length < 1) return
+    //   // console.log(key)
+    //   // const _key = key.toLowerCase().split('|') //.split('.')
+    //   if (typeof key === 'string') key = [key]
+    //   var regx = /:([^"]+)/g
+    //   let rs = ''
+    //   for (let index = 0; index < key.length; index++) {
+    //     if (!state.$dictionary) return key[index]
+    //     const e = key[index].toLowerCase().split('.')
+    //     if (e.length < 2) {
+    //       const e0 = e[0].split(':')
+    //       if (!state.$dictionary[e0[0]]) rs += key[index]
+    //       else rs += (index > 0 ? state.$dictionary[e0[0]].toLowerCaseFirst() : state.$dictionary[e0[0]])
+    //       if (e0.length > 1) rs = rs.format(e0[1])
+    //     } else if (e.length < 3) {
+    //       const e1 = e[1].split(':')
+    //       // if (e1.length > 1) e[1] = e1[0]
+    //       if (!state.$dictionary[e[0]] || !state.$dictionary[e[0]][e1[0]]) rs += key[index]
+    //       else rs += (index > 0 ? state.$dictionary[e[0]][e1[0]].toLowerCaseFirst() : state.$dictionary[e[0]][e1[0]])
+    //       if (e1.length > 1) rs = rs.format(e1[1].split(','), 'ff')
+    //     }
+    //     // if (regx.exec(key[index])) 
+    //     // regx.exec(key[index])[1].forEach(element => {
+
+    //     // });
+    //     // if (regx.exec(key[index])) {
+    //     //   rs = rs.format(regx.exec(key[index])[1].split(','))
+    //     // }
+    //   }
+
+    // _key.forEach(e => {
+    //   const _tmp = e.split('.')
+    //   if (_tmp.length < 2) {
+    //     if (!state.$dictionary[_tmp[0]]) rs += e
+    //     else rs += state.$dictionary[_tmp[0]]
+    //   } else if (_tmp.length < 3) {
+    //     if (!state.$dictionary[_tmp[0]][_tmp[1]]) rs += e
+    //     else rs += state.$dictionary[_tmp[0]][_tmp[1]]
+    //   }
+    // });
+    // return rs
+    // }
     // languages: state => key => {
     //   const _key = key.split('.')
     //   if (!state.$dictionary[_key[0]]) return key

@@ -8,17 +8,6 @@ export default {
     selected: [],
     dialog: false,
     isGetFirst: true,
-    totalItems: 0,
-    pagination: {
-      search: '',
-      sortBy: 'title',
-      descending: false,
-      toggle: 0,
-      flag: 1,
-      page: 1,
-      rowsPerPage: 10,
-      app_key: 'guide'
-    },
     default: {
       id: 0,
       app_key: 'news',
@@ -116,11 +105,11 @@ export default {
     }
   },
   actions: {
-    async select({ commit, rootGetters, state, rootState }, isExport = false, pagination = null, loading = true) {
+    async select({ commit, rootGetters, state, rootState }, params) {
       // Loading
-      if (loading) rootState.$loadingGet = true
+      if (params.loading) rootState.$loadingGet = true
       // http
-      return await vnptbkn().get(collection, { params: pagination ? pagination : { ...state.pagination, ...{ isExport: isExport } } }).then(function (res) {
+      return await vnptbkn().get(collection, { params: params }).then(function (res) {
         if (res.status === 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -130,13 +119,18 @@ export default {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
             return
           }
-          if (res.data.data) commit('SET_ITEMS', res.data.data)
-          if (res.data.total) state.totalItems = res.data.total
-          return res.data.data
+          if (params.is_export) {
+            if (res.data.data.length < 1)
+              commit('SET_MESSAGE', { text: rootGetters.languages('error.no_data'), color: 'warning' }, { root: true })
+            return res.data.data
+          } else {
+            if (res.data.data) commit('SET_ITEMS', res.data.data)
+            return res.data
+          }
         } else commit('SET_CATCH', null, { root: true })
       }).catch((error) => { commit('SET_CATCH', error, { root: true }) }).finally(() => {
         state.isGetFirst = false
-        if (loading) rootState.$loadingGet = false
+        if (params.loading) rootState.$loadingGet = false
       })
     },
     async insert({ commit, state, rootGetters, rootState }, loading = true) {

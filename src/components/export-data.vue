@@ -58,11 +58,10 @@ export default {
       csvContent += [
         `"${Object.keys(data[0]).join('","')}"`,
         ...data.map(item => `"${Object.values(item).join('","')}"`)
-      ].join('\n').replace(/(^\[)|(\]$)/gm, '')
-      // const data = encodeURI(csvContent)
+      ].join('\r\n').replace(/(^\[)|(\]$)/gm, '')
       var BOM = '\uFEFF'
-      var csv = BOM + csvContent
-      var blob = new Blob([csv], { type: 'text/csvcharset=utf-8' })
+      var csv = BOM + csvContent // encodeURI(csvContent)
+      var blob = new Blob([csv], { type: 'text/plain;charset=utf-8' }) //  'text/csvcharset=utf-8'
       var csvUrl = window.webkitURL.createObjectURL(blob)
       const link = document.createElement('a')
       link.setAttribute('href', csvUrl)

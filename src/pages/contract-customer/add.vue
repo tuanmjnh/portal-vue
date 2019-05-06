@@ -21,7 +21,7 @@
                 <v-layout wrap class="pt-2">
                   <v-flex xs12 sm6 md4>
                     <v-text-field v-model.trim="khachhang.ma_gd" :label="$languages.get('contract_customer.ma_gd')"
-                      class="text-color-initial" :persistent-hint="true" hint="Nhập Mã GD, Mã HD, Mã KH, Mã TB, Số GT"
+                      class="text-color-initial" :persistent-hint="true" :hint="$languages.get('contract_customer.hit_import')"
                       v-on:keyup.enter="getContract" :disabled="khachhang.id?true:false"
                       :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
                   </v-flex>

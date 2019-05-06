@@ -1,13 +1,14 @@
 <template>
   <v-app>
-    <template-snackbar></template-snackbar>
+    <tpl-snackbar />
     <div class="mid-center" v-if="$store.state.$loadingApp">
       <v-progress-circular :size="130" :width="10" color="primary" indeterminate></v-progress-circular>
     </div>
     <template v-else>
-      <template-main v-if="$store.state.auth.isAuth"></template-main>
-      <template-auth v-else></template-auth>
+      <tpl-main v-if="$store.state.auth.isAuth" />
+      <tpl-auth v-else />
     </template>
+    <!-- <tpl-test /> -->
   </v-app>
 </template>
 
@@ -15,15 +16,17 @@
 import snackbar from './components/snackbar'
 import auth from './layouts/vuetify/auth'
 import main from './layouts/vuetify/main'
+// import test from './layouts/vuetify/test'
 import * as _store from './plugins/storage'
 // import * as _languages from '@/plugins/languages'
 import * as storageAuth from './plugins/storage-auth'
 export default {
   name: 'App',
   components: {
-    'template-snackbar': snackbar,
-    'template-main': main,
-    'template-auth': auth
+    'tpl-snackbar': snackbar,
+    'tpl-main': main,
+    'tpl-auth': auth,
+    // 'tpl-test': test
   },
   // data: () => ({}),
   beforeCreate() {

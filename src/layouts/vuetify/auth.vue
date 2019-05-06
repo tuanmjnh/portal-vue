@@ -7,9 +7,7 @@
         <v-card>
           <!-- <v-img src="https://cdn.vuetifyjs.com/images/cards/desert.jpg" aspect-ratio="2.75"></v-img> -->
           <v-card-title primary-title>
-            <div>
-              <h3 class="headline mb-0">{{$languages.get('auth.title')}}</h3>
-            </div>
+            <h3 class="headline mb-0">{{$languages.get('auth.title')}}</h3>
           </v-card-title>
           <v-card-text>
             <v-container grid-list-md>
@@ -55,7 +53,6 @@ export default {
   beforeCreate() {
     this.$store.commit('auth/SET_ITEM')
     // this.$store.dispatch('TEST')
-    // console.log(this.$languages.all)
   },
   computed: {
     item() {

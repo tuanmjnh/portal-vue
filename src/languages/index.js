@@ -10,9 +10,11 @@ const current = function () {
     return _store.Get('language')
 }
 const getValue = function (data, items, i = 0) {
-    if (i < items.length)
+    if (i < items.length) {
+        if (!data[items[i]]) return items.join('.')
         return getValue(data[items[i]], items, i + 1)
-    return data
+    }
+    return data ? data : items.join('.')
 }
 export default {
     current: current(),
@@ -33,8 +35,16 @@ export default {
     },
     // all: data[current()],
     get: (val) => {
+        if (!val) return val
         const rs = data[current()]
-        if (rs) return getValue(data[current()], val.trim().split('.'))
-        else return val
+        if (!rs) return val
+        if (Array.isArray(val)) {
+            let rs = ''
+            val.forEach(e => {
+                if (!e) rs += e
+                else rs += getValue(data[current()], e.split('.'))
+            })
+            return rs
+        } else return getValue(data[current()], val.split('.'))
     }
 }

@@ -5,24 +5,23 @@
     <v-card-text class="p-0">
       <v-form v-model="valid" ref="form">
         <v-container grid-list-md>
-          <v-layout wrap v-if="$store.state.kehoach.import_tb.nhomkh_id<1&&attach_upload.files.length<1">
-            <v-flex xs6 sm6 md6 v-if="$store.state.kehoach.import_tb.success||$store.state.kehoach.import_tb.error.length>0">
-              Nhập thành công: <b class="success--text">{{$store.state.kehoach.import_tb.success}}</b>
+          <v-layout wrap v-if="params.nhomkh_id<1&&attach_upload.files.length<1">
+            <v-flex xs6 sm6 md6 v-if="params.success||params.error.length>0">
+              Nhập thành công: <b class="success--text">{{params.success}}</b>
               thuê bao
               <br />
-              Lỗi dữ liệu nhập : <b class="error--text">{{$store.state.kehoach.import_tb.error.length}}</b>
+              Lỗi dữ liệu nhập : <b class="error--text">{{params.error.length}}</b>
               thuê bao
             </v-flex>
-            <v-flex xs6 sm6 md6 v-if="$store.state.kehoach.import_tb.error.length>0">
+            <v-flex xs6 sm6 md6 v-if="params.error.length>0">
               <export-data :getData="getErrorExport" tooltip="Tải danh sách lỗi" color="error"
                 filename="import_error" :items="[{title:`${$languages.get('global.export')} .csv`,type:'csv'}]" />
             </v-flex>
           </v-layout>
           <v-layout wrap>
             <v-flex xs12 sm6 md6>
-              <v-radio-group v-model="$store.state.kehoach.import_tb.nhomkh_id" column
-                :rules="[v=>!!v||$languages.get('error.required_select')]"
-                @click="getNhomKHAttach()">
+              <v-radio-group v-model="params.nhomkh_id" column @click="getNhomKHAttach()"
+                :rules="[v=>!!v||$languages.get('error.required_select')]">
                 <v-radio :key="index" v-for="(item,index) in nhom_kh" :label="item.title"
                   :value="item.id"></v-radio>
               </v-radio-group>
@@ -31,41 +30,43 @@
               <!-- class="text-sm-right" -->
               <v-layout wrap>
                 <v-flex xs12 sm12 md12>
-                  <v-select :items="donvi" v-model="$store.state.kehoach.import_tb.donvi_id"
-                    :hide-selected="true" item-text="ten_dv" item-value="donvi_id" :label="$languages.get('global.local')"></v-select>
+                  <v-select :items="donvi" v-model="params.donvi_id" :hide-selected="true"
+                    item-text="ten_dv" item-value="donvi_id" :label="$languages.get('global.local')"
+                    :rules="[v=>!!v||$languages.get('error.required_select')]"></v-select>
                 </v-flex>
                 <v-flex xs12 sm6 md6>
                   <v-menu v-model="date_picker.menu" :nudge-right="40" lazy transition="scale-transition"
                     offset-y full-width min-width="290px">
                     <template v-slot:activator="{on}">
                       <v-text-field :value="datePickerFormat()" label="Tháng bắt đầu"
-                        prepend-icon="event" readonly v-on="on" persistent-hint hint="Định dạng: MM/YYYY"></v-text-field>
+                        prepend-icon="event" :disabled="true" readonly v-on="on"
+                        persistent-hint hint="Định dạng: MM/YYYY"></v-text-field>
                     </template>
                     <v-date-picker v-model="date_picker.date" @input="menu2=false"></v-date-picker>
                   </v-menu>
                 </v-flex>
                 <v-flex xs12 sm6 md6 class="pb-3">
                   <v-text-field :value="datePickerFormat()" label="Tháng kết thúc"
-                    prepend-icon="event" :disabled="true" persistent-hint hint="Định dạng: MM/YYYY"></v-text-field>
+                    prepend-icon="event" :disabled="true" readonly persistent-hint hint="Định dạng: MM/YYYY"></v-text-field>
                 </v-flex>
-                <v-flex xs12 sm12 md12 v-if="$store.state.kehoach.import_tb.nhomkh_attach">
+                <v-flex xs12 sm12 md12 v-if="params.nhomkh_attach">
                   Tệp dữ liệu mẫu:
                   <v-tooltip bottom>
-                    <a :href="`${http.defaults.host}/${$store.state.kehoach.import_tb.nhomkh_attach}`"
-                      slot="activator" class="mx-0 theme--info" target="_blank">template</a>
+                    <a :href="`${http.defaults.host}/${params.nhomkh_attach}`" slot="activator"
+                      class="mx-0 theme--info" target="_blank">template</a>
                     <!-- <i class="material-icons">attachment</i> -->
-                    <span>{{$store.state.kehoach.import_tb.nhomkh_attach.split('/').pop()}}</span>
+                    <span>{{params.nhomkh_attach.split('/').pop()}}</span>
                   </v-tooltip>
                 </v-flex>
               </v-layout>
             </v-flex>
             <!-- <v-flex xs12 sm6 md6>
-              <v-text-field v-model.trim="$store.state.kehoach.import_tb.file_name" label="Tệp dữ liệu"
+              <v-text-field v-model.trim="params.file_name" label="Tệp dữ liệu"
                 :disabled="true" class="text-color-initial" :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
             </v-flex> -->
             <v-flex xs12 sm6 md6 class="hide">
-              <v-text-field v-model="$store.state.kehoach.import_tb.file_name" :disabled="true"
-                class="text-color-initial" :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
+              <v-text-field v-model="params.file_name" :disabled="true" class="text-color-initial"
+                :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
             </v-flex>
             <v-flex xs12 sm12 md12 v-if="attach_upload.files.length>0">
               <p style="position:relative;top:13px;">
@@ -74,7 +75,7 @@
                   target="_blank">{{attach_upload.files[0].name}}</a>
               </p>
             </v-flex>
-            <v-flex xs12 sm6 md6>
+            <v-flex xs12 sm6 md6 v-if="params.nhomkh_id>0">
               <upload-files :http="http" :autoName="false" :buttonUse="false" :multiple="false"
                 extension=".csv" :files.sync="attach_upload.files" :loading.sync="attach_upload.loading"
                 :buttonText="$languages.get('global.upload_drag')" :basePath="attach_upload.basePath"></upload-files>
@@ -107,17 +108,28 @@ export default {
   data: () => ({
     http: vnptbkn(),
     valid: false,
-    date_picker: {
-      menu: false,
-      format: 'MM/YYYY',
-      date: new Date().toISOString().substr(0, 10),
-    },
     groups: [],
     attach_nhomkh: '',
     attach_upload: {
       files: [],
       basePath: 'Uploads/KeHoach',
       loading: false//true
+    },
+    date_picker: {
+      menu: false,
+      format: 'MM/YYYY',
+      date: new Date().toISOString().substr(0, 10),
+    },
+    params: {
+      loading: true,
+      donvi_id: 0,
+      nhomkh_id: 0,
+      nhomkh_attach: '',
+      file_name: '',
+      file_upload: '',
+      thang_bd: 0,
+      success: '',
+      error: []
     },
   }),
   computed: {
@@ -127,19 +139,16 @@ export default {
     nhom_kh() {
       return this.$store.getters['kehoach/getNhomKH'] // this.$store.state.kehoach.nhom_kh
     },
-    import_tb() {
-      return this.$store.state.kehoach.import_tb
-    },
     dateFormat() {
-      return this.$store.state.kehoach.import_tb.start_at.formatDate('MM/YYYY')
+      return this.params.start_at.formatDate('MM/YYYY')
     }
   },
   watch: {
     attach_upload: {
       handler(val) {
         if (val.files.length > 0) {
-          this.$store.state.kehoach.import_tb.file_name = val.files[0].name
-          this.$store.state.kehoach.import_tb.file_upload = `${this.attach_upload.basePath}/${val.files[0].name}`
+          this.params.file_name = val.files[0].name
+          this.params.file_upload = `${this.attach_upload.basePath}/${val.files[0].name}`
         }
       },
       deep: true
@@ -148,26 +157,36 @@ export default {
   methods: {
     onSave() {
       if (this.valid) {
-        this.$store.state.kehoach.import_tb.thang_bd = this.date_picker.date.formatDate('YYYYMM')
-        this.$store.dispatch('kehoach/import_tb').then(() => { this.reset() })
+        this.params.thang_bd = this.date_picker.date.formatDate('YYYYMM')
+        this.$store.dispatch('kehoach/import_tb', this.params).then((x) => {
+          if (x) {
+            this.params.success = x.success
+            this.params.error = x.error
+          }
+          this.reset()
+        })
       }
     },
     getErrorExport() {
       return new Promise((resolve, reject) => {
-        resolve(this.$store.state.kehoach.import_tb.error)
+        resolve(this.params.error)
       })
     },
     datePickerFormat() {
       return this.date_picker.date.formatDate('MM/YYYY')
     },
     getNhomKHAttach() {
-      var x = this.nhom_kh.find((x) => { return x.id === this.$store.state.kehoach.import_tb.nhomkh_id })
+      var x = this.nhom_kh.find((x) => { return x.id === this.params.nhomkh_id })
       if (x && x.attach)
-        this.$store.state.kehoach.import_tb.nhomkh_attach = x.attach
+        this.params.nhomkh_attach = x.attach
       else
-        this.$store.state.kehoach.import_tb.nhomkh_attach = ''
+        this.params.nhomkh_attach = ''
     },
     reset() {
+      this.params.nhomkh_id = 0
+      this.params.donvi_id = 0
+      this.params.file_name = ''
+      this.params.file_upload = ''
       this.attach_upload.files = []
       this.$refs.form.resetValidation()
     }

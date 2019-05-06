@@ -20,8 +20,8 @@
                 offset-y full-width min-width="290px">
                 <template v-slot:activator="{on}">
                   <v-text-field :value="pagination.start_at.formatDate('DD/MM/YYYY')"
-                    label="Từ ngày" prepend-icon="event" readonly v-on="on"
-                    persistent-hint hint="Định dạng: DD/MM/YYYY"></v-text-field>
+                    :label="$languages.get('global.start_at')" prepend-icon="event"
+                    readonly v-on="on" persistent-hint :hint="`${$languages.get('global.format')}: DD/MM/YYYY`"></v-text-field>
                 </template>
                 <v-date-picker v-model="pagination.start_at" @input="menu2=false"></v-date-picker>
               </v-menu>
@@ -30,8 +30,9 @@
               <v-menu v-model="end_at_menu" :nudge-right="40" lazy transition="scale-transition"
                 offset-y full-width min-width="290px">
                 <template v-slot:activator="{on}">
-                  <v-text-field :value="pagination.end_at.formatDate('DD/MM/YYYY')" label="Đến ngày"
-                    prepend-icon="event" readonly v-on="on" persistent-hint hint="Định dạng: DD/MM/YYYY"></v-text-field>
+                  <v-text-field :value="pagination.end_at.formatDate('DD/MM/YYYY')"
+                    :label="$languages.get('global.end_at')" prepend-icon="event"
+                    readonly v-on="on" persistent-hint :hint="`${$languages.get('global.format')}: DD/MM/YYYY`"></v-text-field>
                 </template>
                 <v-date-picker v-model="pagination.end_at" @input="menu2=false"></v-date-picker>
               </v-menu>
@@ -49,19 +50,19 @@
     </v-dialog>
     <v-card>
       <v-card-title>
-        <span class="title">Danh sách hợp đồng trên PTTB đã scan</span>
+        <span class="title">{{$languages.get('contract_customer.title')}}</span>
         <v-spacer></v-spacer>
-        <v-tooltip bottom>
-          <v-btn slot="activator" flat icon color="primary" @click="dialogFilter=true">
-            <v-icon>filter_list</v-icon>
-          </v-btn>
-          <span>{{$languages.get('global.filter_data')}}</span>
-        </v-tooltip>
         <v-tooltip bottom>
           <v-btn slot="activator" color="primary" small fab flat @click="$store.state.contract_customer.dialog=true">
             <i class="material-icons">add</i>
           </v-btn>
           <span>{{$languages.get('contract_customer.add')}}</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <v-btn slot="activator" flat icon color="primary" @click="dialogFilter=true">
+            <v-icon>filter_list</v-icon>
+          </v-btn>
+          <span>{{$languages.get('global.filter_data')}}</span>
         </v-tooltip>
         <!-- <v-btn-toggle v-model="toggle" mandatory>
           <v-tooltip bottom>
@@ -158,6 +159,7 @@ export default {
       { text: '#', value: '#', sortable: false }
     ],
     pagination: {
+      loading: true,
       search: '',
       sortBy: 'created_at',
       descending: true,
@@ -168,7 +170,7 @@ export default {
       end_at: new Date().toISOString().substr(0, 10),
       // filter: { flag: 1, donvi_id: 0 },
       page: 1,
-      rowsPerPage: 10
+      rowsPerPage: 8
     },
   }),
   mounted() {
@@ -196,11 +198,8 @@ export default {
     pagination: {
       handler(val) {
         // if (!this.$store.state.$loadingGet)
-        this.$store.dispatch('contract_customer/select', {
-          loading: true,
-          pagination: this.pagination
-        }).then((x) => {
-          this.totalItems = x.total
+        this.$store.dispatch('contract_customer/select', this.pagination).then((x) => {
+          if (x && x.total) this.totalItems = x.total
         })
       },
       deep: true
@@ -226,10 +225,14 @@ export default {
       return this.start_at.date.formatDate('MM/YYYY')
     },
     getDataExport() {
-      return this.$store.dispatch('contract_customer/export_contract', {
-        loading: true,
-        pagination: this.pagination
-      })
+      let params = { ...this.pagination }
+      params.sortBy = 'created_at'
+      params.loading = true
+      params.is_export = true
+      return this.$store.dispatch('contract_customer/select', params)
+    },
+    getHeaderText(val) {
+      return this.$languages.get(val)
     }
   }
 }

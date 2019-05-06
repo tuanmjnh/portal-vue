@@ -199,6 +199,7 @@ export default {
       }
     ],
     pagination: {
+      loading: true,
       search: '',
       sortBy: 'donvi_id,nhom_kh,thang_bd,id',
       descending: false,
@@ -255,14 +256,9 @@ export default {
   watch: {
     pagination: {
       handler(val) {
-        this.$store.dispatch('kehoach/select_th',
-          {
-            pagination: this.pagination,
-            totalItems: this.totalItems,
-            loading: true
-          }).then((x) => {
-            if (x && x.total) this.totalItems = x.total
-          })
+        this.$store.dispatch('kehoach/select_th', this.pagination).then((x) => {
+          if (x && x.total) this.totalItems = x.total
+        })
       },
       deep: true
     },
@@ -300,7 +296,7 @@ export default {
       params.sortBy = 'ten_dv,title,thang_bd'
       params.loading = true
       params.isExport = true
-      return this.$store.dispatch('kehoach/export_data_th', params)
+      return this.$store.dispatch('kehoach/select_th', params)
     }
   }
 }
