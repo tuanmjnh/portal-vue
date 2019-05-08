@@ -8,6 +8,8 @@ import App from './App.vue'
 // window.$ = $;
 // // Storage
 // import * as Storage from './plugins/storage'
+// dataType
+// import dataType from './plugins/data-type'
 // Helpers
 import helpers from './plugins/helpers'
 // Local IP

@@ -7,17 +7,17 @@
         </v-card-title>
         <v-card-text>
           <v-layout wrap>
-            <v-flex xs12 sm12 md12 v-if="this.$store.getters['auth/inRoles']('donvi.select')">
+            <v-flex xs12 sm12 md12 v-if="$store.getters['auth/inRoles']('donvi.select')">
               <v-select :items="donvi" v-model="pagination.donvi_id" :hide-selected="true"
                 item-text="ten_dv" item-value="donvi_id" :label="$languages.get('global.local')"></v-select>
+            </v-flex>
+            <v-flex xs12 sm12 md12 v-if="$store.getters['auth/inRoles']('kehoach.update')">
+              <v-select :items="nguoidung" v-model="pagination.ma_nd" item-value="ma_nd"
+                item-text="ten_nd_dv" :hide-selected="true" label="Nhân viên"></v-select>
             </v-flex>
             <v-flex xs12 sm12 md12>
               <v-select :items="nhom_kh" v-model="pagination.nhomkh_id" :hide-selected="true"
                 item-text="title" item-value="id" label="Nhóm kế hoạch"></v-select>
-            </v-flex>
-            <v-flex xs12 sm12 md12 v-if="this.$store.getters['auth/inRoles']('kehoach.select')">
-              <v-select :items="nguoidung" v-model="pagination.ma_nd" item-value="ma_nd"
-                item-text="ten_nd_dv" :hide-selected="true" label="Nhân viên"></v-select>
             </v-flex>
             <v-flex xs12 sm12 md12>
               <v-text-field v-model="pagination.search" append-icon="search" :label="$languages.get('global.search')"
@@ -147,18 +147,6 @@
                 </v-btn>
                 <span>Xác nhận</span>
               </v-tooltip>
-              <!-- <v-tooltip bottom v-if="$store.state.kehoach.pagination.flag===1">
-                <v-btn flat icon slot="activator" color="error" class="mx-0" @click="onDelete(props.item)">
-                  <v-icon>delete</v-icon>
-                </v-btn>
-                <span>{{$languages.get('global.delete')}}</span>
-              </v-tooltip>
-              <v-tooltip bottom v-else>
-                <v-btn flat icon slot="activator" color="info" class="mx-0" @click="onDelete(props.item)">
-                  <v-icon>refresh</v-icon>
-                </v-btn>
-                <span>{{$languages.get('global.recover')}}</span>
-              </v-tooltip> -->
             </td>
           </tr>
         </template>
@@ -223,6 +211,7 @@ export default {
   }),
   created() {
     this.$store.dispatch('kehoach/GetNguoidung', { loading: false, donvi_id: this.pagination.donvi_id })
+    console.log(this.$store.getters['auth/inRoles']('kehoach.update'))
   },
   mounted() {
     this.headers.forEach(e => { e.text = this.$languages.get(e.text) })

@@ -25,6 +25,7 @@
   // "javascript.format.insertSpaceAfterKeywordsInControlFlowStatements": false,
   // "javascript.format.insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces": false,
   // "javascript.format.insertSpaceAfterSemicolonInForStatements": false,
+  "javascript.format.insertSpaceAfterFunctionKeywordForAnonymousFunctions": false,
   // "beautify.config": {
   //   "brace_style": "none",
   //   "indent_size": 2,

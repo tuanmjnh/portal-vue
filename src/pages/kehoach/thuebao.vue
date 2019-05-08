@@ -11,16 +11,17 @@
               <v-text-field v-model="pagination.search" append-icon="search" :label="$store.getters.languages('global.search')"
                 single-line hide-details></v-text-field>
             </v-flex>
-            <v-flex xs12 sm12 md12 v-if="this.$store.getters['auth/inRoles']('donvi.select')">
-              <v-select :items="donvi" v-model="pagination.donvi_id" item-text="ten_dv"
+            <v-flex xs12 sm12 md12 v-if="$store.getters['auth/inRoles']('donvi.select')">
+              <v-select :items="donvi" v-model="pagination.donvi_id" multiple item-text="ten_dv"
                 item-value="donvi_id" :label="$store.getters.languages('global.local')"></v-select>
             </v-flex>
-            <v-flex xs12 sm12 md12>
-              <v-select :items="nhom_kh" v-model="pagination.nhomkh_id" item-text="title"
-                item-value="id" label="Nhóm kế hoạch"></v-select>
+            <v-flex xs12 sm12 md12 v-if="$store.getters['auth/inRoles']('kehoach.update')">
+              <v-select :items="pagination_nguoidung" v-model="pagination.ma_nd" multiple
+                label="Thuê bao theo nhân viên"></v-select>
             </v-flex>
             <v-flex xs12 sm12 md12>
-              <v-select :items="pagination_nguoidung" v-model="pagination.ma_nd" label="Thuê bao theo nhân viên"></v-select>
+              <v-select :items="nhom_kh" v-model="pagination.nhomkh_id" multiple
+                item-text="title" item-value="id" label="Nhóm kế hoạch"></v-select>
             </v-flex>
           </v-layout>
         </v-card-text>
@@ -67,12 +68,25 @@
               </v-flex>
             </v-layout>
           </v-card-text>
-          <!-- <v-divider></v-divider>
-          <v-card-text>
-            Danh sách thuê bao:
-            <export-data :getData="getThueBaoExport" tooltip="Tải danh sách thuê bao"
-              color="success" filename="import_error" :items="[{title:`${$languages.get('global.export')} .csv`,type:'csv'}]" />
-          </v-card-text> -->
+          <v-divider v-if="params_import.total>0"></v-divider>
+          <v-card-text v-if="params_import.total>0">
+            <v-layout wrap>
+              <v-flex xs12 sm6 md6>
+                Tổng số: <b class="primary--text">{{params_import.total}}</b> thuê bao<br />
+                Thành công: <b class="success--text">{{params_import.success}}</b> thuê
+                bao
+                <br />
+                Lỗi cập nhật: <b class="danger--text">{{params_import.error.length}}</b>
+                thuê bao<br />
+              </v-flex>
+              <v-flex xs12 sm6 md6 v-if="params_import.error.length>0">
+                Tệp dữ liệu lỗi:
+                <export-data :getData="getDataErrorExport" filename="loi_capnhat_nhanvien"
+                  :suffixFileName="true" :tooltip="$store.getters.languages('global.export')"
+                  color="danger" :items="[{title:$store.getters.languages(['global.export',' ',' .csv']),type:'csv'}]" />
+              </v-flex>
+            </v-layout>
+          </v-card-text>
           <v-divider></v-divider>
           <v-card-text>
             <v-flex xs12 sm12 md12>
@@ -80,7 +94,7 @@
               Bước 2: Nhập mã thuê bao, mã nhân viên vào tệp <br />
               Bước 2: Chọn tệp đã cập nhật tải lên hệ thống <br />
             </v-flex>
-            <v-flex xs12 sm12 md12><br/></v-flex>
+            <v-flex xs12 sm12 md12><br /></v-flex>
             <v-flex xs12 sm12 md12 v-if="attach_upload.files.length>0">
               <p style="position:relative;top:13px;">
                 Tệp đã tải lên:
@@ -100,7 +114,8 @@
             <!-- <v-btn color="primary" flat @click.native="onSave">
                 {{$store.getters.languages('global.accept')}}
               </v-btn> -->
-            <v-btn slot="activator" color="primary" flat @click.native="onUpdateND()">
+            <v-btn slot="activator" color="primary" flat @click.native="onUpdateND()"
+              :loading="$store.state.$loadingCommit">
               Cập nhật
             </v-btn>
             <v-btn slot="activator" color="secondary" flat @click.native="dialog_import=false">
@@ -110,8 +125,51 @@
         </v-card>
       </v-form>
     </v-dialog>
+    <v-dialog v-model="dialog_thuchien" max-width="521px" persistent>
+      <v-card>
+        <v-card-title class="headline grey lighten-2">
+          Xác nhận thực hiện
+        </v-card-title>
+        <v-card-text>
+          <v-layout wrap>
+            <v-form v-model="valid" ref="form">
+              <v-layout wrap>
+                <v-flex xs12 sm12 md12>
+                  <v-radio-group v-model="item.ket_qua" :column="false" :rules="[v=>v>1||$languages.get('error.required_select')]">
+                    <v-radio :key="index" v-for="(item,index) in ket_qua" :label="item.label"
+                      :color="item.color" :value="item.value"></v-radio>
+                  </v-radio-group>
+                </v-flex>
+              </v-layout>
+              <v-divider></v-divider>
+              <v-layout wrap>
+                <v-flex xs12 sm12 md12>
+                  <v-textarea v-model="item.ghichu" color="teal">
+                    <template v-slot:label>
+                      <div>
+                        Ghi chú
+                      </div>
+                    </template>
+                  </v-textarea>
+                </v-flex>
+              </v-layout>
+            </v-form>
+          </v-layout>
+        </v-card-text>
+        <v-divider></v-divider>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <!-- <v-btn color="primary" flat @click.native="onSave">
+                {{$store.getters.languages('global.accept')}}
+              </v-btn> -->
+          <v-btn color="primary" flat @click.native="dialog_thuchien=false">
+            {{$store.getters.languages('global.back')}}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-card>
-      <v-form v-model="valid" ref="form">
+      <v-form v-model="valid" ref="form" v-if="$store.getters['auth/inRoles']('kehoach.update')">
         <v-card-title>
           <v-layout wrap>
             <v-flex xs12 sm5 md5>
@@ -157,7 +215,6 @@
         select-all item-key="id" :headers="headers" :items="items" :rows-per-page-items="[10, 25, 50, 100, 200, 500]"
         :rows-per-page-text="$store.getters.languages('global.rows_per_page')"
         :pagination.sync="pagination" :loading="$store.state.$loadingGet" :total-items="totalItems">
-        <!--:loading="loading" :pagination.sync="pagination" :total-items="totalItems" -->
         <template slot="items" slot-scope="props">
           <tr>
             <td>
@@ -167,6 +224,14 @@
             <td>{{ props.item.ten_tb }}</td>
             <td>{{ props.item.so_dt }}</td>
             <td>{{ props.item.ma_nd }}</td>
+            <td class="justify-center layout px-0">
+              <v-tooltip bottom>
+                <v-btn flat icon slot="activator" color="teal" class="mx-0" @click="onEdit(props.item)">
+                  <v-icon>offline_pin</v-icon>
+                </v-btn>
+                <span>Xác nhận</span>
+              </v-tooltip>
+            </td>
           </tr>
         </template>
       </v-data-table>
@@ -193,6 +258,7 @@ export default {
     dialog_confirm: false,
     dialog_filter: false,
     dialog_import: false,
+    dialog_thuchien: false,
     valid: false,
     valid_import: false,
     totalItems: 0,
@@ -205,15 +271,16 @@ export default {
       flag: 1,
       page: 1,
       rowsPerPage: 10,
-      donvi_id: 5588,
-      nhomkh_id: 702,
-      ma_nd: ''
+      donvi_id: [5588],
+      nhomkh_id: [702],
+      ma_nd: ['']
     },
     headers: [
       { text: 'Mã TB', value: 'ma_tb', align: 'left' },
       { text: 'Tên TB', value: 'ten_tb' },
       { text: 'Số ĐT', value: 'so_dt' },
       { text: 'Mã NV', value: 'ma_nd' },
+      { text: '#', value: '#', sortable: false },
       // { text: 'Tháng BĐ', value: 'thang_bd' },
       // { text: 'Tháng KT', value: 'thang_kt' },
       // { text: '#', value: '#', sortable: false },
@@ -229,6 +296,9 @@ export default {
       file_name: '',
       file_upload: '',
       nhomkh_attach: '',
+      total: 0,
+      success: 0,
+      error: []
     }
   }),
   created() {
@@ -288,7 +358,18 @@ export default {
         if (val.files.length > 0) {
           this.params_import.file_name = val.files[0].name
           this.params_import.file_upload = `${this.attach_upload.basePath}/${val.files[0].name}`
+          //
+          this.params_import.total = 0
+          this.params_import.success = 0
+          this.params_import.error = []
         }
+      },
+      deep: true
+    },
+    dialog_import: {
+      handler(val) {
+        this.attach_upload.files = []
+        this.reset()
       },
       deep: true
     }
@@ -315,7 +396,11 @@ export default {
     },
     onUpdateND() {
       if (this.valid_import) {
-        this.$store.dispatch('kehoach/updateND', this.params_import)
+        this.$store.dispatch('kehoach/updateND', this.params_import).then((x) => {
+          this.params_import.total = x.total
+          this.params_import.success = x.success
+          this.params_import.error = x.error
+        })
       }
     },
     getNhomKHAttach() {
@@ -332,8 +417,15 @@ export default {
       params.is_export = true
       return this.$store.dispatch('kehoach/select_tb', params)
     },
-    getThueBaoExport() {
-
+    getDataErrorExport() {
+      return new Promise((resolve, reject) => {
+        resolve(this.params_import.error)
+      })
+    },
+    reset() {
+      this.params_import.total = 0
+      this.params_import.success = 0
+      this.params_import.error = []
     }
   }
 }

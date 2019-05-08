@@ -178,7 +178,8 @@
     "permissions": "Cấp phép",
     "profile": "Hồ sơ",
     "roles": "Quyền",
-    "title": "Tên module"
+    "title": "Tên module",
+    "setting": "Cài đặt"
   },
   "navigation": {
     "category": "Danh mục",

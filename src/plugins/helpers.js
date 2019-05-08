@@ -355,20 +355,6 @@ Array.prototype.getRule = function (element, prefix = 'error') {
   const rs = this.filter(e => e.field === element)
   return rs.length > 0 ? (prefix ? `${prefix}.${rs[0].rule}` : rs[0].rule) : null
 };
-// Array.prototype.toQueryString = function() {
-//   let $this = this
-//   let rs = '?'
-//   if (!$this) return ''
-//   console.log($this)
-//   Object.keys($this).forEach(function(key, index) {
-//     if (typeof $this[key] === 'object') {
-//       if ($this[key].name) rs += `${$this[key].name}=${$this[key].value}&`
-//     } else {
-//       if ($this[key].toString().length > 0) rs += `${key}=${$this[key]}&`
-//     }
-//   })
-//   return rs.substr(0, rs.length - 1)
-// }
 // Object.prototype.isEmpty = function() {
 //   for (let key in this) {
 //     if (this.hasOwnProperty(key))

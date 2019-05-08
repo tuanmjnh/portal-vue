@@ -4,12 +4,12 @@
       <v-card-title>
         <v-layout wrap class="pt-2">
           <v-flex xs6 sm3 md3 class="mr-3">
-            <v-select :items="donvi" v-model="$store.state.nguoidung.donvi_id"
-              :hide-selected="true" item-text="ten_dv" item-value="donvi_id" :label="$store.getters.languages('global.local')"></v-select>
+            <v-select :items="donvi" v-model="pagination.donvi_id" multiple item-text="ten_dv"
+              item-value="donvi_id" :label="$store.getters.languages('global.local')"></v-select>
           </v-flex>
           <v-flex xs6 sm5 md5>
-            <v-text-field v-model="$store.state.nguoidung.pagination.search" append-icon="search"
-              :label="$store.getters.languages('global.search')" single-line hide-details></v-text-field>
+            <v-text-field v-model="pagination.search" append-icon="search" :label="$store.getters.languages('global.search')"
+              single-line hide-details></v-text-field>
           </v-flex>
           <v-spacer></v-spacer>
           <v-tooltip bottom>
@@ -18,13 +18,13 @@
             </v-btn>
             <span>{{$store.getters.languages('nguoidung.set_roles')}}</span>
           </v-tooltip>
-          <!-- <v-tooltip bottom v-if="$store.state.nguoidung.selected.length>0 && $store.state.nguoidung.pagination.find.trangthai===1">
+          <!-- <v-tooltip bottom v-if="$store.state.nguoidung.selected.length>0 && pagination.find.trangthai===1">
             <v-btn flat icon slot="activator" color="danger" @click="onDelete()">
               <v-icon>delete</v-icon>
             </v-btn>
             <span>{{$store.getters.languages('global.delete_selected')}}</span>
           </v-tooltip>
-          <v-tooltip bottom v-if="$store.state.nguoidung.selected.length>0 && $store.state.nguoidung.pagination.find.trangthai===0">
+          <v-tooltip bottom v-if="$store.state.nguoidung.selected.length>0 && pagination.find.trangthai===0">
             <v-btn flat icon slot="activator" color="info" @click="onDelete()">
               <v-icon>refresh</v-icon>
             </v-btn>
@@ -33,24 +33,24 @@
         </v-layout>
         <!-- <v-btn-toggle v-model="toggle_one" mandatory>
           <v-tooltip bottom>
-            <v-btn slot="activator" flat @click="$store.state.nguoidung.pagination.find.trangthai=1">
+            <v-btn slot="activator" flat @click="pagination.find.trangthai=1">
               <v-icon>view_list</v-icon>
             </v-btn>
             <span>{{$store.getters.languages('global.using')}}</span>
           </v-tooltip>
           <v-tooltip bottom>
-            <v-btn slot="activator" flat @click="$store.state.nguoidung.pagination.find.trangthai=0">
+            <v-btn slot="activator" flat @click="pagination.find.trangthai=0">
               <v-icon>delete</v-icon>
             </v-btn>
             <span>{{$store.getters.languages('global.deleted')}}</span>
           </v-tooltip>
         </v-btn-toggle> -->
       </v-card-title>
-      <v-data-table class="elevation-1" v-model="$store.state.nguoidung.selected"
-        item-key="nguoidung_id" :headers="$store.getters['nguoidung/headers']" :items="items"
-        :rows-per-page-items="$store.state.$row_per_page" :rows-per-page-text="$store.getters.languages('global.rows_per_page')"
-        :pagination.sync="$store.state.nguoidung.pagination" :search="$store.state.nguoidung.pagination.search">
-        <!--:loading="loading" :total-items="totalItems" -->
+      <v-data-table class="elevation-1" v-model="selected" item-key="nguoidung_id"
+        :headers="headers" :items="items" :total-items="totalItems" :pagination.sync="pagination"
+        :rows-per-page-items="[10, 25, 50, 100, 200, 500]" :rows-per-page-text="$languages.get('global.rows_per_page')"
+        :loading="$store.state.$loadingGet" :no-data-text="$languages.get('global.no_data_text')"
+        :no-results-text="$languages.get('global.no_results_text')">
         <template slot="items" slot-scope="props">
           <tr>
             <td>{{ props.item.ma_nd }}</td>
@@ -58,11 +58,10 @@
             <td>{{ props.item.so_dt }}</td>
             <td>{{ props.item.email }}</td>
             <td>
-              <v-chip small :color="getColor(props.item,'cover')" :text-color="getColor(props.item,'text')">
-                {{
+              <v-chip small :color="props.item.color?props.item.color.cover:''"
+                :text-color="props.item.color?props.item.color.text:''">{{
                 props.item.roles_name?props.item.roles_name:$store.getters.languages('global.undefined')
-                }}
-              </v-chip>
+                }}</v-chip>
             </td>
             <td class="justify-center layout px-0">
               <v-tooltip bottom>
@@ -77,7 +76,7 @@
                 </v-btn>
                 <span>{{$store.getters.languages('global.edit')}}</span>
               </v-tooltip>
-              <v-tooltip bottom v-if="$store.state.nguoidung.pagination.find.trangthai===1">
+              <v-tooltip bottom v-if="pagination.find.trangthai===1">
                 <v-btn flat icon slot="activator" color="error" class="mx-0" @click="onDelete(props.item)">
                   <v-icon>delete</v-icon>
                 </v-btn>
@@ -94,10 +93,9 @@
         </template>
       </v-data-table>
     </v-card>
-    <tpl-confirm :dialog.sync="$store.state.nguoidung.confirm" @onAccept="onCFMAccept"
-      @onCancel="onCFMCancel" :title="$store.getters.languages('global.message')"
-      :content="$store.getters.languages('messages.confirm_content')" :btnAcceptText="$store.getters.languages('global.accept')"
-      :btnCancelText="$store.getters.languages('global.cancel')" />
+    <tpl-confirm :dialog.sync="dialog_confirm" @onAccept="onCFMAccept" @onCancel="onCFMCancel"
+      :title="$store.getters.languages('global.message')" :content="$store.getters.languages('messages.confirm_content')"
+      :btnAcceptText="$store.getters.languages('global.accept')" :btnCancelText="$store.getters.languages('global.cancel')" />
   </div>
 </template>
 
@@ -105,35 +103,71 @@
 import confirm from '@/components/confirm'
 export default {
   components: { 'tpl-confirm': confirm },
+  data: () => ({
+    dialog_confirm: false,
+    totalItems: 0,
+    selected: [],
+    pagination: {
+      loading: true,
+      search: '',
+      sortBy: 'donvi_id,ma_nd',
+      descending: false,
+      toggle: 0,
+      flag: 1,
+      page: 1,
+      rowsPerPage: 10,
+      donvi_id: [5588],
+    },
+    headers: [
+      { text: 'nguoidung.username', value: 'ma_nd' },
+      { text: 'nguoidung.full_name', value: 'ten_nd' },
+      { text: 'nguoidung.mobile', value: 'so_dt' },
+      { text: 'nguoidung.email', value: 'email' },
+      { text: 'global.roles', value: 'roles_name' },
+      { text: '#', value: '#', sortable: false }
+    ]
+  }),
+  mounted() {
+    this.headers.forEach(e => { e.text = this.$languages.get(e.text) })
+  },
   computed: {
     items() {
-      var rs = this.$store.getters['nguoidung/getFilterDonvi']//({ find: { trangthai: 1, donvi_id: this.$store.state.nguoidung.donvi_id } })
-      //console.log(rs)
-      return rs
+      // var rs = this.$store.getters['nguoidung/getFilterDonvi']//({ find: { trangthai: 1, donvi_id: this.$store.state.nguoidung.donvi_id } })
+      return this.$store.state.nguoidung.items// this.$store.getters['nguoidung/getAll']
     },
     donvi() {
-      var rs = this.$store.getters['donvi/getFilter']({ sortBy: 'ma_dvi' })
-      return [...[{ donvi_id: 0, ten_dv: this.$store.getters.languages('global.select_all') }], ...rs] //.unshift({ donvi_id: 0, ten_donvi: '-- Tất cả --' })
+      return this.$store.getters['donvi/getFilter']({ sortBy: 'ma_dvi' })
+      // return [...[{ donvi_id: 0, ten_dv: this.$store.getters.languages('global.select_all') }], ...rs] //.unshift({ donvi_id: 0, ten_donvi: '-- Tất cả --' })
+    }
+  },
+  watch: {
+    pagination: {
+      handler(val) {
+        this.$store.dispatch('nguoidung/select', this.pagination).then((x) => {
+          if (x && x.total) this.totalItems = x.total
+        })
+      },
+      deep: true
     }
   },
   methods: {
     changePassword(item) {
-      this.$store.state.nguoidung.confirm = true
-      if (item) this.$store.state.nguoidung.selected.push(item);
+      this.dialog_confirm = true
+      if (item) this.selected.push(item);
     },
     onEdit(item) {
       this.$store.commit('nguoidung/SET_ITEM', item)
       this.$store.state.nguoidung.dialog = true
     },
     onDelete(item) {
-      this.$store.state.nguoidung.confirm = true
-      if (item) this.$store.state.nguoidung.selected.push(item);
+      this.dialog_confirm = true
+      if (item) this.selected.push(item);
     },
     onCFMAccept() {
       this.$store.dispatch('nguoidung/reset_password')
     },
     onCFMCancel() {
-      this.$store.state.nguoidung.selected = []
+      this.selected = []
     },
     getColor(item, element) {
       if (item) {

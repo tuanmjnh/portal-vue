@@ -181,7 +181,8 @@
     "permissions": "Licensing",
     "profile": "Profile",
     "roles": "Permissions",
-    "title": "Module name"
+    "title": "Module name",
+    "setting": "Settings"
   },
   "navigation": {
     "category": "Category",

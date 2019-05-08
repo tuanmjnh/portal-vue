@@ -1,5 +1,5 @@
 <template>
-    <v-dialog v-model="$store.state.nguoidung.dialog" max-width="1024px" persistent>
+  <v-dialog v-model="$store.state.nguoidung.dialog" max-width="1024px" persistent>
     <v-card>
       <v-card-title class="headline grey lighten-2">
         {{ item.id ?
@@ -7,9 +7,9 @@
         $store.getters.languages('global.add') }}
       </v-card-title>
       <v-card-text class="p-0">
-        <v-form v-model="$store.state.nguoidung.valid" ref="form">
+        <v-form v-model="valid" ref="form">
           <v-container grid-list-md>
-            <v-tabs v-model="$store.state.nguoidung.tabs" color="secondary" dark>
+            <v-tabs v-model="tabs" color="secondary" dark>
               <v-tab>{{$store.getters.languages('global.main_info')}}</v-tab>
               <v-tab>{{$store.getters.languages('global.note')}}</v-tab>
               <v-tab-item>
@@ -73,7 +73,7 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" flat @click.native="onSave" :disabled="!$store.state.nguoidung.valid"
+        <v-btn color="primary" flat @click.native="onSave" :disabled="!valid"
           :loading="$store.state.$loadingCommit">
           {{$store.getters.languages('global.update')}}
         </v-btn>
@@ -96,6 +96,8 @@ export default {
     'vue-quill-editor': quillEditor,
   },
   data: () => ({
+    valid: false,
+    tabs: null,
     repassword: '',
   }),
   created() {
@@ -122,7 +124,7 @@ export default {
   },
   methods: {
     onSave() {
-      if (this.$store.state.nguoidung.valid) {
+      if (this.valid) {
         if (this.item.id) this.$store.dispatch('nguoidung/update')
         else this.$store.dispatch('nguoidung/insert')
       }

@@ -93,7 +93,7 @@
       </v-data-table>
       <!-- </v-form> -->
     </v-card>
-    <tpl-confirm :dialog="confirm" @onAccept="onCFMAccept" @onCancel="onCFMCancel" :title="$languages.get('global.message')"
+    <tpl-confirm :dialog="dialog_confirm" @onAccept="onCFMAccept" @onCancel="onCFMCancel" :title="$languages.get('global.message')"
       :content="$languages.get('messages.confirm_content')" :btnAcceptText="$languages.get('global.accept')"
       :btnCancelText="$languages.get('global.cancel')"></tpl-confirm>
   </div>
@@ -108,7 +108,7 @@ export default {
     'export-data': exportData
   },
   data: () => ({
-    confirm: false,
+    dialog_confirm: false,
     totalItems: 0,
     pagination: {
       loading: true,
@@ -157,7 +157,7 @@ export default {
       this.$store.state.category.dialog = true
     },
     onDelete(item) {
-      this.confirm = true
+      this.dialog_confirm = true
       if (item) this.$store.state.category.selected.push(item);
     },
     onCFMAccept() {

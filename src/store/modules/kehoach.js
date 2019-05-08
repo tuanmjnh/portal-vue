@@ -1,4 +1,5 @@
 import { vnptbkn } from '@/plugins/axios-config'
+import QueryString from '@/plugins/query-string'
 const collection = 'kehoach'
 export default {
   namespaced: true,
@@ -67,7 +68,7 @@ export default {
       // Loading
       if (params.loading) rootState.$loadingGet = true
       // http
-      return await vnptbkn().get(collection, { params: params }).then(function (res) {
+      return await vnptbkn().get(collection + QueryString.get(params)).then(function(res) {
         if (res.status === 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -97,7 +98,7 @@ export default {
       // Loading
       if (params.loading) rootState.$loadingGet = true
       // http
-      return await vnptbkn().get(`${collection}/GetThucHienTB`, { params: params }).then(function (res) {
+      return await vnptbkn().get(`${collection}/GetThucHienTB`, { params: params }).then(function(res) {
         if (res.status === 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -126,7 +127,7 @@ export default {
       // Loading
       if (params.loading) rootState.$loadingGet = true
       // http
-      return await vnptbkn().get(`${collection}/GetNguoidung/${params.donvi_id}`).then(function (res) {
+      return await vnptbkn().get(`${collection}/GetNguoidung/${QueryString.get(params)}`).then(function(res) {
         if (res.status === 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -155,7 +156,7 @@ export default {
       // Loading
       if (params.loading) rootState.$loadingCommit = true
       // http
-      return await vnptbkn().post(collection, params).then(function (res) {
+      return await vnptbkn().post(collection, params).then(function(res) {
         if (res.status == 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -188,7 +189,7 @@ export default {
       // Loading
       if (params.loading) rootState.$loadingCommit = true
       // http
-      await vnptbkn().post(`${collection}/GanThueBaoTH/${state.thuebao_nguoidung.nguoidung_id}`, state.selected_tb).then(function (res) {
+      await vnptbkn().post(`${collection}/GanThueBaoTH/${state.thuebao_nguoidung.nguoidung_id}`, state.selected_tb).then(function(res) {
         if (res.status == 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -217,7 +218,7 @@ export default {
       // Loading
       if (params.loading) rootState.$loadingCommit = true
       // http
-      await vnptbkn().post(`${collection}/GanThueBaoTH/${state.thuebao_nguoidung.nguoidung_id}`, state.selected_th).then(function (res) {
+      await vnptbkn().post(`${collection}/GanThueBaoTH/${state.thuebao_nguoidung.nguoidung_id}`, state.selected_th).then(function(res) {
         if (res.status == 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -246,7 +247,7 @@ export default {
       // Loading
       if (params.loading) rootState.$loadingCommit = true
       // http
-      return await vnptbkn().post(`${collection}/UpdateND`, params).then(function (res) {
+      return await vnptbkn().post(`${collection}/UpdateND`, params).then(function(res) {
         if (res.status == 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -257,6 +258,7 @@ export default {
             return
           }
           // Success
+          commit('SET_MESSAGE', { text: rootGetters.languages('success.update'), color: res.data.msg }, { root: true })
           return res.data
         } else commit('SET_CATCH', null, { root: true })
       }).catch((error) => {
@@ -272,7 +274,7 @@ export default {
       // http
       state.item.updated_by = vnptbkn().defaults.headers.Author
       state.item.updated_at = new Date()
-      await vnptbkn().put(collection, state.item).then(function (res) {
+      await vnptbkn().put(collection, state.item).then(function(res) {
         if (res.status == 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -297,7 +299,7 @@ export default {
       if (loading) rootState.$loadingCommit = true
       // http
       const data = state.selected.map(x => ({ id: x.id, flag: x.flag === 0 ? 1 : 0 }))
-      await vnptbkn().put(collection + '/delete', data).then(function (res) {
+      await vnptbkn().put(collection + '/delete', data).then(function(res) {
         if (res.status == 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -324,7 +326,7 @@ export default {
       // Loading
       if (loading) rootState.$loadingCommit = true
       // http
-      await vnptbkn().delete(collection, state.item).then(function (res) {
+      await vnptbkn().delete(collection, state.item).then(function(res) {
         if (res.status == 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })

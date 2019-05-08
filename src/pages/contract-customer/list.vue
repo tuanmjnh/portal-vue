@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="dialogFilter" max-width="512px" persistent>
+    <v-dialog v-model="dialog_filter" max-width="512px" persistent>
       <v-card>
         <v-card-title class="headline grey lighten-2">
           {{$languages.get('global.filter_data')}}
@@ -42,7 +42,7 @@
         <v-divider></v-divider>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="primary" flat @click.native="dialogFilter=false">
+          <v-btn color="primary" flat @click.native="dialog_filter=false">
             {{$languages.get('global.back')}}
           </v-btn>
         </v-card-actions>
@@ -59,7 +59,7 @@
           <span>{{$languages.get('contract_customer.add')}}</span>
         </v-tooltip>
         <v-tooltip bottom>
-          <v-btn slot="activator" flat icon color="primary" @click="dialogFilter=true">
+          <v-btn slot="activator" flat icon color="primary" @click="dialog_filter=true">
             <v-icon>filter_list</v-icon>
           </v-btn>
           <span>{{$languages.get('global.filter_data')}}</span>
@@ -145,15 +145,15 @@ export default {
   },
   props: { http: null },
   data: () => ({
-    dialogFilter: false,
+    dialog_filter: false,
     toggle: 0,
     totalItems: 0,
     start_at_menu: false,
     end_at_menu: false,
     headers: [
-      { text: 'contract_customer.contract_code', value: 'contract_code' },
-      { text: 'contract_customer.customer_name', value: 'customer_name' },
-      { text: 'nguoidung.mobile', value: 'customer_phone' },
+      { text: 'contract_customer.contract_code', value: 'ma_gd' },
+      { text: 'contract_customer.customer_name', value: 'ten_kh' },
+      { text: 'nguoidung.mobile', value: 'so_dt' },
       { text: 'global.created_by', value: 'created_by' },
       { text: 'global.created_at', value: 'created_at' },
       { text: '#', value: '#', sortable: false }
@@ -166,8 +166,8 @@ export default {
       toggle: 0,
       flag: 1,
       donvi_id: 0,
-      start_at: new Date().toISOString().substr(0, 10),
-      end_at: new Date().toISOString().substr(0, 10),
+      start_at: '',//new Date().toISOString().substr(0, 10),
+      end_at: '',//new Date().toISOString().substr(0, 10),
       // filter: { flag: 1, donvi_id: 0 },
       page: 1,
       rowsPerPage: 8
