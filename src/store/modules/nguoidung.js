@@ -53,11 +53,11 @@ export default {
       else rs = rs.sortByKey(state.pagination.sortBy)
       return rs
     },
-    getFilterDonvi: state => {
-      if (state.donvi_id > 0)
-        return state.items.filterValue({ ...state.pagination.find, ...{ donvi_id: state.donvi_id } })
-      else
-        return state.items.filterValue(state.pagination.find)
+    getFilterDonvi: state => pagination => {
+      return state.items.filter((x) => {
+        console.log(x)
+        return pagination.donvi_id.indexOf(x.donvi_id) > -1
+      }).map((x) => ({ value: x.ma_nd, text: x.ten_nd_dv }))
     },
     headers: (state, getters, rootState, rootGetters) => {
       state.headers.forEach(e => { e.text = rootGetters.languages(e.text) })

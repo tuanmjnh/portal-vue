@@ -3,44 +3,52 @@
     <v-card>
       <v-card-title class="headline grey lighten-2">
         {{ item.id ?
-        $store.getters.languages('global.details') :
-        $store.getters.languages('global.add') }}
+        $languages.get('global.details') :
+        $languages.get('global.add') }}
       </v-card-title>
       <v-card-text class="p-0">
         <v-form v-model="$store.state.roles.valid" ref="form">
           <v-container grid-list-md>
             <v-tabs v-model="$store.state.roles.tabs" color="secondary" dark>
-              <v-tab>{{$store.getters.languages('global.main_info')}}</v-tab>
-              <v-tab>{{$store.getters.languages('global.roles')}}</v-tab>
-              <v-tab>{{$store.getters.languages('global.note')}}</v-tab>
+              <v-tab>{{$languages.get('global.main_info')}}</v-tab>
+              <v-tab>{{$languages.get('global.roles')}}</v-tab>
+              <v-tab>{{$languages.get('global.note')}}</v-tab>
               <v-tab-item>
                 <v-layout wrap class="pt-2">
                   <v-flex xs12 sm6 md6>
-                    <v-text-field v-model.trim="item.name" :rules="[v=>!!v||$store.getters.languages('error.required')]"
-                      :label="$store.getters.languages('roles.name')"></v-text-field>
+                    <v-text-field v-model.trim="item.name" :rules="[v=>!!v||$languages.get('error.required')]"
+                      :label="$languages.get('roles.name')"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field v-model.trim="item.code" :rules="[v=>!!v||$languages.get('error.required')]"
+                      :label="$languages.get('global.code')"></v-text-field>
                   </v-flex>
                   <!-- <v-flex xs12 md6 sm6>
                     <v-select :items="permissions" v-model="$store.state.roles.roles_selected"
                       multiple :menu-props="{ maxHeight: '400' }" item-text="title"
-                      item-value="code" :label="$store.getters.languages('permissions.title'])"
-                      persistent-hint :hint="$store.getters.languages('permissions.select'])"
-                      :rules="[v => v.length>0 || $store.getters.languages('error.required_select'])]"></v-select>
+                      item-value="code" :label="$languages.get('permissions.title'])"
+                      persistent-hint :hint="$languages.get('permissions.select'])"
+                      :rules="[v => v.length>0 || $languages.get('error.required_select'])]"></v-select>
                   </v-flex> -->
-                  <v-flex xs6 sm3 md3>
-                    <v-text-field type="number" v-model.trim="item.orders" :label="$store.getters.languages('global.orders')"
-                      :rules="[v=>!!v||$store.getters.languages('error.required')]"></v-text-field>
+                  <v-flex xs6 sm2 md2>
+                    <v-text-field type="number" v-model.trim="item.levels" :label="$languages.get('global.levels')"
+                      :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
                   </v-flex>
-                  <v-flex xs6 sm3 md3>
-                    <v-switch color="primary" :label="item.flag===1?$store.getters.languages('global.show'):$store.getters.languages('global.hide')"
+                  <v-flex xs6 sm2 md2>
+                    <v-text-field type="number" v-model.trim="item.orders" :label="$languages.get('global.orders')"
+                      :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
+                  </v-flex>
+                  <v-flex xs6 sm8 md8>
+                    <v-switch color="primary" :label="item.flag===1?$languages.get('global.show'):$languages.get('global.hide')"
                       :true-value="1" :false-value="0" v-model.number="item.flag"></v-switch>
                   </v-flex>
                   <v-flex xs6 sm4 md4>
-                    <v-text-field v-model.trim="$store.state.roles.color.cover" :label="$store.getters.languages('global.color_cover')"
-                      :rules="[v=>!!v||$store.getters.languages('error.required')]"></v-text-field>
+                    <v-text-field v-model.trim="$store.state.roles.color.cover" :label="$languages.get('global.color_cover')"
+                      :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs6 sm4 md4>
-                    <v-text-field v-model.trim="$store.state.roles.color.text" :label="$store.getters.languages('global.color_text')"
-                      :rules="[v=>!!v||$store.getters.languages('error.required')]"></v-text-field>
+                    <v-text-field v-model.trim="$store.state.roles.color.text" :label="$languages.get('global.color_text')"
+                      :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs6 sm4 md4 class="mt-3">
                     <v-chip small :color="$store.state.roles.color.cover" :text-color="$store.state.roles.color.text">{{item.name}}</v-chip>
@@ -55,8 +63,8 @@
                     <table class="v-datatable v-table theme--light custom-v-checkbox">
                       <thead>
                         <tr>
-                          <th class="column text-xs-left">{{$store.getters.languages('roles.name')}}</th>
-                          <th class="column text-xs-left">{{$store.getters.languages('roles.code')}}</th>
+                          <th class="column text-xs-left">{{$languages.get('roles.name')}}</th>
+                          <th class="column text-xs-left">{{$languages.get('roles.code')}}</th>
                           <th class="column text-xs-left" v-for="(item,index) in permissions"
                             :key="index">
                             <v-checkbox :label="$store.getters.languages(`roles.${item.code}`)"
@@ -92,11 +100,11 @@
         <v-spacer></v-spacer>
         <v-btn color="primary" flat @click.native="onSave" :disabled="!$store.state.roles.valid"
           :loading="$store.state.$loadingCommit">
-          {{$store.getters.languages('global.update')}}
+          {{$languages.get('global.update')}}
         </v-btn>
         <v-btn color="secondary" flat @click.native="$store.state.roles.dialog=false"
           :disabled="$store.state.$loadingCommit">
-          {{$store.getters.languages('global.back')}}
+          {{$languages.get('global.back')}}
         </v-btn>
       </v-card-actions>
     </v-card>

@@ -4,11 +4,12 @@ const collection = 'kehoach'
 export default {
   namespaced: true,
   state: {
+    item: {},
     kehoach_tb: [],
     kehoach_th: [],
     nhom_kh: [],
     nguoidung: [],
-    item: {},
+    kehoach_extra: {},
     selected_tb: [],
     selected_th: {},
     dialog: false,
@@ -33,6 +34,11 @@ export default {
       else rs = rs.sortByKey(state.pagination.sortBy)
       return rs
     },
+    getFilterDonvi: state => pagination => {
+      return state.nguoidung.filter((x) => {
+        return pagination.donvi_id.indexOf(x.donvi_id) > -1
+      })
+    },
   },
   mutations: {
     SET_ITEMS(state, items) {
@@ -40,11 +46,7 @@ export default {
       // console.log(state.items)
     },
     SET_ITEM(state, item) {
-      if (item) {
-        if (item.url_plus) state.url_plus = JSON.parse(item.url_plus)
-        else state.url_plus = { push: '', go: '', store: '' }
-        state.item = { ...item }
-      } else state.item = { ...state.default }
+      state.item = item
     },
     SET_ITEM_ID(state, id) {
       if (id) {
@@ -139,12 +141,41 @@ export default {
           }
           if (res.data.data) {
             state.nguoidung = res.data.data.sortByKey('donvi_id')
-            state.nguoidung.forEach(e => {
-              e.ten_nd_dv = `${e.ten_nd} - ${e.ma_nd} - ${e.ma_dv}`
-            })
+            // state.nguoidung.forEach(e => {
+            //   e.ten_nd_dv = `${e.ten_nd} - ${e.ma_nd} - ${e.ma_dv}`
+            // })
           }
           else state.nguoidung = []
           return state.nguoidung
+        } else commit('SET_CATCH', null, { root: true })
+      }).catch((error) => {
+        commit('SET_CATCH', error, { root: true })
+      }).finally(() => {
+        if (params.loading) rootState.$loadingGet = false
+      })
+    },
+    async GetLyDo({ commit, state, rootGetters, rootState }, params) {
+      // Loading
+      if (params.loading) rootState.$loadingGet = true
+      // http
+      return await vnptbkn().get(`${collection}/GetLyDo/${params.nhomkh_id}`).then(function(res) {
+        if (res.status === 200) {
+          if (res.data.msg === 'error_token') {
+            commit('SET_CATCH', { response: { status: 401 } }, { root: true })
+            return
+          }
+          if (res.data.msg === 'danger') {
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            return
+          }
+          if (res.data.data) {
+            state.kehoach_extra.lydo = res.data.data.filter((x) => { return x.app_key === 'lydo' })
+            state.kehoach_extra.goicuoc = res.data.data.filter((x) => { return x.app_key === 'goicuoc' })
+          }
+          else {
+            state.kehoach_extra = { lydo: [], goicuoc: [] }
+          }
+          return state.kehoach_extra
         } else commit('SET_CATCH', null, { root: true })
       }).catch((error) => {
         commit('SET_CATCH', error, { root: true })
@@ -258,6 +289,37 @@ export default {
             return
           }
           // Success
+          commit('SET_MESSAGE', { text: rootGetters.languages('success.update'), color: res.data.msg }, { root: true })
+          return res.data
+        } else commit('SET_CATCH', null, { root: true })
+      }).catch((error) => {
+        commit('SET_CATCH', error, { root: true })
+      }).finally(() => {
+        state.selected_th = []
+        if (params.loading) rootState.$loadingCommit = false
+      })
+    },
+    async Thuchien({ commit, state, rootGetters, rootState }, params) {
+      // Loading
+      if (params.loading) rootState.$loadingCommit = true
+      // http
+      return await vnptbkn().post(`${collection}/Thuchien`, params).then(function(res) {
+        if (res.status == 200) {
+          if (res.data.msg === 'error_token') {
+            commit('SET_CATCH', { response: { status: 401 } }, { root: true })
+            return
+          }
+          if (res.data.msg === 'danger') {
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            return
+          }
+          if (res.data.msg === 'exist') {
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.exist'), color: res.data.msg }, { root: true })
+            return
+          }
+          // Success
+          state.kehoach_tb.remove({ id: params.kehoachtb_id }, 'id')
+          // if (res.data.data) state.kehoach_tb.update(res.data.data, 'id')
           commit('SET_MESSAGE', { text: rootGetters.languages('success.update'), color: res.data.msg }, { root: true })
           return res.data
         } else commit('SET_CATCH', null, { root: true })

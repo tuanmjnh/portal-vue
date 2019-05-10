@@ -1,4 +1,5 @@
 import { vnptbkn } from '@/plugins/axios-config'
+import QueryString from '@/plugins/query-string'
 const collection = 'appkey'
 export default {
   namespaced: true,
@@ -59,11 +60,11 @@ export default {
     }
   },
   actions: {
-    async select({ commit, rootGetters, state, rootState }, isExport = false, pagination = null, loading = true) {
+    async select({ commit, rootGetters, state, rootState }, params) {
       // Loading
-      if (loading) rootState.$loadingGet = true
+      if (params.loading) rootState.$loadingGet = true
       // http
-      return await vnptbkn().get(collection, { params: pagination ? pagination : { ...state.pagination, ...{ isExport: isExport } } }).then(function (res) {
+      return await vnptbkn().get(collection + QueryString.get(params)).then(function(res) {
         if (res.status === 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -73,13 +74,18 @@ export default {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
             return
           }
-          if (res.data.data) commit('SET_ITEMS', res.data.data)
-          if (res.data.total) state.totalItems = res.data.total
-          return res.data.data
+          if (params.is_export) {
+            if (res.data.data.length < 1)
+              commit('SET_MESSAGE', { text: rootGetters.languages('error.no_data'), color: 'warning' }, { root: true })
+            return res.data.data
+          } else {
+            if (res.data.data) state.items = res.data.data
+            return res.data
+          }
         } else commit('SET_CATCH', null, { root: true })
       }).catch((error) => { commit('SET_CATCH', error, { root: true }) }).finally(() => {
         state.isGetFirst = false
-        if (loading) rootState.$loadingGet = false
+        if (params.loading) rootState.$loadingGet = false
       })
     },
     async insert({ commit, state, rootGetters, rootState }, loading = true) {
@@ -89,7 +95,7 @@ export default {
       state.item.created_by = vnptbkn().defaults.headers.Author
       state.item.created_at = new Date()
       //state.item.url_plus = JSON.stringify(state.url_plus)
-      await vnptbkn().post(collection, state.item).then(function (res) {
+      await vnptbkn().post(collection, state.item).then(function(res) {
         if (res.status == 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -122,7 +128,7 @@ export default {
       state.item.updated_by = vnptbkn().defaults.headers.Author
       state.item.updated_at = new Date()
       // state.item.url_plus = JSON.stringify(state.url_plus)
-      await vnptbkn().put(collection, state.item).then(function (res) {
+      await vnptbkn().put(collection, state.item).then(function(res) {
         if (res.status == 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -147,7 +153,7 @@ export default {
       if (loading) rootState.$loadingCommit = true
       // http
       const data = state.selected.map(x => ({ id: x.id, flag: x.flag === 0 ? 1 : 0 }))
-      await vnptbkn().put(collection + '/delete', data).then(function (res) {
+      await vnptbkn().put(collection + '/delete', data).then(function(res) {
         if (res.status == 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -174,7 +180,7 @@ export default {
       // Loading
       if (loading) rootState.$loadingCommit = true
       // http
-      await vnptbkn().delete(collection, state.item).then(function (res) {
+      await vnptbkn().delete(collection, state.item).then(function(res) {
         if (res.status == 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })

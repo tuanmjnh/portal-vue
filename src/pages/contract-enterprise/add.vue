@@ -3,32 +3,32 @@
     <v-card>
       <v-card-title class="headline grey lighten-2">
         {{ item.id ?
-        $store.getters.languages('global.details') :
-        $store.getters.languages('global.add') }}
+        $languages.get('global.details') :
+        $languages.get('global.add') }}
       </v-card-title>
       <v-card-text class="p-0">
         <v-form v-model="$store.state.contract_enterprise.valid" ref="form">
           <v-container grid-list-md>
             <v-tabs v-model="$store.state.contract_enterprise.tabs" color="secondary" dark>
-              <v-tab>{{$store.getters.languages('global.main_info')}}</v-tab>
-              <v-tab>{{$store.getters.languages('global.note')}}</v-tab>
+              <v-tab>{{$languages.get('global.main_info')}}</v-tab>
+              <v-tab>{{$languages.get('global.note')}}</v-tab>
               <v-tab-item>
                 <v-layout wrap class="pt-2">
                   <v-flex xs12 sm8 md8>
-                    <v-text-field v-model.trim="item.title" :label="$store.getters.languages('contract_enterprise.title')"
-                      :rules="[!!item.title || $store.getters.languages('error.required')]"></v-text-field>
+                    <v-text-field v-model.trim="item.title" :label="$languages.get('contract_enterprise.title')"
+                      :rules="[!!item.title || $languages.get('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
                     <v-text-field v-model.trim="item.code" class="text-color-initial"
-                      :disabled="item.id?true:false" :label="$store.getters.languages('global.code')"
-                      :rules="[v => !!v  || $store.getters.languages('error.required'),$store.state.contract_enterprise.exist_code||$store.getters.languages('error.exist')]"></v-text-field>
+                      :disabled="item.id?true:false" :label="$languages.get('global.code')"
+                      :rules="[v => !!v  || $languages.get('error.required'),$store.state.contract_enterprise.exist_code||$languages.get('error.exist')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md4>
-                    <v-text-field type="number" v-model.trim="item.orders" :label="$store.getters.languages('global.orders')"
-                      :rules="[v => !!v || $store.getters.languages('messages.err_required')]"></v-text-field>
+                    <v-text-field type="number" v-model.trim="item.orders" :label="$languages.get('global.orders')"
+                      :rules="[v => !!v || $languages.get('messages.err_required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm3 md3>
-                    <v-switch color="primary" :label="item.flag===1?$store.getters.languages('global.show'):$store.getters.languages('global.hide')"
+                    <v-switch color="primary" :label="item.flag===1?$languages.get('global.show'):$languages.get('global.hide')"
                       :true-value="1" :false-value="0" v-model.number="item.flag"></v-switch>
                   </v-flex>
                 </v-layout>
@@ -48,11 +48,11 @@
         <v-spacer></v-spacer>
         <v-btn color="primary" flat @click.native="onSave" :disabled="!$store.state.contract_enterprise.valid"
           :loading="$store.state.$loadingCommit">
-          {{$store.getters.languages('global.update')}}
+          {{$languages.get('global.update')}}
         </v-btn>
         <v-btn color="secondary" flat @click.native="$store.state.contract_enterprise.dialog=false"
           :disabled="$store.state.$loadingCommit">
-          {{$store.getters.languages('global.back')}}
+          {{$languages.get('global.back')}}
         </v-btn>
       </v-card-actions>
     </v-card>

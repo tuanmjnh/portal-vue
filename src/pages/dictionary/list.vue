@@ -6,11 +6,11 @@
         <v-layout wrap class="pt-2">
           <v-flex xs12 sm3 md3 class="mr-3">
             <v-select :items="languages" v-model="$store.state.dictionary.lang_code"
-              :hide-selected="true" item-text="title" item-value="code" :label="$store.getters.languages('languages.title')"></v-select>
+              :hide-selected="true" item-text="title" item-value="code" :label="$languages.get('languages.title')"></v-select>
           </v-flex>
           <v-flex xs12 sm4 md4>
             <v-combobox v-model="$store.state.dictionary.pagination.search" :items="modules"
-              item-text="code" item-value="code" :auto-select-first="true" :label="$store.getters.languages('global.search')"></v-combobox>
+              item-text="code" item-value="code" :auto-select-first="true" :label="$languages.get('global.search')"></v-combobox>
             <!-- <v-text-field v-model="$store.state.dictionary.pagination.search" append-icon="search" label="Search"
               single-line hide-details></v-text-field> -->
           </v-flex>
@@ -19,20 +19,20 @@
             <v-btn flat icon slot="activator" color="primary" @click="$store.state.dictionary.dialog=true">
               <v-icon>add</v-icon>
             </v-btn>
-            <span>{{$store.getters.languages('global.add')}}</span>
+            <span>{{$languages.get('global.add')}}</span>
           </v-tooltip>
           <v-tooltip bottom v-if="$store.state.dictionary.selected.length>0">
             <v-btn flat icon slot="activator" color="danger" @click="onDelete()">
               <v-icon>delete</v-icon>
             </v-btn>
-            <span>{{$store.getters.languages('global.delete_selected')}}</span>
+            <span>{{$languages.get('global.delete_selected')}}</span>
           </v-tooltip>
         </v-layout>
       </v-card-title>
       <v-form v-model="valid" ref="form">
         <v-data-table class="elevation-1" v-model="$store.state.dictionary.selected"
           select-all item-key="id" :headers="$store.state.dictionary.headers" :items="items"
-          :rows-per-page-items="[25, 50, 100, 200, 500]" :rows-per-page-text="$store.getters.languages('global.rows_per_page')"
+          :rows-per-page-items="[25, 50, 100, 200, 500]" :rows-per-page-text="$languages.get('global.rows_per_page')"
           :pagination.sync="$store.state.dictionary.pagination" :search="$store.state.dictionary.pagination.search">
           <!--:loading="loading" :total-items="totalItems" -->
           <template slot="items" slot-scope="props">
@@ -45,16 +45,16 @@
                 <v-edit-dialog :return-value.sync="props.item.module_code" lazy @save="onQuickSave(props.item)">
                   {{props.item.module_code }}
                   <v-text-field slot="input" v-model="props.item.module_code" single-line
-                    :rules="[v => !!v || $store.getters.languages('error.required')]"
-                    :label="$store.getters.languages('global.input')"></v-text-field>
+                    :rules="[v => !!v || $languages.get('error.required')]"
+                    :label="$languages.get('global.input')"></v-text-field>
                 </v-edit-dialog>
               </td>
               <td>
                 <!-- {{ props.item.key }} -->
                 <v-edit-dialog :return-value.sync="props.item.key" lazy @save="onQuickSave(props.item)">
                   {{props.item.key }}
-                  <v-text-field slot="input" v-model="props.item.key" single-line :label="$store.getters.languages('global.input')"
-                    :rules="[v => !!v || $store.getters.languages('error.required')]"></v-text-field>
+                  <v-text-field slot="input" v-model="props.item.key" single-line :label="$languages.get('global.input')"
+                    :rules="[v => !!v || $languages.get('error.required')]"></v-text-field>
                 </v-edit-dialog>
               </td>
               <td>
@@ -62,7 +62,7 @@
                 <v-edit-dialog :return-value.sync="props.item.value" lazy @save="onQuickSave(props.item)">
                   {{props.item.value }}
                   <v-text-field slot="input" v-model="props.item.value" single-line
-                    :label="$store.getters.languages('global.input')" :rules="[v => !!v || $store.getters.languages('error.required')]"></v-text-field>
+                    :label="$languages.get('global.input')" :rules="[v => !!v || $languages.get('error.required')]"></v-text-field>
                 </v-edit-dialog>
               </td>
               <td class="justify-center layout px-0">
@@ -70,13 +70,13 @@
                   <v-btn flat icon slot="activator" color="teal" class="mx-0" @click="onEdit(props.item)">
                     <v-icon>edit</v-icon>
                   </v-btn>
-                  <span>{{$store.getters.languages('global.edit')}}</span>
+                  <span>{{$languages.get('global.edit')}}</span>
                 </v-tooltip>
                 <v-tooltip bottom>
                   <v-btn flat icon slot="activator" color="error" class="mx-0" @click="onDelete(props.item)">
                     <v-icon>delete</v-icon>
                   </v-btn>
-                  <span>{{$store.getters.languages('global.delete')}}</span>
+                  <span>{{$languages.get('global.delete')}}</span>
                 </v-tooltip>
               </td>
             </tr>
@@ -85,9 +85,9 @@
       </v-form>
     </v-card>
     <tpl-confirm :dialog="$store.state.navigation.confirm" @onAccept="onCFMAccept"
-      @onCancel="onCFMCancel" :title="$store.getters.languages('global.message')"
-      :content="$store.getters.languages('messages.confirm_content')" :btnAcceptText="$store.getters.languages('global.accept')"
-      :btnCancelText="$store.getters.languages('global.cancel')"></tpl-confirm>
+      @onCancel="onCFMCancel" :title="$languages.get('global.message')"
+      :content="$languages.get('messages.confirm_content')" :btnAcceptText="$languages.get('global.accept')"
+      :btnCancelText="$languages.get('global.cancel')"></tpl-confirm>
   </div>
 </template>
 

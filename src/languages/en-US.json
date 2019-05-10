@@ -16,6 +16,7 @@
     "hit_username": "Your username of PTTB Application"
   },
   "category": {
+    "title": "Manager Category",
     "app_key": "Category category",
     "group": "Category group",
     "name": "Category name"
@@ -108,6 +109,7 @@
     "languages": "Languages",
     "list": "List",
     "local": "Local",
+    "levels": "Level",
     "main_info": "Main information",
     "message": "Notice",
     "navigation_main": "Main path",
@@ -182,7 +184,9 @@
     "profile": "Profile",
     "roles": "Permissions",
     "title": "Module name",
-    "setting": "Settings"
+    "setting": "Settings",
+    "category_kh": "Plan category",
+    "items_kh": "Plan common data"
   },
   "navigation": {
     "category": "Category",
@@ -220,7 +224,9 @@
     "signout": "Sign out",
     "user_list": "List",
     "user_role": "Decentralize",
-    "users": "Users"
+    "users": "Users",
+    "category_kh": "Plan category",
+    "items_kh": "Plan common data"
   },
   "news": { "name": "News name", "title": "News title" },
   "nguoidung": {

@@ -4,7 +4,7 @@
       <v-card-title>
         <v-layout wrap class="pt-2">
           <v-flex xs12 sm6 md6 class="mr-3">
-            <v-text-field v-model="pagination.search" append-icon="search" :label="$store.getters.languages('global.search')"
+            <v-text-field v-model="pagination.search" append-icon="search" :label="$languages.get('global.search')"
               single-line hide-details></v-text-field>
           </v-flex>
           <v-spacer></v-spacer>
@@ -16,19 +16,19 @@
             <v-btn flat icon slot="activator" color="primary" @click="$store.state.nguoidung.dialog=true">
               <v-icon>add</v-icon>
             </v-btn>
-            <span>{{$store.getters.languages('global.add')}}</span>
+            <span>{{$languages.get('global.add')}}</span>
           </v-tooltip>
           <v-tooltip bottom v-if="$store.state.nguoidung.selected.length>0 && pagination.find.trangthai===1">
             <v-btn flat icon slot="activator" color="danger" @click="onDelete()">
               <v-icon>delete</v-icon>
             </v-btn>
-            <span>{{$store.getters.languages('global.delete_selected')}}</span>
+            <span>{{$languages.get('global.delete_selected')}}</span>
           </v-tooltip>
           <v-tooltip bottom v-if="$store.state.nguoidung.selected.length>0 && pagination.find.trangthai===0">
             <v-btn flat icon slot="activator" color="info" @click="onDelete()">
               <v-icon>refresh</v-icon>
             </v-btn>
-            <span>{{$store.getters.languages('global.recover_selected')}}</span>
+            <span>{{$languages.get('global.recover_selected')}}</span>
           </v-tooltip> -->
         </v-layout>
         <!-- <v-btn-toggle v-model="toggle_one" mandatory>
@@ -36,19 +36,19 @@
             <v-btn slot="activator" flat @click="pagination.find.trangthai=1">
               <v-icon>view_list</v-icon>
             </v-btn>
-            <span>{{$store.getters.languages('global.using')}}</span>
+            <span>{{$languages.get('global.using')}}</span>
           </v-tooltip>
           <v-tooltip bottom>
             <v-btn slot="activator" flat @click="pagination.find.trangthai=0">
               <v-icon>delete</v-icon>
             </v-btn>
-            <span>{{$store.getters.languages('global.deleted')}}</span>
+            <span>{{$languages.get('global.deleted')}}</span>
           </v-tooltip>
         </v-btn-toggle> -->
       </v-card-title>
       <v-data-table class="elevation-1" v-model="$store.state.nguoidung.selected"
         item-key="nguoidung_id" :headers="headers" :items="items" :rows-per-page-items="rowPerPage"
-        :rows-per-page-text="$store.getters.languages('global.rows_per_page')"
+        :rows-per-page-text="$languages.get('global.rows_per_page')"
         :pagination.sync="pagination" :search="pagination.search">
         <!--:loading="loading" :pagination.sync="pagination" :total-items="totalItems" -->
         <template slot="items" slot-scope="props">
@@ -63,25 +63,25 @@
                 <v-btn flat icon slot="activator" color="warning" class="mx-0" @click="changePassword(props.item)">
                   <v-icon>restore</v-icon>
                 </v-btn>
-                <span>{{$store.getters.languages('global.reset_password')}}</span>
+                <span>{{$languages.get('global.reset_password')}}</span>
               </v-tooltip>
               <!-- <v-tooltip bottom>
                 <v-btn flat icon slot="activator" color="teal" class="mx-0" @click="onEdit(props.item)">
                   <v-icon>edit</v-icon>
                 </v-btn>
-                <span>{{$store.getters.languages('global.edit')}}</span>
+                <span>{{$languages.get('global.edit')}}</span>
               </v-tooltip>
               <v-tooltip bottom v-if="pagination.find.trangthai===1">
                 <v-btn flat icon slot="activator" color="error" class="mx-0" @click="onDelete(props.item)">
                   <v-icon>delete</v-icon>
                 </v-btn>
-                <span>{{$store.getters.languages('global.delete')}}</span>
+                <span>{{$languages.get('global.delete')}}</span>
               </v-tooltip>
               <v-tooltip bottom v-else>
                 <v-btn flat icon slot="activator" color="info" class="mx-0" @click="onDelete(props.item)">
                   <v-icon>refresh</v-icon>
                 </v-btn>
-                <span>{{$store.getters.languages('global.recover')}}</span>
+                <span>{{$languages.get('global.recover')}}</span>
               </v-tooltip> -->
             </td>
           </tr>
@@ -89,8 +89,8 @@
       </v-data-table>
     </v-card>
     <tpl-confirm :dialog.sync="confirmDialog" @onAccept="onCFMAccept" @onCancel="onCFMCancel"
-      :title="$store.getters.languages('global.message')" :content="$store.getters.languages('messages.confirm_content')"
-      :btnAcceptText="$store.getters.languages('global.accept')" :btnCancelText="$store.getters.languages('global.cancel')" />
+      :title="$languages.get('global.message')" :content="$languages.get('messages.confirm_content')"
+      :btnAcceptText="$languages.get('global.accept')" :btnCancelText="$languages.get('global.cancel')" />
   </div>
 </template>
 

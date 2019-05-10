@@ -19,7 +19,12 @@ export default {
     // if (this.$store.state.nguoidung.isGetFirst) 
     // this.$store.dispatch('nguoidung/select')
     // if (this.$store.state.donvi.isGetFirst) 
-    this.$store.dispatch('donvi/select', false)
+    if (this.$store.state.donvi.items < 1)
+      this.$store.dispatch('donvi/select', {
+        loading: true,
+        rowsPerPage: 0,
+        flag: 1
+      })
   }
 }
 </script>

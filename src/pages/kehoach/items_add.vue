@@ -12,22 +12,18 @@
           <v-container grid-list-md>
             <v-tabs v-model="tabs" color="secondary" dark>
               <v-tab>{{$languages.get('global.main_info')}}</v-tab>
-              <v-tab>{{$languages.get('global.files')}}</v-tab>
               <v-tab>{{$languages.get('global.images')}}</v-tab>
               <v-tab>{{$languages.get('global.contents')}}</v-tab>
               <v-tab-item>
                 <v-layout wrap class="pt-2">
                   <v-flex xs12 sm5 md5>
                     <v-select :items="category" v-model.trim="item.code" item-value="id"
-                      item-text="title" :label="$languages.get('global.dependent')"
+                      item-text="title" :label="$languages.get('category.group')"
                       :rules="[v=>!!v||$languages.get('error.required_select')]"></v-select>
                   </v-flex>
                   <v-flex xs12 sm7 md7>
                     <v-text-field v-model.trim="item.title" :rules="[v=>!!v||$languages.get('error.required')]"
                       :label="$languages.get('news.title')"></v-text-field>
-                  </v-flex>
-                  <v-flex xs12 sm8 md8>
-                    <v-text-field v-model.trim="item.url" :label="$languages.get('global.url')"></v-text-field>
                   </v-flex>
                   <v-flex xs3 sm1 md1>
                     <v-text-field type="number" v-model.trim="item.orders" :label="$languages.get('global.orders')"
@@ -41,10 +37,6 @@
                       :true-value="1" :false-value="0" v-model.number="item.flag"></v-switch>
                   </v-flex>
                   <v-flex xs12 sm6 md6 class="text-append-icon">
-                    <v-text-field v-model.trim="item.icon" label="Icon"></v-text-field>
-                    <div class="icon" v-html="item.icon"></div>
-                  </v-flex>
-                  <v-flex xs12 sm6 md6 class="text-append-icon">
                     <v-text-field v-model.trim="tag" :label="$languages.get('global.tags')"></v-text-field>
                     <v-tooltip bottom>
                       <div slot="activator" class="icon pointer" @click="addTag()">
@@ -56,30 +48,17 @@
                   <v-flex xs12 sm12 md12>
                     <template v-for="(tag,index) in tags">
                       <v-chip color="orange" text-color="white" :key="index">
-                        <!-- <v-avatar>
-                          <v-icon right>turned_in</v-icon>
-                        </v-avatar> -->
                         {{tag}}
                         <div class="v-chip__close" @click="removeTag()">
                           <i aria-hidden="true" class="v-icon material-icons theme--light">cancel</i>
                         </div>
                       </v-chip>
-                      <!-- 
-                      <v-chip :v-model="true" close color="green" outline :key="index">
-                        {{tag}}
-                      </v-chip> -->
                     </template>
                   </v-flex>
                 </v-layout>
               </v-tab-item>
               <v-tab-item>
                 <v-layout wrap class="pt-2">
-                  <!-- <v-flex xs12 sm12 md12></v-flex> -->
-                  <!-- <v-flex xs12 sm12 md12 v-if="item.id">
-                    {{$languages.get('global.contract')}}: <a class="mx-0 v-btn v-btn--icon theme--info"
-                      :href="`${http.defaults.host}/${item.attach}`" target="_blank"><i
-                        class="material-icons">attachment</i></a>
-                  </v-flex> -->
                   <v-flex xs12 sm12 md12 v-if="item.id">
                     <display-files :files="item.attach" :baseUrl="http.defaults.host"
                       :isShowName="false" classes="w-50"></display-files>
@@ -96,23 +75,6 @@
                 </v-layout>
               </v-tab-item>
               <v-tab-item>
-                <!-- <v-layout wrap class="pt-2">
-                  <v-flex xs12 sm12 md12 v-if="item.id">
-                    <display-files :files="item.image" :baseUrl="http.defaults.host"
-                      :isShowName="false" classes="w-50"></display-files>
-                  </v-flex>
-                  <v-flex xs12 sm6 md4>
-                    <upload-files @handleUpload="uploadFiles=$event" :buttonUse="false"
-                      :multiple="false" :http="http" extension="image/*" :basePath="uploadFiles.basePath"
-                      :autoName="true" :buttonText="$languages.get('global.upload_drag')"></upload-files>
-                  </v-flex>
-                  <v-flex xs12 sm6 md8>
-                    <display-files :files="uploadFiles.files" :baseUrl="http.defaults.host"
-                      :isShowName="false" classes="w-50"></display-files>
-                  </v-flex>
-                </v-layout> -->
-              </v-tab-item>
-              <v-tab-item>
                 <v-layout wrap class="pt-2">
                   <v-flex xs12 sm12 md12>
                     <v-textarea v-model.trim="item.descs" auto-grow box :placeholder="$store.getters.languages(['global.input',' ','global.descs'])"></v-textarea>
@@ -120,7 +82,6 @@
                   <v-flex xs12 sm12 md12>
                     <vue-quill-editor v-model.trim="item.contents" ref="Content"
                       :placeholder="$languages.get('global.contents')"></vue-quill-editor>
-                    <!-- <tinymce id="desc" v-model="item.desc"></tinymce> -->
                   </v-flex>
                 </v-layout>
               </v-tab-item>

@@ -380,6 +380,20 @@ const routes = [
         meta: { desc: 'kehoach-import', auth: true, roles: ['kehoach.insert'] },
         component: () => import('@/pages/kehoach/import')
       },
+      {
+        path: 'category',
+        name: 'kehoach-category',
+        props: true,
+        meta: { desc: 'kehoach-category', auth: true, roles: ['category_kh.select'] },
+        component: () => import('@/pages/kehoach/category_list')
+      },
+      {
+        path: 'items',
+        name: 'kehoach-items',
+        props: true,
+        meta: { desc: 'kehoach-items', auth: true, roles: ['items_kh.select'] },
+        component: () => import('@/pages/kehoach/items_list')
+      }
     ]
   },
   // {

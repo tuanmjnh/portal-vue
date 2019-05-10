@@ -3,8 +3,8 @@
     <v-card>
       <v-card-title class="headline grey lighten-2">
         {{ item.id ?
-        $store.getters.languages('global.details') :
-        $store.getters.languages('global.add') }}
+        $languages.get('global.details') :
+        $languages.get('global.add') }}
       </v-card-title>
       <v-card-text class="p-0">
         <v-form v-model="$store.state.dictionary.valid" ref="form">
@@ -12,15 +12,15 @@
             <v-layout wrap class="pt-2">
               <v-flex xs12 sm6 md6>
                 <v-combobox v-model.trim="item.module_code" :items="modules" label="Modules"
-                  :rules="[v => !!v || $store.getters.languages('error.required')]" hint="Select module"></v-combobox>
+                  :rules="[v=>!!v||$languages.get('error.required')]" hint="Select module"></v-combobox>
               </v-flex>
               <v-flex xs12 sm6 md6>
               </v-flex>
               <v-flex xs12 sm4 md4>
-                <v-text-field v-model.trim="item.key" label="Key" :rules="[v => !!v || $store.getters.languages('error.required')]"></v-text-field>
+                <v-text-field v-model.trim="item.key" label="Key" :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
               </v-flex>
               <v-flex xs12 sm8 md8>
-                <v-text-field v-model.trim="item.value" label="Value" :rules="[v => !!v || $store.getters.languages('error.required')]"></v-text-field>
+                <v-text-field v-model.trim="item.value" label="Value" :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
               </v-flex>
             </v-layout>
           </v-container>
@@ -31,11 +31,11 @@
         <v-spacer></v-spacer>
         <v-btn color="primary" flat @click.native="onSave" :disabled="!$store.state.dictionary.valid"
           :loading="$store.state.$loadingCommit">
-          {{$store.getters.languages('global.update')}}
+          {{$languages.get('global.update')}}
         </v-btn>
         <v-btn color="secondary" flat @click.native="$store.state.dictionary.dialog=false"
           :disabled="$store.state.$loadingCommit">
-          {{$store.getters.languages('global.back')}}
+          {{$languages.get('global.back')}}
         </v-btn>
       </v-card-actions>
     </v-card>

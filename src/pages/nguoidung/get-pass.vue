@@ -10,7 +10,7 @@
             <!-- <v-flex xs12 sm6 md6> -->
             <v-flex xs12 sm6 md6>
               <v-select :items="donvi" v-model="params.donvi_id" item-text="ten_dv"
-                item-value="donvi_id" :label="$store.getters.languages('global.local')"></v-select>
+                item-value="donvi_id" :label="$languages.get('global.local')"></v-select>
             </v-flex>
             <v-flex xs12 sm6 md6 v-if="!$store.state.$loadingGet">
               <v-select :items="nguoidung" v-model="params.ma_nd" item-value="ma_nd"
@@ -33,7 +33,7 @@
     <v-card-actions>
       <v-spacer></v-spacer>
       <v-btn color="primary" flat @click.native="onSave" :disabled="!valid" :loading="$store.state.$loadingCommit">
-        {{$store.getters.languages('global.accept')}}
+        {{$languages.get('global.accept')}}
       </v-btn>
     </v-card-actions>
   </v-card>

@@ -4,15 +4,15 @@
     <v-card>
       <v-card-title class="headline grey lighten-2">
         {{ item.user_id ?
-        $store.getters.languages('global.details') :
-        $store.getters.languages('global.add') }}
+        $languages.get('global.details') :
+        $languages.get('global.add') }}
       </v-card-title>
       <v-card-text>
         <v-form v-model="valid" ref="form">
           <v-container grid-list-md>
             <v-tabs v-model="tabActive" color="secondary" dark>
-              <v-tab>{{$store.getters.languages('global.main_info')}}</v-tab>
-              <v-tab>{{$store.getters.languages('global.note')}}</v-tab>
+              <v-tab>{{$languages.get('global.main_info')}}</v-tab>
+              <v-tab>{{$languages.get('global.note')}}</v-tab>
               <v-tab-item>
                 <v-layout wrap class="pt-2">
                   <v-flex xs12 md8 sm8>
@@ -24,40 +24,40 @@
                   <v-flex xs12 md8 sm8>
                   </v-flex>
                   <v-flex xs12 sm8 md8>
-                    <v-text-field v-model.trim="item.username" :label="$store.getters.languages('nguoidung.username')"
+                    <v-text-field v-model.trim="item.username" :label="$languages.get('nguoidung.username')"
                       :disabled="item.user_id?true:false" class="text-color-initial"
-                      :rules="[!!item.username||$store.getters.languages('error.required'),exist_username||$store.getters.languages('error.exist')]"></v-text-field>
+                      :rules="[!!item.username||$languages.get('error.required'),exist_username||$languages.get('error.exist')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field v-model.trim="item.email" :label="$store.getters.languages('nguoidung.email')"
-                      :rules="[v =>!!v||$store.getters.languages('error.required')]"></v-text-field>
+                    <v-text-field v-model.trim="item.email" :label="$languages.get('nguoidung.email')"
+                      :rules="[v =>!!v||$languages.get('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field v-model.trim="item.password" :label="$store.getters.languages('nguoidung.password')"
-                      :rules="[v =>!!v||$store.getters.languages('error.required')]"></v-text-field>
+                    <v-text-field v-model.trim="item.password" :label="$languages.get('nguoidung.password')"
+                      :rules="[v =>!!v||$languages.get('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field v-model.trim="repassword" :label="$store.getters.languages('nguoidung.repassword')"
-                      :rules="[v =>!!v||$store.getters.languages('error.required')]"></v-text-field>
+                    <v-text-field v-model.trim="repassword" :label="$languages.get('nguoidung.repassword')"
+                      :rules="[v =>!!v||$languages.get('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field v-model.trim="item.full_name" :label="$store.getters.languages('nguoidung.full_name')"
-                      :rules="[v =>!!v||$store.getters.languages('error.required')]"></v-text-field>
+                    <v-text-field v-model.trim="item.full_name" :label="$languages.get('nguoidung.full_name')"
+                      :rules="[v =>!!v||$languages.get('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
-                    <v-text-field v-model.trim="item.mobile" :label="$store.getters.languages('nguoidung.mobile')"
-                      :rules="[v =>!!v||$store.getters.languages('error.required')]"></v-text-field>
+                    <v-text-field v-model.trim="item.mobile" :label="$languages.get('nguoidung.mobile')"
+                      :rules="[v =>!!v||$languages.get('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm3 md3>
-                    <v-switch color="primary" :label="item.flag===1?$store.getters.languages('global.show'):$store.getters.languages('global.hide')"
+                    <v-switch color="primary" :label="item.flag===1?$languages.get('global.show'):$languages.get('global.hide')"
                       :true-value="1" :false-value="0" v-model.number="item.flag"></v-switch>
                   </v-flex>
                   <v-flex xs12 sm12 md12>
                     <v-textarea v-model.trim="item.address" auto-grow box :placeholder="$store.getters.languages(['global.input',' ','nguoidung.address'])"></v-textarea>
                   </v-flex>
                   <!-- <v-flex xs12 sm6 md4>
-                    <v-text-field type="number" v-model.trim="item.orders" :label="$store.getters.languages('global.orders')"
-                      :rules="[v =>!!v||$store.getters.languages('messages.err_required')]"></v-text-field>
+                    <v-text-field type="number" v-model.trim="item.orders" :label="$languages.get('global.orders')"
+                      :rules="[v =>!!v||$languages.get('messages.err_required')]"></v-text-field>
                   </v-flex> -->
                 </v-layout>
               </v-tab-item>
@@ -75,11 +75,11 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="primary" flat @click.native="onSave" :disabled="!valid" :loading="$store.state.$loadingCommit">
-          {{$store.getters.languages('global.update')}}
+          {{$languages.get('global.update')}}
         </v-btn>
         <v-btn color="secondary" flat @click.native="$store.state.nguoidung.dialog=false"
           :disabled="$store.state.$loadingCommit">
-          {{$store.getters.languages('global.back')}}
+          {{$languages.get('global.back')}}
         </v-btn>
       </v-card-actions>
     </v-card>

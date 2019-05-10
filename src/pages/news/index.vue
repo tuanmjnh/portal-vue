@@ -20,12 +20,12 @@ export default {
   beforeCreate() {
     // if (this.$store.state.navigation.isGetFirst) 
     // this.$store.dispatch('news/select')
-    if (this.$store.state.category.items < 1)
-      this.$store.dispatch('category/select', {
-        loading: true,
-        rowsPerPage: 0,
-        flag: 1
-      })
+    // if (this.$store.state.category.items < 1)
+    this.$store.dispatch('category/select', {
+      loading: true,
+      rowsPerPage: 0,
+      flag: 1
+    })
     if (this.$store.state.app_key.items.length < 1)
       this.$store.dispatch('app_key/select')
   }

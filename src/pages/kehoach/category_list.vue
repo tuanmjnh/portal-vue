@@ -1,5 +1,6 @@
 <template>
   <div>
+    <tpl-add :http="http" />
     <v-dialog v-model="dialog_filter" max-width="512px">
       <v-card>
         <v-card-title class="headline grey lighten-2">
@@ -10,11 +11,6 @@
             <v-flex xs12 sm12 md12>
               <v-text-field v-model="pagination.search" append-icon="search" :label="$languages.get('global.search')"
                 single-line hide-details></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm12 md12>
-              <v-select :items="app_key" v-model="pagination.app_key" :label="$languages.get('category.app_key')"
-                :rules="[v=>!!v||$languages.get('error.required_select')]" item-text="title"
-                item-value="app_key"></v-select>
             </v-flex>
           </v-layout>
         </v-card-text>
@@ -30,9 +26,10 @@
     <v-card>
       <v-card-title>
         <v-layout wrap>
-          <span class="title">{{$languages.get('category.title')}}</span>
+          <span class="title">{{$languages.get('navigation.category_kh')}}</span>
           <v-spacer></v-spacer>
         </v-layout>
+        <v-spacer></v-spacer>
         <v-tooltip bottom>
           <v-btn flat icon slot="activator" color="primary" @click="$store.state.category.dialog=true">
             <v-icon>add</v-icon>
@@ -59,20 +56,6 @@
         </v-tooltip>
         <export-data :getData="getDataExport" :tooltip="$languages.get('global.export')"
           :items="[{title:$store.getters.languages(['global.export',' ',' .csv']),type:'csv'}]" />
-        <v-btn-toggle v-model="pagination.toggle" mandatory>
-          <v-tooltip bottom>
-            <v-btn slot="activator" flat @click="pagination.flag=1">
-              <v-icon>view_list</v-icon>
-            </v-btn>
-            <span>{{$languages.get('global.using')}}</span>
-          </v-tooltip>
-          <v-tooltip bottom>
-            <v-btn slot="activator" flat @click="pagination.flag=0">
-              <v-icon>delete</v-icon>
-            </v-btn>
-            <span>{{$languages.get('global.deleted')}}</span>
-          </v-tooltip>
-        </v-btn-toggle>
       </v-card-title>
       <!-- <v-form ref="form" v-model="valid" lazy-validation> -->
       <v-data-table class="elevation-1" v-model="$store.state.category.selected"
@@ -126,14 +109,18 @@
 </template>
 
 <script>
+import { vnptbkn } from '@/plugins/axios-config'
 import confirm from '@/components/confirm'
 import exportData from '@/components/export-data'
+import add from './category_add'
 export default {
   components: {
     'tpl-confirm': confirm,
-    'export-data': exportData
+    'export-data': exportData,
+    'tpl-add': add
   },
   data: () => ({
+    http: vnptbkn(),
     dialog_filter: false,
     dialog_confirm: false,
     totalItems: 0,
@@ -146,7 +133,8 @@ export default {
       flag: 1,
       page: 1,
       rowsPerPage: 10,
-      app_key: 'guide'
+      app_key: 'kehoach',
+      dependent: 501
     },
     headers: [
       { text: 'category.name', value: 'title', align: 'left' },
@@ -157,15 +145,16 @@ export default {
       { text: '#', value: '#', sortable: false }
     ],
   }),
+  beforeCreate() {
+    // if (this.$store.state.app_key.items.length < 1)
+    //   this.$store.dispatch('app_key/select')
+  },
   mounted() {
     this.headers.forEach(e => { e.text = this.$languages.get(e.text) })
   },
   computed: {
     items() {
       return this.$store.state.category.items
-    },
-    app_key() {
-      return this.$store.getters['app_key/getFilter']()
     }
   },
   watch: {

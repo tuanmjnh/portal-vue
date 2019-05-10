@@ -16,6 +16,7 @@
     "hit_username": "Tài khoản hệ thống PTTB"
   },
   "category": {
+    "title": "Quản lý danh mục",
     "app_key": "Loại danh mục",
     "group": "Nhóm danh mục",
     "name": "Tên danh mục"
@@ -108,6 +109,7 @@
     "languages": "Ngôn ngữ",
     "list": "Danh sách",
     "local": "Đơn vị",
+    "levels": "Cấp độ",
     "main_info": "Thông tin chính",
     "message": "Thông báo",
     "navigation_main": "Đường dẫn chính",
@@ -179,7 +181,9 @@
     "profile": "Hồ sơ",
     "roles": "Quyền",
     "title": "Tên module",
-    "setting": "Cài đặt"
+    "setting": "Cài đặt",
+    "category_kh": "Nhóm kế hoạch",
+    "items_kh": "Dữ liệu chung"
   },
   "navigation": {
     "category": "Danh mục",
@@ -217,7 +221,9 @@
     "signout": "Đăng xuất",
     "user_list": "Danh sách",
     "user_role": "Phân quyền",
-    "users": "Người dùng"
+    "users": "Người dùng",
+    "category_kh": "Nhóm kế hoạch",
+    "items_kh": "Dữ liệu chung"
   },
   "news": { "name": "Tên tin tức", "title": "Tiêu đề tin tức" },
   "nguoidung": {

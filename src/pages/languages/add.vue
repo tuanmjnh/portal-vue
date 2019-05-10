@@ -3,41 +3,41 @@
     <v-card>
       <v-card-title class="headline grey lighten-2">
         {{ item.id ?
-        $store.getters.languages('global.details') :
-        $store.getters.languages('global.add') }}
+        $languages.get('global.details') :
+        $languages.get('global.add') }}
       </v-card-title>
       <v-card-text class="p-0">
         <v-form v-model="$store.state.languages.valid" ref="form">
           <v-container grid-list-md>
             <v-tabs v-model="$store.state.languages.tabs" color="secondary" dark>
-              <v-tab>{{$store.getters.languages('global.main_info')}}</v-tab>
-              <v-tab>{{$store.getters.languages('global.note')}}</v-tab>
+              <v-tab>{{$languages.get('global.main_info')}}</v-tab>
+              <v-tab>{{$languages.get('global.note')}}</v-tab>
               <v-tab-item>
                 <v-layout wrap class="pt-2">
                   <v-flex xs12 sm8 md8>
-                    <v-text-field v-model.trim="item.title" :label="$store.getters.languages('languages.title')"
-                      :rules="[v => !!v || $store.getters.languages('error.required')]"></v-text-field>
+                    <v-text-field v-model.trim="item.title" :label="$languages.get('languages.title')"
+                      :rules="[v => !!v || $languages.get('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm4 md4>
                     <v-text-field v-model.trim="item.code" class="text-color-initial"
-                      @keyup="onExistCode()" :disabled="item.id?true:false" :label="$store.getters.languages('global.code')"
-                      :rules="[v => !!v  || $store.getters.languages('error.required'),$store.state.languages.exist_code||$store.getters.languages('error.exist')]"></v-text-field>
+                      @keyup="onExistCode()" :disabled="item.id?true:false" :label="$languages.get('global.code')"
+                      :rules="[v => !!v  || $languages.get('error.required'),$store.state.languages.exist_code||$languages.get('error.exist')]"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6 class="text-append-icon">
                     <v-text-field v-model.trim="item.icon" label="Icon"></v-text-field>
                     <div class="icon" v-html="item.icon"></div>
                   </v-flex>
                   <v-flex xs12 sm3 md3>
-                    <v-text-field type="number" v-model.trim="item.orders" :label="$store.getters.languages('global.orders')"
-                      :rules="[v => !!v  || $store.getters.languages('error.required')]"></v-text-field>
+                    <v-text-field type="number" v-model.trim="item.orders" :label="$languages.get('global.orders')"
+                      :rules="[v => !!v  || $languages.get('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs6 sm3 md3>
-                    <v-switch color="primary" :label="item.flag===1?$store.getters.languages('global.show'):$store.getters.languages('global.hide')"
+                    <v-switch color="primary" :label="item.flag===1?$languages.get('global.show'):$languages.get('global.hide')"
                       :true-value="1" :false-value="0" v-model.number="item.flag"></v-switch>
                   </v-flex>
                   <v-flex xs6 sm6 md6>
                     <v-text-field v-model.trim="item.attach_file" :disabled="true" class="text-color-initial"
-                      :label="$store.getters.languages('global.attach')"></v-text-field>
+                      :label="$languages.get('global.attach')"></v-text-field>
                   </v-flex>
                   <v-flex xs6 sm6 md4>
                     <display-files :files="uploadFiles.files" :baseUrl="http.defaults.host"
@@ -47,7 +47,7 @@
                     <upload-files @handleUpload="uploadFiles=$event" :buttonUse="false"
                       :basePath="uploadFiles.basePath" :multiple="false" :autoName="false"
                       :fileName="item.code" :http="http" extension="application/json"
-                      :buttonText="$store.getters.languages('global.upload_drag')"></upload-files>
+                      :buttonText="$languages.get('global.upload_drag')"></upload-files>
                   </v-flex>
                 </v-layout>
               </v-tab-item>
@@ -66,11 +66,11 @@
         <v-spacer></v-spacer>
         <v-btn color="primary" flat @click.native="onSave" :disabled="!$store.state.languages.valid"
           :loading="$store.state.$loadingCommit">
-          {{$store.getters.languages('global.update')}}
+          {{$languages.get('global.update')}}
         </v-btn>
         <v-btn color="secondary" flat @click.native="$store.state.languages.dialog=false"
           :disabled="$store.state.$loadingCommit">
-          {{$store.getters.languages('global.back')}}
+          {{$languages.get('global.back')}}
         </v-btn>
       </v-card-actions>
     </v-card>

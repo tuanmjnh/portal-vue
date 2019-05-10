@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-dialog v-model="dialog_filter" max-width="512px" persistent>
+    <v-dialog v-model="dialog_filter" max-width="512px">
       <v-card>
         <v-card-title class="headline grey lighten-2">
           {{$languages.get('global.filter_data')}}
