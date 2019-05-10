@@ -7,9 +7,9 @@
         $languages.get('global.add') }}
       </v-card-title>
       <v-card-text class="p-0">
-        <v-form v-model="$store.state.roles.valid" ref="form">
+        <v-form v-model="valid" ref="form">
           <v-container grid-list-md>
-            <v-tabs v-model="$store.state.roles.tabs" color="secondary" dark>
+            <v-tabs v-model="tabs" color="secondary" dark>
               <v-tab>{{$languages.get('global.main_info')}}</v-tab>
               <v-tab>{{$languages.get('global.roles')}}</v-tab>
               <v-tab>{{$languages.get('global.note')}}</v-tab>
@@ -43,15 +43,18 @@
                       :true-value="1" :false-value="0" v-model.number="item.flag"></v-switch>
                   </v-flex>
                   <v-flex xs6 sm4 md4>
-                    <v-text-field v-model.trim="$store.state.roles.color.cover" :label="$languages.get('global.color_cover')"
-                      :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
+                    <v-text-field v-model.trim="$store.state.roles.item.color.cover"
+                      :label="$languages.get('global.color_cover')" :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs6 sm4 md4>
-                    <v-text-field v-model.trim="$store.state.roles.color.text" :label="$languages.get('global.color_text')"
-                      :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
+                    <v-text-field v-model.trim="$store.state.roles.item.color.text"
+                      :label="$languages.get('global.color_text')" :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs6 sm4 md4 class="mt-3">
-                    <v-chip small :color="$store.state.roles.color.cover" :text-color="$store.state.roles.color.text">{{item.name}}</v-chip>
+                    <v-chip small :color="$store.state.roles.item.color.cover"
+                      :text-color="$store.state.roles.item.color.text">
+                      {{item.name}}
+                    </v-chip>
                   </v-flex>
                 </v-layout>
               </v-tab-item>
@@ -98,7 +101,7 @@
       <v-divider></v-divider>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" flat @click.native="onSave" :disabled="!$store.state.roles.valid"
+        <v-btn color="primary" flat @click.native="onSave" :disabled="!valid"
           :loading="$store.state.$loadingCommit">
           {{$languages.get('global.update')}}
         </v-btn>
@@ -123,6 +126,8 @@ export default {
     // 'list-select': listSelect
   },
   data: () => ({
+    valid: false,
+    tabs: null,
     // roles_selected: [],
     // color: {}
   }),
@@ -175,7 +180,7 @@ export default {
   },
   methods: {
     onSave() {
-      if (this.$store.state.roles.valid) {
+      if (this.valid) {
         if (this.item.id) this.$store.dispatch('roles/update')
         else this.$store.dispatch('roles/insert').then(() => { this.reset() })
       }

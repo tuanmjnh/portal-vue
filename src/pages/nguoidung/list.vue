@@ -3,7 +3,7 @@
     <v-card>
       <v-card-title>
         <v-layout wrap class="pt-2">
-          <v-flex xs6 sm3 md3 class="mr-3">
+          <v-flex xs6 sm3 md3 class="mr-3" v-if="$store.getters['auth/inRoles']('donvi.select')">
             <v-select :items="donvi" v-model="pagination.donvi_id" multiple item-text="ten_dv"
               item-value="donvi_id" :label="$languages.get('global.local')"></v-select>
           </v-flex>
@@ -12,7 +12,7 @@
               single-line hide-details></v-text-field>
           </v-flex>
           <v-spacer></v-spacer>
-          <v-tooltip bottom>
+          <v-tooltip bottom v-if="$store.getters['auth/inRoles']('nguoidung.update')">
             <v-btn flat icon slot="activator" color="primary" @click="$router.push('/nguoidung/set-roles')">
               <v-icon>how_to_reg</v-icon>
             </v-btn>
@@ -59,12 +59,12 @@
             <td>{{ props.item.email }}</td>
             <td>
               <v-chip small :color="props.item.color?props.item.color.cover:''"
-                :text-color="props.item.color?props.item.color.text:''">{{
-                props.item.roles_name?props.item.roles_name:$languages.get('global.undefined')
-                }}</v-chip>
+                :text-color="props.item.color?props.item.color.text:''">
+                {{props.item.roles_name?props.item.roles_name:$languages.get('global.undefined')}}
+              </v-chip>
             </td>
             <td class="justify-center layout px-0">
-              <v-tooltip bottom>
+              <v-tooltip bottom v-if="$store.getters['auth/inRoles']('nguoidung.update')">
                 <v-btn flat icon slot="activator" color="warning" class="mx-0" @click="changePassword(props.item)">
                   <v-icon>restore</v-icon>
                 </v-btn>

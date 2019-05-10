@@ -22,7 +22,7 @@ export default {
       return state.items.find(x => x.id === id)
     },
     getNhomKH: state => {
-      return state.nhom_kh.filter(x => { if (x.dependent !== ',0,') return x })
+      return state.nhom_kh ? state.nhom_kh.filter(x => { if (x.dependent !== ',0,') return x }) : []
     },
     getFilter: state => pagination => {
       let rs = [...state.items]
@@ -35,9 +35,9 @@ export default {
       return rs
     },
     getFilterDonvi: state => pagination => {
-      return state.nguoidung.filter((x) => {
+      return state.nguoidung ? state.nguoidung.filter((x) => {
         return pagination.donvi_id.indexOf(x.donvi_id) > -1
-      })
+      }) : []
     },
   },
   mutations: {

@@ -20,6 +20,12 @@ export default {
     $this.$store.dispatch('category/GetByKey', ({ key: 'kehoach' })).then(x => {
       $this.$store.state.kehoach.nhom_kh = x
     })
+    this.$store.dispatch('kehoach/GetNguoidung', {
+      loading: false,
+      // donvi_id: this.pagination.donvi_id,
+      sortBy: 'donvi_id,ma_nd',
+      rowsPerPage: 0
+    })
   }
 }
 </script>

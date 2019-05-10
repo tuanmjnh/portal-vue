@@ -81,8 +81,8 @@
                       :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field :value="$store.state.kehoach.item.ngay_nhap" label="Ngày nhập"
-                      :disabled="true" class="text-color-initial"></v-text-field>
+                    <v-text-field :value="getFormatDate($store.state.kehoach.item.ngay_nhap)"
+                      label="Ngày nhập" :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm12 md12>
                     <v-textarea :value="$store.state.kehoach.item.ghichu" label="Ghi chú thuê bao"
@@ -252,7 +252,7 @@
               </v-layout>
               <v-divider></v-divider>
               <v-layout>
-                <v-flex xs12 sm12 md12 v-if="kehoach_extra.goicuoc.length>0">
+                <v-flex xs12 sm12 md12 v-if="kehoach_extra.goicuoc&&kehoach_extra.goicuoc.length>0">
                   <v-select :items="kehoach_extra.goicuoc" v-model="params_thuchien.goicuoc"
                     item-text="title" :rules="[v=>!!v||$languages.get('error.required_select')]"
                     item-value="id" label="Gói cước" hint="Chọn một gói cước"
@@ -318,29 +318,27 @@
       <v-form v-model="valid" ref="form" v-if="$store.getters['auth/inRoles']('kehoach.update')">
         <v-card-title>
           <v-layout wrap>
+            <v-flex xs12 sm12 md12>
+              <span class="title">Giao thuê bao cho nhân viên</span>
+            </v-flex>
             <v-flex xs12 sm5 md5>
               <v-select :items="nguoidung" v-model="$store.state.kehoach.thuebao_nguoidung.nguoidung_id"
                 item-value="ma_nd" item-text="ten_nd_dv" :hide-selected="true" label="Nhân viên"
-                :rules="[v=>v&&v.length>0||$languages.get('error.required_select')]"></v-select>
+                :rules="[v=>v&&v.length>0||$languages.get('error.required_select')]" hint="Chọn một nhân viên"
+                persistent-hint></v-select>
             </v-flex>
             <v-spacer></v-spacer>
-            <v-tooltip left>
+            <!-- <v-tooltip left>
               <v-btn slot="activator" color="primary" flat icon @click.native="onSave"
                 :disabled="!valid" :loading="$store.state.$loadingCommit">
                 <v-icon>how_to_reg</v-icon>
               </v-btn>
               <span>Cập nhật gán thuê bao đã chọn cho nhân viên</span>
-            </v-tooltip>
-            <!-- <v-btn color="primary" flat @click.native="onSave" :disabled="!valid"
+            </v-tooltip> -->
+            <v-btn color="primary" flat @click.native="onSave" :disabled="!valid"
               :loading="$store.state.$loadingCommit">
               {{$languages.get('global.update')}}
-            </v-btn> -->
-            <v-tooltip bottom>
-              <v-btn slot="activator" color="success" flat icon @click.native="dialog_import=true">
-                <v-icon>cloud_upload</v-icon>
-              </v-btn>
-              <span>Gán nhân viên theo tệp</span>
-            </v-tooltip>
+            </v-btn>
           </v-layout>
         </v-card-title>
       </v-form>
@@ -353,6 +351,12 @@
             <v-icon>filter_list</v-icon>
           </v-btn>
           <span>{{$languages.get('global.filter_data')}}</span>
+        </v-tooltip>
+        <v-tooltip bottom v-if="$store.getters['auth/inRoles']('kehoach.update')">
+          <v-btn slot="activator" color="success" flat icon @click.native="dialog_import=true">
+            <v-icon>cloud_upload</v-icon>
+          </v-btn>
+          <span>Giao thuê bao theo tệp</span>
         </v-tooltip>
         <export-data :getData="getDataExport" filename="kehoach_thuebao" :suffixFileName="true"
           :tooltip="$languages.get('global.export')" color="success" :items="[{title:$store.getters.languages(['global.export',' ',' .csv']),type:'csv'}]" />
@@ -495,14 +499,6 @@ export default {
       }
     ]
   }),
-  created() {
-    this.$store.dispatch('kehoach/GetNguoidung', {
-      loading: false,
-      // donvi_id: this.pagination.donvi_id,
-      sortBy: 'donvi_id,ma_nd',
-      rowsPerPage: 0
-    })
-  },
   mounted() {
     this.headers.forEach(e => { e.text = this.$store.getters.languages(e.text) })
   },
@@ -553,6 +549,7 @@ export default {
     pagination_nguoidung() {
       const rs = this.$store.getters['kehoach/getFilterDonvi'](this.pagination) // this.$store.state.kehoach.nguoidung.map((x) => ({ value: x.ma_nd, text: x.ten_nd_dv }))
       //return rs.unshift([{ ma_nd: '', ten_nd_dv: '-- Chưa được gán nhân viên --' }])
+      console.log(rs)
       return [
         ...[{ ma_nd: '', ten_nd_dv: '-- Chưa được gán nhân viên --' }],
         ...rs
@@ -593,8 +590,14 @@ export default {
     },
     dialog_thuchien: {
       handler(val) {
-        if (val)
+        if (val) {
           this.$store.dispatch('kehoach/GetLyDo', this.params_thuchien)
+          this.params_thuchien.ket_qua = 0
+          this.params_thuchien.goicuoc = ''
+          this.params_thuchien.lydo = ''
+          this.params_thuchien.de_xuat = ''
+          this.params_thuchien.ghichu = ''
+        }
       },
       deep: true
     }

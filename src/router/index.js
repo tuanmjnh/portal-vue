@@ -393,6 +393,13 @@ const routes = [
         props: true,
         meta: { desc: 'kehoach-items', auth: true, roles: ['items_kh.select'] },
         component: () => import('@/pages/kehoach/items_list')
+      },
+      {
+        path: 'baocao',
+        name: 'kehoach-baocao',
+        props: true,
+        meta: { desc: 'kehoach-baocao', auth: true, roles: ['kehoach.select'] },
+        component: () => import('@/pages/kehoach/baocao')
       }
     ]
   },
