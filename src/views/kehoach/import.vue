@@ -133,8 +133,8 @@ export default {
     },
   }),
   computed: {
-    donvi() {
-      return this.$store.getters['donvi/getFilter']({ sortBy: 'ma_dvi' })
+     donvi() {
+      return this.$store.state.donvi.items //this.$store.getters['donvi/getPBH']
     },
     nhom_kh() {
       return this.$store.getters['kehoach/getNhomKH'] // this.$store.state.kehoach.nhom_kh

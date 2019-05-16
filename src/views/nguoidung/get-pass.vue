@@ -12,17 +12,15 @@
               <v-select :items="donvi" v-model="params.donvi_id" item-text="ten_dv"
                 item-value="donvi_id" :label="$languages.get('global.local')"></v-select>
             </v-flex>
-            <v-flex xs12 sm6 md6 v-if="!$store.state.$loadingGet">
-              <v-select :items="nguoidung" v-model="params.ma_nd" item-value="ma_nd"
-                item-text="ten_nd" label="Mã người dùng"></v-select>
+            <v-flex xs12 sm6 md6>
+              <v-select :items="nguoidung" v-model="ten_nd" item-value="ma_nd" item-text="ten_nd"
+                label="Tên người dùng"></v-select>
             </v-flex>
-            <v-flex xs12 sm6 md6 v-if="params.ma_nd">
-              <v-text-field v-model="params.ma_nd" disabled="" label="Tài khoản người dùng"
-                class="text-color-initial"></v-text-field>
+            <v-flex xs12 sm6 md6>
+              <v-text-field v-model="ma_nd" label="Tài khoản người dùng"></v-text-field>
             </v-flex>
             <v-flex xs12 sm6 md6 v-if="matkhau">
-              <v-text-field v-model="matkhau" disabled="" label="Mật khẩu người dùng"
-                class="text-color-initial"></v-text-field>
+              <v-text-field v-model="matkhau" disabled label="Mật khẩu người dùng" class="text-color-initial"></v-text-field>
             </v-flex>
             <!-- </v-flex> -->
           </v-layout>
@@ -44,6 +42,8 @@ export default {
   data: () => ({
     valid: false,
     matkhau: '',
+    ten_nd: '',
+    ma_nd: '',
     nguoidung: [],
     totalItems: 0,
     params: {
@@ -51,7 +51,6 @@ export default {
       rowsPerPage: 0,
       flag: 1,
       donvi_id: 5588,
-      ma_nd: '',
     }
   }),
   created() {
@@ -70,16 +69,31 @@ export default {
       handler(val) {
         this.$store.dispatch('nguoidung/select', this.params).then((x) => {
           if (x && x.data) this.nguoidung = x.data
+          this.reset()
         })
-        this.reset()
       },
       deep: true
+    },
+    ten_nd(val) {
+      this.ma_nd = val
+      this.reset()
+    },
+    ma_nd(val) {
+      this.reset()
     }
+    // donvi_id(val) {
+    //   this.$store.dispatch('nguoidung/select', {
+    //     donvi_id: this.donvi_id
+    //   }).then((x) => {
+    //     if (x && x.data) this.nguoidung = x.data
+    //     this.reset()
+    //   })
+    // }
   },
   methods: {
     onSave(item) {
       if (this.valid) {
-        this.$store.dispatch('nguoidung/GetPassword', this.params).then((x) => {
+        this.$store.dispatch('nguoidung/GetPassword', { ma_nd: this.ma_nd }).then((x) => {
           this.matkhau = x.GIAIMA_MK
         })
       }

@@ -54,6 +54,14 @@ export default {
     this.$store.commit('auth/SET_ITEM')
     // this.$store.dispatch('TEST')
   },
+  mounted() {
+    const $this = this
+    window.addEventListener('keyup', function(event) {
+      if (event.keyCode === 13) {
+        $this.signIn()
+      }
+    })
+  },
   computed: {
     item() {
       return this.$store.state.auth.item
@@ -71,7 +79,9 @@ export default {
   },
   methods: {
     signIn() {
-      this.$store.dispatch('auth/signIn', true).then(() => { this.$router.push(this.$route.query.redirect) })
+      this.$store.dispatch('auth/signIn', true).then(() => {
+        this.$router.push(this.$route.query.redirect)
+      })
     }
   }
 }

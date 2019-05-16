@@ -10,8 +10,6 @@ export default {
     nhom_kh: [],
     nguoidung: [],
     kehoach_extra: {},
-    selected_tb: [],
-    selected_th: {},
     dialog: false,
     isGetFirst: true,
     thuebao_nguoidung: {},
@@ -35,6 +33,11 @@ export default {
       return rs
     },
     getFilterDonvi: state => pagination => {
+      return state.nguoidung ? state.nguoidung.filter((x) => {
+        return pagination.donvi_id === x.donvi_id
+      }) : ''
+    },
+    getFilterDonvi2: state => pagination => {
       return state.nguoidung ? state.nguoidung.filter((x) => {
         return pagination.donvi_id.indexOf(x.donvi_id) > -1
       }) : []
@@ -271,6 +274,32 @@ export default {
         commit('SET_CATCH', error, { root: true })
       }).finally(() => {
         state.selected_th = []
+        if (params.loading) rootState.$loadingCommit = false
+      })
+    },
+    async updateNVTB({ commit, state, rootGetters, rootState }, params) {
+      // Loading
+      if (params.loading) rootState.$loadingCommit = true
+      console.log(params)
+      // http
+      return await vnptbkn().post(`${collection}/updateNVTB/${params.nd}`, params.tb).then(function(res) {
+        if (res.status == 200) {
+          if (res.data.msg === 'error_token') {
+            commit('SET_CATCH', { response: { status: 401 } }, { root: true })
+            return
+          }
+          if (res.data.msg === 'danger') {
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            return
+          }
+          // Success
+          commit('SET_MESSAGE', { text: rootGetters.languages('success.update'), color: res.data.msg }, { root: true })
+          state.kehoach_tb.remove(params.tb)
+          return res.data
+        } else commit('SET_CATCH', null, { root: true })
+      }).catch((error) => {
+        commit('SET_CATCH', error, { root: true })
+      }).finally(() => {
         if (params.loading) rootState.$loadingCommit = false
       })
     },

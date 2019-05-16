@@ -1,9 +1,7 @@
 import axios from 'axios'
 import * as storageAuth from './storage-auth'
-import { env } from '@/environment.js';
-// console.log(environment.production)
+import env from '@/environment'
 const source = axios.CancelToken.source();
-
 const vnptbkn = () => {
   return axios.create({
     upload: env.upload,

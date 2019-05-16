@@ -1,6 +1,8 @@
 var webpack = require("webpack");
 var path = require("path");
 var _package = require('./package.json');
+// import env from 'src/environment/index.js'
+// console.log(env)
 const env = { //environment
   dev: { // development
     publicPath: '/',

@@ -12,16 +12,16 @@
                 single-line hide-details></v-text-field>
             </v-flex>
             <v-flex xs12 sm12 md12 v-if="$store.getters['auth/inRoles']('donvi.select')">
-              <v-select :items="donvi" v-model="pagination.donvi_id" multiple item-text="ten_dv"
+              <v-select :items="donvi" v-model="pagination.donvi_id" item-text="ten_dv"
                 item-value="donvi_id" :label="$languages.get('global.local')"></v-select>
             </v-flex>
             <v-flex xs12 sm12 md12 v-if="$store.getters['auth/inRoles']('kehoach.update')">
-              <v-select :items="pagination_nguoidung" v-model="pagination.ma_nd" multiple
+              <v-select :items="pagination_nguoidung" v-model="pagination.ma_nd"
                 item-text="ten_nd_dv" item-value="ma_nd" label="Thuê bao theo nhân viên"></v-select>
             </v-flex>
             <v-flex xs12 sm12 md12>
-              <v-select :items="nhom_kh" v-model="pagination.nhomkh_id" multiple
-                item-text="title" item-value="id" label="Nhóm kế hoạch"></v-select>
+              <v-select :items="nhom_kh" v-model="pagination.nhomkh_id" item-text="title"
+                item-value="id" label="Nhóm kế hoạch"></v-select>
             </v-flex>
             <v-flex xs12 sm12 md12>
               <v-select :items="flag" v-model="pagination.flag" label="Trạng thái thực hiện"></v-select>
@@ -315,17 +315,16 @@
       </v-card>
     </v-dialog>
     <v-card>
-      <v-form v-model="valid" ref="form" v-if="$store.getters['auth/inRoles']('kehoach.update')">
+      <v-form v-model="valid" ref="valid_update" v-if="$store.getters['auth/inRoles']('kehoach.update')">
         <v-card-title>
           <v-layout wrap>
             <v-flex xs12 sm12 md12>
               <span class="title">Giao thuê bao cho nhân viên</span>
             </v-flex>
             <v-flex xs12 sm5 md5>
-              <v-select :items="nguoidung" v-model="$store.state.kehoach.thuebao_nguoidung.nguoidung_id"
-                item-value="ma_nd" item-text="ten_nd_dv" :hide-selected="true" label="Nhân viên"
-                :rules="[v=>v&&v.length>0||$languages.get('error.required_select')]" hint="Chọn một nhân viên"
-                persistent-hint></v-select>
+              <v-select :items="nguoidung" v-model="selected_nd" item-value="ma_nd"
+                item-text="ten_nd_dv" :hide-selected="true" label="Nhân viên" :rules="[v=>v&&v.length>0||$languages.get('error.required_select')]"
+                hint="Chọn một nhân viên" persistent-hint></v-select>
             </v-flex>
             <v-spacer></v-spacer>
             <!-- <v-tooltip left>
@@ -335,7 +334,7 @@
               </v-btn>
               <span>Cập nhật gán thuê bao đã chọn cho nhân viên</span>
             </v-tooltip> -->
-            <v-btn color="primary" flat @click.native="onSave" :disabled="!valid"
+            <v-btn color="primary" flat @click.native="onUpdateNVTB" :disabled="!valid"
               :loading="$store.state.$loadingCommit">
               {{$languages.get('global.update')}}
             </v-btn>
@@ -361,8 +360,8 @@
         <export-data :getData="getDataExport" filename="kehoach_thuebao" :suffixFileName="true"
           :tooltip="$languages.get('global.export')" color="success" :items="[{title:$store.getters.languages(['global.export',' ',' .csv']),type:'csv'}]" />
       </v-card-title>
-      <v-data-table class="elevation-1" v-model="$store.state.kehoach.selected_tb"
-        select-all item-key="id" :headers="headers" :items="items" :rows-per-page-items="[10, 25, 50, 100, 200, 500]"
+      <v-data-table class="elevation-1" v-model="selected_tb" select-all item-key="id"
+        :headers="headers" :items="items" :rows-per-page-items="[10, 25, 50, 100, 200, 500]"
         :rows-per-page-text="$languages.get('global.rows_per_page')" :pagination.sync="pagination"
         :loading="$store.state.$loadingGet" :total-items="totalItems">
         <template slot="items" slot-scope="props">
@@ -430,6 +429,8 @@ export default {
     valid_thuchien: false,
     totalItems: 0,
     tabs_deatils: null,
+    selected_tb: [],
+    selected_nd: '',
     pagination: {
       loading: true,
       search: '',
@@ -439,9 +440,9 @@ export default {
       flag: 1,
       page: 1,
       rowsPerPage: 10,
-      donvi_id: [5588],
-      nhomkh_id: [702],
-      ma_nd: [''],
+      donvi_id: 5588,
+      nhomkh_id: 702,
+      ma_nd: '$all',
       ket_qua: ''
     },
     headers: [
@@ -526,7 +527,7 @@ export default {
       //   ...[{ donvi_id: 0, ten_dv: this.$languages.get('global.select_all') }],
       //   ...rs
       // ]
-      return this.$store.getters['donvi/getPBH']
+      return this.$store.state.donvi.items //this.$store.getters['donvi/getPBH']
     },
     nhom_kh() {
       // const rs = this.$store.getters['kehoach/getNhomKH']
@@ -549,8 +550,8 @@ export default {
     pagination_nguoidung() {
       const rs = this.$store.getters['kehoach/getFilterDonvi'](this.pagination) // this.$store.state.kehoach.nguoidung.map((x) => ({ value: x.ma_nd, text: x.ten_nd_dv }))
       //return rs.unshift([{ ma_nd: '', ten_nd_dv: '-- Chưa được gán nhân viên --' }])
-      console.log(rs)
       return [
+        ...[{ ma_nd: '$all', ten_nd_dv: this.$languages.get('global.select_all') }],
         ...[{ ma_nd: '', ten_nd_dv: '-- Chưa được gán nhân viên --' }],
         ...rs
       ]
@@ -623,9 +624,17 @@ export default {
     onCFMCancel() {
       this.$store.state.kehoach.selected = []
     },
-    onSave() {
+    onUpdateNVTB() {
       if (this.valid) {
-        this.$store.dispatch('kehoach/insert_th', { loading: true })
+        this.$store.dispatch('kehoach/updateNVTB', {
+          loading: true,
+          tb: this.selected_tb,
+          nd: this.selected_nd
+        }).then(() => {
+          this.selected_tb = []
+          this.selected_nd = ''
+          this.$refs.valid_update.resetValidation()
+        })
       }
     },
     onUpdateND() {
