@@ -79,7 +79,7 @@
             <td>{{ props.item.title }}</td>
             <td>{{ props.item.orders }}</td>
             <td>{{ props.item.created_at|formatDate('DD/MM/YYYY hh:mm') }}</td>
-            <td v-html="props.item.icon"></td>
+            <!-- <td v-html="props.item.icon"></td> -->
             <td class="justify-center layout px-0">
               <v-tooltip bottom>
                 <v-btn flat icon slot="activator" color="teal" class="mx-0" @click="onEdit(props.item)">
@@ -143,7 +143,7 @@ export default {
       { text: 'news.title', value: 'title', align: 'left' },
       { text: 'global.orders', value: 'orders' },
       { text: 'global.created_at', value: 'created_at' },
-      { text: 'Icon', value: 'icon' },
+      // { text: 'Icon', value: 'icon' },
       { text: '#', value: '#', sortable: false },
     ]
   }),

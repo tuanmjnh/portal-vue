@@ -16,14 +16,18 @@
               <v-tab>{{$languages.get('global.contents')}}</v-tab>
               <v-tab-item>
                 <v-layout wrap class="pt-2">
-                  <v-flex xs12 sm5 md5>
+                  <v-flex xs12 sm6 md6>
                     <v-select :items="category" v-model.trim="item.code" item-value="id"
-                      item-text="title" :label="$languages.get('category.group')"
+                      item-text="title" :label="$languages.get('category.group')" :rules="[v=>!!v||$languages.get('error.required_select')]"></v-select>
+                  </v-flex>
+                  <v-flex xs12 sm6 md6>
+                    <v-select :items="app_key" v-model.trim="item.app_key" item-value="app_key"
+                      item-text="title" :label="$languages.get('category.app_key')"
                       :rules="[v=>!!v||$languages.get('error.required_select')]"></v-select>
                   </v-flex>
-                  <v-flex xs12 sm7 md7>
+                  <v-flex xs12 sm6 md6>
                     <v-text-field v-model.trim="item.title" :rules="[v=>!!v||$languages.get('error.required')]"
-                      :label="$languages.get('news.title')"></v-text-field>
+                      :label="$languages.get('global.title')"></v-text-field>
                   </v-flex>
                   <v-flex xs3 sm1 md1>
                     <v-text-field type="number" v-model.trim="item.orders" :label="$languages.get('global.orders')"
@@ -135,6 +139,9 @@ export default {
     },
     category() {
       return this.$store.state.category.items.map(x => ({ id: x.id.toString(), title: x.title }))
+    },
+    app_key() {
+      return this.$store.state.app_key.items
     }
   },
   watch: {
@@ -157,6 +164,7 @@ export default {
     onSave() {
       if (this.valid) {
         // if (this.dependent_selected) this.item.code = `,${this.dependent_selected.join(',')},`
+        this.item.icon = ''
         if (this.tags) this.item.tags = `,${this.tags.join(',')},`
         if (this.item.id) this.$store.dispatch('news/update')
         else this.$store.dispatch('news/insert').then(() => { this.reset() })
@@ -176,6 +184,7 @@ export default {
     reset() {
       this.$store.commit('news/SET_ITEM')
       // this.dependent_selected = [0]
+      this.item.app_key = 'lydo'
       this.tags = []
       this.$refs.form.resetValidation()
     }
