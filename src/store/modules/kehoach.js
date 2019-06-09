@@ -99,6 +99,31 @@ export default {
         if (params.loading) rootState.$loadingGet = false
       })
     },
+    async GetReport({ commit, rootGetters, state, rootState }, params) {
+      // Loading
+      if (params.loading) rootState.$loadingGet = true
+      // http
+      return await vnptbkn().get(`${collection}/GetReport${QueryString.get(params)}`).then(function(res) {
+        if (res.status === 200) {
+          if (res.data.msg === 'error_token') {
+            commit('SET_CATCH', { response: { status: 401 } }, { root: true })
+            return
+          }
+          if (res.data.msg === 'danger') {
+            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
+            return
+          }
+          // if (res.data.data.length < 1)
+          //   commit('SET_MESSAGE', { text: rootGetters.languages('error.no_data'), color: 'warning' }, { root: true })
+          return res.data.data
+        } else commit('SET_CATCH', null, { root: true })
+      }).catch((error) => {
+        commit('SET_CATCH', error, { root: true })
+      }).finally(() => {
+        state.isGetFirst = false
+        if (params.loading) rootState.$loadingGet = false
+      })
+    },
     async select_th({ commit, state, rootGetters, rootState }, params) {
       // Loading
       if (params.loading) rootState.$loadingGet = true

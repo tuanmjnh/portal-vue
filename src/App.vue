@@ -31,7 +31,7 @@ export default {
   // data: () => ({}),
   beforeCreate() {
     // Get Languages
-    if (this.$store.state.languages.isGetFirst) this.$store.dispatch('languages/select')
+    // if (this.$store.state.languages.isGetFirst) this.$store.dispatch('languages/select')
     // Get Dictionary
     // if (!this.$store.state.$language || !this.$store.state.$dictionary) this.$store.dispatch('setLanguage')
     // if (!this.$store.state.$language) this.$store.dispatch('setLanguage')

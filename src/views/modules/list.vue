@@ -87,7 +87,7 @@
       </v-data-table>
       <!-- </v-form> -->
     </v-card>
-    <tpl-confirm :dialog="$store.state.permissions.confirm" @onAccept="onCFMAccept"
+    <tpl-confirm :dialog.sync="$store.state.permissions.confirm" @onAccept="onCFMAccept"
       @onCancel="onCFMCancel" :title="$languages.get('global.message')"
       :content="$languages.get('messages.confirm_content')" :btnAcceptText="$languages.get('global.accept')"
       :btnCancelText="$languages.get('global.cancel')"></tpl-confirm>

@@ -16,10 +16,6 @@
               <v-tab-item>
                 <v-layout wrap class="pt-2">
                   <v-flex xs12 sm6 md6>
-                    <v-text-field v-model.trim="item.title" :rules="[v=>!!v||$languages.get('error.required')]"
-                      :label="$languages.get('category.name')"></v-text-field>
-                  </v-flex>
-                  <v-flex xs12 sm6 md6>
                     <v-select :items="items" v-model="dependent_selected" multiple
                       :menu-props="{maxHeight:'400'}" item-value="id" item-text="title"
                       persistent-hint :hint="$languages.get('global.dependent_select')"
@@ -31,6 +27,10 @@
                       item-text="title" item-value="app_key"></v-select>
                     <!-- <v-combobox :items="key_category" v-model.trim="item.app_key" :rules="[v=>!!v||$languages.get('error.required')]"
                       :label="$languages.get('category.app_key')"></v-combobox> -->
+                  </v-flex>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field v-model.trim="item.title" :rules="[v=>!!v||$languages.get('error.required')]"
+                      :label="$languages.get('category.name')"></v-text-field>
                   </v-flex>
                   <!-- <v-flex xs12 sm4 md4>
                     <v-select :items="code_category" v-model="item.code" :label="$languages.get('category.group')"

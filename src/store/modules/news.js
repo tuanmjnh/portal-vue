@@ -10,7 +10,7 @@ export default {
     isGetFirst: true,
     default: {
       id: 0,
-      app_key: 'news',
+      app_key: 'guide',
       code: '',
       title: '',
       icon: '<i class="material-icons">view_module</i>',

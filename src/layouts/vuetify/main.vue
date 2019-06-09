@@ -19,7 +19,7 @@
       </v-toolbar>
       <v-divider></v-divider>
       <v-list>
-        <template v-for="(item, i) in $store.getters['navigation/getRender']({position: 'content-left',roles:$store.state.auth.user.roles})">
+        <template v-for="(item, i) in $store.getters['navigation/getRender']({position: 'content-left',quyen:$store.state.auth.user.quyen})">
           <v-list-tile v-if="item.children.length<1" :key="i" @click="MenuAction(item)">
             <v-list-tile-action v-html="item.icon">
               <!-- <v-icon v-html="item.icon"></v-icon> -->
@@ -102,7 +102,7 @@
       <!-- <v-btn icon @click.stop="rightDrawer = !rightDrawer">
         <v-icon>apps</v-icon>
       </v-btn> -->
-      <template v-for="(item, index) in $store.getters['navigation/getRender']({position: 'head-right',roles:$store.state.auth.user.roles})">
+      <template v-for="(item, index) in $store.getters['navigation/getRender']({position: 'head-right',quyen:$store.state.auth.user.quyen})">
         <template v-if="item.children.length>0">
           <v-menu :key="item.id" bottom :min-width="166">
             <v-tooltip slot="activator" bottom :key="index" v-if="item.icon">
@@ -227,8 +227,10 @@
     <v-footer :fixed="fixed" app>
       <!-- <v-layout wrap class="pl-3"> -->
       <v-flex xs3 sm3 md2 class="pl-3">
-        <v-select :items="$store.getters['languages/getFilter']({flag:1})" v-model="$store.state.$language"
-          :hide-selected="true" item-text="title" item-value="code"></v-select>
+        <!-- <v-select :items="$store.getters['languages/getFilter']({flag:1})" v-model="$store.state.$language"
+          :hide-selected="true" item-text="title" item-value="code"></v-select> -->
+        <v-select :items="$languages.data" :hide-selected="true" :value="$languages.code"
+          item-text="title" item-value="code" @change="changeLanguage"></v-select>
       </v-flex>
       <v-spacer></v-spacer>
       <!-- <v-flex xs9 sm9 md10></v-flex> -->
@@ -312,20 +314,20 @@ export default {
       var rs = this.$store.state.auth.user
       return rs
     },
-    dataLanguages() {
-      const rs = this.$store.state.languages.items
-      return rs
-    },
-    language() {
-      const rs = this.$store.state.$language
-      return rs
-    },
+    // dataLanguages() {
+    //   const rs = this.$store.state.languages.items
+    //   return rs
+    // },
+    // language() {
+    //   const rs = this.$store.state.$language
+    //   return rs
+    // },
     notification() {
       const rs = this.$store.state.notification.items
       return rs
     },
     navHeadLeft() {
-      const rs = this.$store.getters['navigation/getRender']({ position: 'head-left', roles: this.$store.state.auth.user.roles })
+      const rs = this.$store.getters['navigation/getRender']({ position: 'head-left', quyen: this.$store.state.auth.user.quyen })
       if (rs.length > 0) return rs[0]
       else return {
         title: 'Portal',
@@ -352,14 +354,18 @@ export default {
     },
     getAuth(key) {
       return storageAuth.GetStorage()[key]
-    }
-  },
-  watch: {
-    language(val) {
-      this.$store.state.$language = val
+    },
+    changeLanguage(val) {
       this.$languages.setLang(val)
-    }
+      this.$forceUpdate()
+    },
   },
+  // watch: {
+  //   language(val) {
+  //     this.$store.state.$language = val
+  //     this.$languages.setLang(val)
+  //   }
+  // },
 }
 </script>
 <style lang="scss">

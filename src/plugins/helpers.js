@@ -125,6 +125,10 @@ String.prototype.toUpperCaseFirst = function() {
 String.prototype.toLowerCaseFirst = function() {
   return this.charAt(0).toLowerCase() + this.slice(1);
 }
+Number.prototype.format = function(n, x) {
+  var re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\.' : '$') + ')';
+  return this.toFixed(Math.max(0, ~~n)).replace(new RegExp(re, 'g'), '$&,');
+};
 String.prototype.format = function() {
   if (arguments.length > 0 && typeof arguments[0] === 'object') {
     let $this = this

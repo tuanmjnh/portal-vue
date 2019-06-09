@@ -118,7 +118,7 @@ export default {
       // Loading
       if (params.loading && !rootState.$loadingGet) rootState.$loadingGet = true
       // http
-      return await vnptbkn().get(`${collection}/GetByDonVi`, { params: params }).then(function (res) {
+      return await vnptbkn().get(`${collection}/GetByDonVi`, { params: params }).then(function(res) {
         if (res.status === 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -148,7 +148,7 @@ export default {
       // Loading
       if (loading) rootState.$loadingCommit = true
       // http
-      await vnptbkn().get(`${collection}/getThuebao/${state.khachhang.hdkh_id}`).then(function (res) {
+      await vnptbkn().get(`${collection}/getThuebao/${state.khachhang.hdkh_id}`).then(function(res) {
         if (res.status === 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -175,7 +175,7 @@ export default {
       // state.khachhang.created_at = new Date()
       // const thuebao = [...state.thuebao]
       // const data = { khachhang: { ...state.khachhang }, thuebao: [...state.thuebao] }
-      await vnptbkn().post(collection, state.khachhang).then(function (res) {
+      await vnptbkn().post(collection, state.khachhang).then(function(res) {
         if (res.status == 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -218,7 +218,7 @@ export default {
       if (loading) rootState.$loadingCommit = true
       // http
       const data = state.selected.map(x => ({ id: x.id, flag: 4 }))
-      await vnptbkn().put(`${collection}/delete`, data).then(function (res) {
+      await vnptbkn().put(`${collection}/delete`, data).then(function(res) {
         if (res.status == 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })
@@ -256,7 +256,7 @@ export default {
       // Loading
       if (loading) rootState.$loadingCommit = true
       // http
-      await vnptbkn().get(`${collection}/getContract?key=${state.khachhang.ma_gd}`).then(function (res) {
+      await vnptbkn().get(`${collection}/getContract?key=${state.khachhang.ma_gd}`).then(function(res) {
         if (res.status == 200) {
           if (res.data.msg === 'not_exist') {
             commit('SET_MESSAGE', { text: rootGetters.languages('contract_customer.msg_err_not_exist'), color: 'warning' }, { root: true })

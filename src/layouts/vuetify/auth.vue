@@ -38,8 +38,8 @@
     </v-layout>
     <v-layout wrap class="align-center justify-center">
       <v-flex xs6 sm6 md3>
-        <v-select :items="$store.getters['languages/getFilter']({find:{flag:1}})" v-model="$store.state.$language"
-          :hide-selected="true" item-text="title" item-value="code"></v-select>
+        <v-select :items="$languages.data" :hide-selected="true" :value="$languages.code"
+          item-text="title" item-value="code" @change="changeLanguage"></v-select>
       </v-flex>
     </v-layout>
   </div>
@@ -56,7 +56,7 @@ export default {
   },
   mounted() {
     const $this = this
-    window.addEventListener('keyup', function(event) {
+    window.addEventListener('keyup', function (event) {
       if (event.keyCode === 13) {
         $this.signIn()
       }
@@ -66,18 +66,23 @@ export default {
     item() {
       return this.$store.state.auth.item
     },
-    language() {
-      return this.$store.state.$language
-    }
+    // language() {
+    //   console.log(this.$languages.code)
+    //   return this.$languages.code
+    // }
   },
-  watch: {
-    language(val) {
-      this.$store.state.$language = val
-      this.$languages.setLang(val)
-      // this.$store.dispatch('setLanguage')
-    }
-  },
+  // watch: {
+  //   language(val) {
+  //     // this.$store.state.$language = val
+  //     this.$languages.setLang(val)
+  //     // this.$store.dispatch('setLanguage')
+  //   }
+  // },
   methods: {
+    changeLanguage(val) {
+      this.$languages.setLang(val)
+      this.$forceUpdate()
+    },
     signIn() {
       this.$store.dispatch('auth/signIn', true).then(() => {
         this.$router.push(this.$route.query.redirect)

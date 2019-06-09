@@ -119,7 +119,7 @@
       </v-data-table>
       <!-- </v-form> -->
     </v-card>
-    <tpl-confirm :dialog="dialog_confirm" @onAccept="onCFMAccept" @onCancel="onCFMCancel"
+    <tpl-confirm :dialog.sync="dialog_confirm" @onAccept="onCFMAccept" @onCancel="onCFMCancel"
       :title="$languages.get('global.message')" :content="$languages.get('messages.confirm_content')"
       :btnAcceptText="$languages.get('global.accept')" :btnCancelText="$languages.get('global.cancel')"></tpl-confirm>
   </div>

@@ -16,8 +16,9 @@
                 item-text="ten_dv" item-value="donvi_id" :label="$languages.get('global.local')"></v-select>
             </v-flex>
             <v-flex xs12 sm6 md6>
-              <v-menu v-model="start_at_menu" :nudge-right="40" lazy transition="scale-transition"
-                offset-y full-width min-width="290px">
+              <v-menu v-model="start_at_menu" :close-on-content-click="false"
+                :nudge-right="40" lazy transition="scale-transition" offset-y full-width
+                min-width="290px">
                 <template v-slot:activator="{on}">
                   <v-text-field :value="pagination.start_at.formatDate('DD/MM/YYYY')"
                     :label="$languages.get('global.start_at')" prepend-icon="event"
@@ -27,8 +28,8 @@
               </v-menu>
             </v-flex>
             <v-flex xs12 sm6 md6>
-              <v-menu v-model="end_at_menu" :nudge-right="40" lazy transition="scale-transition"
-                offset-y full-width min-width="290px">
+              <v-menu v-model="end_at_menu" :close-on-content-click="false" :nudge-right="40"
+                lazy transition="scale-transition" offset-y full-width min-width="290px">
                 <template v-slot:activator="{on}">
                   <v-text-field :value="pagination.end_at.formatDate('DD/MM/YYYY')"
                     :label="$languages.get('global.end_at')" prepend-icon="event"
@@ -103,7 +104,7 @@
                   target="_blank"><i class="material-icons">attachment</i></a>
                 <span>
                   {{
-                  `${$languages.get('contract_customer.details')}:${props.item.ma_gd}`
+                  `${$languages.get('contract_customer.details')}: ${props.item.ma_gd}`
                   }}
                 </span>
               </v-tooltip>

@@ -363,6 +363,7 @@
       <v-data-table class="elevation-1" v-model="selected_tb" select-all item-key="id"
         :headers="headers" :items="items" :rows-per-page-items="[10, 25, 50, 100, 200, 500]"
         :rows-per-page-text="$languages.get('global.rows_per_page')" :pagination.sync="pagination"
+        :no-data-text="$languages.get('global.no_data_text')" :no-results-text="$languages.get('global.no_results_text')"
         :loading="$store.state.$loadingGet" :total-items="totalItems">
         <template slot="items" slot-scope="props">
           <tr>
@@ -373,6 +374,7 @@
             <td>{{ props.item.ten_tb }}</td>
             <td>{{ props.item.so_dt }}</td>
             <td>{{ props.item.ma_nd }}</td>
+            <td>{{ props.item.diachi_tb }}</td>
             <td class="justify-center layout px-0">
               <v-tooltip bottom>
                 <v-btn flat icon slot="activator" color="primary" class="mx-0" @click="onDetails(props.item)">
@@ -400,7 +402,7 @@
         </template>
       </v-data-table>
     </v-card>
-    <tpl-confirm :dialog="dialog_confirm" @onAccept="onCFMAccept" @onCancel="onCFMCancel"
+    <tpl-confirm :dialog.sync="dialog_confirm" @onAccept="onCFMAccept" @onCancel="onCFMCancel"
       :title="$languages.get('global.message')" :content="$languages.get('messages.confirm_content')"
       :btnAcceptText="$languages.get('global.accept')" :btnCancelText="$languages.get('global.cancel')"></tpl-confirm>
   </div>
@@ -442,7 +444,7 @@ export default {
       rowsPerPage: 10,
       donvi_id: 5588,
       nhomkh_id: 702,
-      ma_nd: '$all',
+      ma_nd: '0',
       ket_qua: ''
     },
     headers: [
@@ -450,6 +452,7 @@ export default {
       { text: 'Tên TB', value: 'ten_tb' },
       { text: 'Số ĐT', value: 'so_dt' },
       { text: 'Mã NV', value: 'ma_nd' },
+      { text: 'Địa chỉ', value: 'diachi_tb' },
       // { text: '#', value: '#f', sortable: false },
       { text: '#', value: '#', sortable: false },
       // { text: 'Tháng BĐ', value: 'thang_bd' },
@@ -548,10 +551,12 @@ export default {
       return this.$store.state.kehoach.nguoidung
     },
     pagination_nguoidung() {
-      const rs = this.$store.getters['kehoach/getFilterDonvi'](this.pagination) // this.$store.state.kehoach.nguoidung.map((x) => ({ value: x.ma_nd, text: x.ten_nd_dv }))
+      const rs = this.$store.getters['kehoach/getFilterDonvi']({
+        donvi_id: this.$store.getters['auth/inRoles']('donvi.select') ? this.pagination.donvi_id : this.$store.state.auth.user.donvi_id
+      }) // this.$store.state.kehoach.nguoidung.map((x) => ({ value: x.ma_nd, text: x.ten_nd_dv }))
       //return rs.unshift([{ ma_nd: '', ten_nd_dv: '-- Chưa được gán nhân viên --' }])
       return [
-        ...[{ ma_nd: '$all', ten_nd_dv: this.$languages.get('global.select_all') }],
+        ...[{ ma_nd: '0', ten_nd_dv: this.$languages.get('global.select_all') }],
         ...[{ ma_nd: '', ten_nd_dv: '-- Chưa được gán nhân viên --' }],
         ...rs
       ]

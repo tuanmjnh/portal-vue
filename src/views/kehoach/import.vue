@@ -133,7 +133,7 @@ export default {
     },
   }),
   computed: {
-     donvi() {
+    donvi() {
       return this.$store.state.donvi.items //this.$store.getters['donvi/getPBH']
     },
     nhom_kh() {

@@ -63,8 +63,8 @@ export default new Vuex.Store({
       color: 'success',
       text: ''
     },
-    $language: TMLanguage.getLang('vi-VN'),
-    //$dictionary: TMLanguage.GetDictionary(),
+    // $language: TMLanguage.getLang('vi-VN'),
+    // $dictionary: TMLanguage.GetDictionary(),
     // $dictionary: TMLanguage.GetDictionary(),
     $notification: false,
     $row_per_page: [10, 25, 50, 100, 200, 500], //  { text: "All", value: -1 }

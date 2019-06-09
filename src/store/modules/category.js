@@ -11,7 +11,7 @@ export default {
     isGetFirst: true,
     default: {
       id: 0,
-      app_key: 'news',
+      app_key: 'guide',
       code: '',
       dependent: '',
       levels: 0,
@@ -91,11 +91,7 @@ export default {
       state.items = items
     },
     SET_ITEM(state, item) {
-      if (item) {
-        if (item.url_plus) state.url_plus = JSON.parse(item.url_plus)
-        else state.url_plus = { push: '', go: '', store: '' }
-        state.item = { ...item }
-      } else state.item = { ...state.default }
+      state.item = item ? { ...item } : { ...state.default }
     },
     SET_ITEM_ID(state, id) {
       if (id) {

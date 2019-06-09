@@ -5,50 +5,44 @@ export default {
   state: {
     items: [],
     item: {},
-    tabs: null,
     selected: [],
-    valid: false,
+    category: [],
     dialog: false,
-    confirm: false,
-    exist_code: true,
-    isGetFirst: true,
-    headers: [
-      { text: 'Tài khoản', value: 'username' },
-      { text: 'Họ tên', value: 'full_name' },
-      { text: 'Điện thoại', value: 'mobile' },
-      { text: 'Email', value: 'email' },
-      { text: '#', value: '#', sortable: false }
-    ],
-    pagination: {
-      search: '',
-      sortBy: 'created_at',
-      toggle: 0,
-      find: { flag: 1 }
-    },
     default: {
       id: '',
       app_key: '',
-      local_id: 0,
+      kieuld_id: 0,
+      donvi_id: 0,
       group_id: 0,
-      contract_code: '',
-      customer_name: '',
-      customer_address: '',
-      tax_code: '',
-      start_at: new Date(),
-      end_at: new Date(),
-      quantity: 1,
-      price: '',
-      details: '',
-      contents: '',
-      attach: '',
-      created_by: '',
-      created_at: new Date(),
-      updated_by: '',
-      updated_at: null,
-      deleted_by: '',
-      deleted_at: null,
-      flag: 1,
-      type_id: 1
+      ma_hd: '',
+      ten_kh: '',
+      diachi_kh: '',
+      nguoi_dd: '',
+      sdt: '',
+      stk: '',
+      mst: '',
+      sgt: '',
+      ngay_cap: new Date().toISOString().substr(0, 10),
+      noi_cap: '',
+      ngay_bd: new Date().toISOString().substr(0, 10),
+      ngay_kt: new Date().toISOString().substr(0, 10),
+      so_luong: 1,
+      tien: 0,
+      thue: 0,
+      noi_dung: '',
+      ghi_chu: '',
+      tep_dk: '',
+      nguoi_tao: '',
+      ip_tao: '',
+      ngay_tao: new Date(),
+      nguoi_cn: '',
+      ip_cn: '',
+      ngay_cn: null,
+      nguoi_xoa: '',
+      ip_xoa: '',
+      ngay_xoa: null,
+      trang_thai: 1,
+      nguoi_gt: ''
     }
   },
   getters: {
@@ -67,10 +61,6 @@ export default {
       if (pagination && pagination.sortBy) rs = rs.sortByKey(pagination.sortBy)
       else rs = rs.sortByKey(state.pagination.sortBy)
       return rs
-    },
-    headers: (state, getters, rootState, rootGetters) => {
-      state.headers.forEach(e => { e.text = rootGetters.languages(e.text) })
-      return state.headers
     }
   },
   mutations: {
@@ -94,24 +84,24 @@ export default {
     }
   },
   actions: {
-    async select({ commit, state, rootGetters, rootState }, loading = true) {
+    async select({ commit, state, rootGetters, rootState }, params) {
       // Loading
-      if (loading) rootState.$loadingGet = true
+      if (params.loading && !rootState.$loadingGet) rootState.$loadingGet = true
       // http
-      await vnptbkn().get(collection).then(function (res) {
+      await vnptbkn().get(collection, { params: params }).then(function(res) {
         if (res.status === 200) {
           if (res.data.msg === 'danger') {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
             return
           }
-          if (res.data.data) {
-            commit('SET_ITEMS', res.data.data)
+          if (res.data.items) {
+            commit('SET_ITEMS', res.data.items)
           }
         } else { commit('SET_CATCH', null, { root: true }) }
       }).catch((error) => { commit('SET_CATCH', error, { root: true }) })
         .finally(() => {
           state.isGetFirst = false
-          if (loading) rootState.$loadingGet = false
+          if (params.loading) rootState.$loadingGet = false
         })
     },
     async insert({ commit, state, rootGetters, rootState }, loading = true) {
@@ -120,7 +110,7 @@ export default {
       // http
       state.item.created_by = vnptbkn().defaults.headers.Author
       state.item.created_at = new Date()
-      await vnptbkn().post(collection, state.item).then(function (res) {
+      await vnptbkn().post(collection, state.item).then(function(res) {
         if (res.status == 200) {
           if (res.data.msg === 'exist') {
             commit('SET_MESSAGE', { text: rootGetters.languages('permissions.err_exist'), color: 'warning' }, { root: true })
@@ -144,7 +134,7 @@ export default {
       // http
       state.item.updated_by = vnptbkn().defaults.headers.Author
       state.item.updated_at = new Date()
-      await vnptbkn().put(collection, state.item).then(function (res) {
+      await vnptbkn().put(collection, state.item).then(function(res) {
         if (res.status == 200) {
           if (res.data.msg === 'danger') {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
@@ -162,7 +152,7 @@ export default {
       if (loading) rootState.$loadingCommit = true
       // http
       const data = state.selected.map(x => ({ id: x.id, flag: x.flag === 0 ? 1 : 0 }))
-      await vnptbkn().put(`${collection}/delete`, data).then(function (res) {
+      await vnptbkn().put(`${collection}/delete`, data).then(function(res) {
         if (res.status == 200) {
           if (res.data.msg === 'danger') {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
@@ -182,7 +172,7 @@ export default {
       // Loading
       if (loading) rootState.$loadingCommit = true
       // http
-      await vnptbkn().delete(collection, state.item).then(function (res) {
+      await vnptbkn().delete(collection, state.item).then(function(res) {
         if (res.status == 200) {
           if (res.data.msg === 'danger') {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
@@ -201,7 +191,7 @@ export default {
       // Loading
       if (loading) rootState.$loadingCommit = true
       // http
-      await vnptbkn().get(`${collection}/ExistCode/${state.item.code}`, { timeout: 1000 }).then(function (res) { //, { timeout: 3000 }
+      await vnptbkn().get(`${collection}/ExistCode/${state.item.code}`, { timeout: 1000 }).then(function(res) { //, { timeout: 3000 }
         if (res.status === 200) {
           if (res.data.msg === 'exist') state.exist_code = false
           else state.exist_code = true

@@ -1,27 +1,50 @@
 <template>
   <div>
+    <v-dialog v-model="dialog_filter" max-width="521px">
+      <v-card>
+        <v-card-title class="headline grey lighten-2">
+          {{$languages.get('global.filter_data')}}
+        </v-card-title>
+        <v-card-text>
+          <v-layout wrap>
+            <v-flex xs12 sm12 md12>
+              <v-text-field v-model="pagination.search" append-icon="search" :label="$languages.get('global.search')"
+                single-line hide-details></v-text-field>
+            </v-flex>
+            <v-flex xs12 sm12 md12>
+              <v-select :items="app_key" v-model="params_app_key" :label="$languages.get('category.app_key')"
+                item-text="title" item-value="app_key"></v-select>
+            </v-flex>
+            <v-flex xs12 sm12 md12>
+              <v-select :items="category" v-model="pagination.code" :label="$languages.get('category.group')"
+                item-text="title" item-value="id"></v-select>
+            </v-flex>
+          </v-layout>
+        </v-card-text>
+        <v-divider></v-divider>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" flat @click.native="dialog_filter=false">
+            {{$languages.get('global.back')}}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-card>
       <v-card-title>
-        <v-layout wrap>
-          <v-flex xs12 sm4 md4 class="pr-3">
-            <v-select :items="category" v-model="pagination.code" :label="$languages.get('category.group')"
-              item-text="title" item-value="id"></v-select>
-          </v-flex>
-          <v-flex xs12 sm4 md4 class="pr-3">
-            <v-select :items="app_key" v-model="pagination.app_key" :label="$languages.get('category.app_key')"
-              item-text="title" item-value="app_key"></v-select>
-          </v-flex>
-          <v-flex xs12 sm4 md4>
-            <v-text-field v-model="pagination.search" append-icon="search" :label="$languages.get('global.search')"
-              single-line hide-details></v-text-field>
-          </v-flex>
-        </v-layout>
-        <!-- <v-spacer></v-spacer> -->
+        <span class="title">Danh sách thuê bao kế hoạch</span>
+        <v-spacer></v-spacer>
         <v-tooltip bottom>
           <v-btn flat icon slot="activator" color="primary" @click="$store.state.news.dialog=true">
             <v-icon>add</v-icon>
           </v-btn>
           <span>{{$languages.get('global.add')}}</span>
+        </v-tooltip>
+        <v-tooltip bottom>
+          <v-btn slot="activator" flat icon color="primary" @click="dialog_filter=true">
+            <v-icon>filter_list</v-icon>
+          </v-btn>
+          <span>{{$languages.get('global.filter_data')}}</span>
         </v-tooltip>
         <v-tooltip bottom v-if="$store.state.news.selected.length>0 && pagination.flag===1">
           <v-btn flat icon slot="activator" color="danger" @click="onDelete()">
@@ -92,9 +115,9 @@
       </v-data-table>
       <!-- </v-form> -->
     </v-card>
-    <tpl-confirm :dialog="confirm" @onAccept="onCFMAccept" @onCancel="onCFMCancel" :title="$languages.get('global.message')"
-      :content="$languages.get('messages.confirm_content')" :btnAcceptText="$languages.get('global.accept')"
-      :btnCancelText="$languages.get('global.cancel')"></tpl-confirm>
+    <tpl-confirm :dialog.sync="dialog_confirm" @onAccept="onCFMAccept" @onCancel="onCFMCancel"
+      :title="$languages.get('global.message')" :content="$languages.get('messages.confirm_content')"
+      :btnAcceptText="$languages.get('global.accept')" :btnCancelText="$languages.get('global.cancel')"></tpl-confirm>
   </div>
 </template>
 
@@ -107,8 +130,10 @@ export default {
     'export-data': exportData
   },
   data: () => ({
-    confirm: false,
+    dialog_filter: false,
+    dialog_confirm: false,
     totalItems: 0,
+    params_app_key: 'guide',
     pagination: {
       loading: true,
       search: '',
@@ -118,8 +143,8 @@ export default {
       flag: 1,
       page: 1,
       rowsPerPage: 10,
-      app_key: 'guide',
-      code: '101',
+      code: 101,
+      // app_key: 'guide',
     },
     headers: [
       { text: 'news.title', value: 'title', align: 'left' },
@@ -129,6 +154,14 @@ export default {
       { text: '#', value: '#', sortable: false },
     ]
   }),
+  created() {
+    this.$store.dispatch('category/select', {
+      loading: true,
+      rowsPerPage: 0,
+      flag: 1,
+      app_key: this.params_app_key,
+    })
+  },
   mounted() {
     this.headers.forEach(e => { e.text = this.$store.getters.languages(e.text) })
   },
@@ -152,6 +185,14 @@ export default {
       },
       deep: true
     },
+    params_app_key(val) {
+      this.$store.dispatch('category/select', {
+        loading: true,
+        rowsPerPage: 0,
+        flag: 1,
+        app_key: val,
+      })
+    }
   },
   methods: {
     onEdit(item) {
@@ -159,7 +200,7 @@ export default {
       this.$store.state.news.dialog = true
     },
     onDelete(item) {
-      this.confirm = true
+      this.dialog_confirm = true
       if (item) this.$store.state.news.selected.push(item);
     },
     onCFMAccept() {
