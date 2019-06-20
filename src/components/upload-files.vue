@@ -102,8 +102,9 @@ export default {
         // console.log(_files)
         // console.log(this.files)
       })
-      formData.append('basePath', this.basePath)
-      if (this.http)
+      // formData.append('basePath', this.basePath)
+      if (this.http) {
+        this.http.defaults.headers.path = this.basePath
         this.http.post(`${this.http.defaults.baseURL}/${this.http.defaults.upload}`, formData).then((rs) => {
           // this.$emit('handleUpload', Object.assign(rs.data, { basePath: this.basePath }))
           // this.$emit('update:files', Array.from(event.target.files))
@@ -113,7 +114,8 @@ export default {
         }).finally(() => {
           this.clear()
         })
-      else
+      } else {
+        this.httpOptions.path = this.basePath
         axios.post(this.baseUrl, formData, { headers: this.httpOptions }).then((rs) => {
           // this.$emit('handleUpload', Object.assign(rs.data, { basePath: this.basePath }))
           // this.$emit('update:files', Array.from(event.target.files))
@@ -123,6 +125,7 @@ export default {
         }).finally(() => {
           this.clear()
         })
+      }
     },
     clear() {
       this.reload = false

@@ -196,14 +196,17 @@ export default {
       state.item.created_by = vnptbkn().defaults.headers.Author
       state.item.created_at = new Date()
       //state.item.url_plus = JSON.stringify(state.url_plus)
-      await vnptbkn().post(collection, state.item).then(function(res) {
-        if (res.status == 201) {
-          // Success
+      return await vnptbkn().post(collection, state.item).then(function(res) {
+        if (res.status === 201) {
           commit('SET_ITEM')
           commit('PUSH_ITEMS', res.data)
           commit('SET_MESSAGE', { text: rootGetters.languages('success.add'), color: 'success' }, { root: true })
           state.url_plus = { push: '', go: '', store: '' }
-        } else commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: 'danger' }, { root: true })
+          return true;
+        } else {
+          commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: 'danger' }, { root: true })
+          return false;
+        }
       }).catch((error) => {
         commit('SET_CATCH', error, { root: true })
       }).finally(() => {
@@ -217,16 +220,15 @@ export default {
       state.item.updated_by = vnptbkn().defaults.headers.Author
       state.item.updated_at = new Date()
       // state.item.url_plus = JSON.stringify(state.url_plus)
-      await vnptbkn().put(collection, state.item).then(function(res) {
-        if (res.status == 200) {
-          if (res.data.msg === 'danger') {
-            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
-            return
-          }
-          // Success
-          commit('UPDATE_ITEMS', state.item)
-          commit('SET_MESSAGE', { text: rootGetters.languages('success.update'), color: res.data.msg }, { root: true })
-        } else commit('SET_CATCH', null, { root: true })
+      return await vnptbkn().put(`${collection}/${state.item.id}`, state.item).then(function(res) {
+        if (res.status === 200) {
+          commit('UPDATE_ITEMS', res.data)
+          commit('SET_MESSAGE', { text: rootGetters.languages('success.update'), color: 'success' }, { root: true })
+          return true;
+        } else {
+          commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: 'danger' }, { root: true })
+          return false;
+        }
       }).catch((error) => {
         commit('SET_CATCH', error, { root: true })
       }).finally(() => {
@@ -237,20 +239,25 @@ export default {
       // Loading
       if (loading) rootState.$loadingCommit = true
       // http
-      const data = state.selected.map(x => ({ id: x.id, flag: x.flag === 0 ? 1 : 0 }))
-      await vnptbkn().put(collection + '/delete', data).then(function(res) {
-        if (res.status == 200) {
-          if (res.data.msg === 'danger') {
-            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
-            return
-          }
-          // Success
+      const data = state.selected.map(x => ({
+        id: x.id,
+        flag: x.flag === 0 ? 1 : 0,
+        deleted_by: vnptbkn().defaults.headers.Author
+      }))
+      console.log(data)
+      return await vnptbkn().patch(collection, data).then(function(res) {
+        if (res.status === 200) {
           //state.selected.forEach(e => { commit(UPDATE_ITEMS, e) });
-          state.selected.update(data, 'id')
+          state.selected.update(res.data, 'id')
+          // console.log(state.items.findIndex((x) => { return x.id === res.data[0].id }))
           state.selected = []
           commit('SET_ITEM')
-          commit('SET_MESSAGE', { text: rootGetters.languages('success.delete'), color: res.data.msg }, { root: true })
-        } else commit('SET_CATCH', null, { root: true })
+          commit('SET_MESSAGE', { text: rootGetters.languages('success.delete'), color: 'success' }, { root: true })
+          return true;
+        } else {
+          commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: 'danger' }, { root: true })
+          return false
+        }
       }).catch((error) => {
         commit('SET_CATCH', error, { root: true })
       }).finally(() => {
@@ -262,16 +269,11 @@ export default {
       if (loading) rootState.$loadingCommit = true
       // http
       await vnptbkn().delete(collection, state.item).then(function(res) {
-        if (res.status == 200) {
-          if (res.data.msg === 'danger') {
-            commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
-            return
-          }
-          // Success
+        if (res.status === 200) {
           commit('REMOVE_ITEMS', state.item)
           commit('SET_ITEM')
-          commit('SET_MESSAGE', { text: rootGetters.languages('success.delete'), color: res.data.msg }, { root: true })
-        } else commit('SET_CATCH', null, { root: true })
+          commit('SET_MESSAGE', { text: rootGetters.languages('success.delete'), color: 'success' }, { root: true })
+        } else commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: 'danger' }, { root: true })
       }).catch((error) => {
         commit('SET_CATCH', error, { root: true })
       }).finally(() => {
@@ -284,8 +286,7 @@ export default {
       // http
       await vnptbkn().get(`common/exist?obj=navigation&key=code&val=${state.item.code}`, { timeout: 1000 }).then(function(res) { //, { timeout: 3000 }
         if (res.status === 200) {
-          if (res.data.msg === 'exist') state.exist_code = false
-          else state.exist_code = true
+          state.exist_code = res.data === true ? false : true
         } else commit('SET_CATCH', null, { root: true })
       }).catch((error) => {
         commit('SET_CATCH', error, { root: true })

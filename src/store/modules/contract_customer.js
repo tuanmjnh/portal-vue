@@ -118,7 +118,7 @@ export default {
       // Loading
       if (params.loading && !rootState.$loadingGet) rootState.$loadingGet = true
       // http
-      return await vnptbkn().get(`${collection}/GetByDonVi`, { params: params }).then(function(res) {
+      return await vnptbkn().get(collection, { params: params }).then(function(res) {
         if (res.status === 200) {
           if (res.data.msg === 'error_token') {
             commit('SET_CATCH', { response: { status: 401 } }, { root: true })

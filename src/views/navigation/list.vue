@@ -42,8 +42,8 @@
       <v-data-table class="elevation-1" v-model="$store.state.navigation.selected"
         select-all item-key="id" :headers="this.$store.getters['navigation/headers']"
         :items="items" :rows-per-page-items="$store.state.$row_per_page"
-        :rows-per-page-text="$languages.get('global.rows_per_page')"
-        :pagination.sync="$store.state.navigation.pagination" :search="$store.state.navigation.pagination.search">
+        :rows-per-page-text="$languages.get('global.rows_per_page')" :pagination.sync="$store.state.navigation.pagination"
+        :search="$store.state.navigation.pagination.search">
         <!--:loading="loading" :pagination.sync="pagination" :total-items="totalItems" -->
         <template slot="items" slot-scope="props">
           <tr>
@@ -84,9 +84,8 @@
       <!-- </v-form> -->
     </v-card>
     <tpl-confirm :dialog.sync="$store.state.navigation.confirm" @onAccept="onCFMAccept"
-      @onCancel="onCFMCancel" :title="$languages.get('global.message')"
-      :content="$languages.get('messages.confirm_content')" :btnAcceptText="$languages.get('global.accept')"
-      :btnCancelText="$languages.get('global.cancel')"></tpl-confirm>
+      @onCancel="onCFMCancel" :title="$languages.get('global.message')" :content="$languages.get('messages.confirm_content')"
+      :btnAcceptText="$languages.get('global.accept')" :btnCancelText="$languages.get('global.cancel')"></tpl-confirm>
   </div>
 </template>
 
@@ -107,6 +106,7 @@ export default {
     },
     onDelete(item) {
       this.$store.state.navigation.confirm = true
+      this.$store.state.navigation.selected = []
       if (item) this.$store.state.navigation.selected.push(item);
     },
     onCFMAccept() {

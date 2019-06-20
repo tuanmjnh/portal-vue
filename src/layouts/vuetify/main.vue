@@ -1,8 +1,8 @@
 <template>
   <div>
     <!--temporary-->
-    <v-navigation-drawer :mini-variant="miniVariant" :clipped="clipped" v-model="drawer"
-      enable-resize-watcher fixed app>
+    <v-navigation-drawer :mini-variant.sync="miniVariant" :clipped="clipped" v-model="drawer"
+      enable-resize-watcher fixed app mini-variant-width="110px">
       <v-toolbar flat>
         <v-list>
           <v-list-tile @click="$router.push(navHeadLeft.push)">
@@ -28,17 +28,19 @@
               <v-list-tile-title v-text="$languages.get(`navigation.${item.code}`)"></v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
-          <v-list-group v-else :key="i" no-action>
+          <v-list-group v-else :key="i" >
             <v-list-tile slot="activator">
-              <v-list-tile-action v-html="item.icon"></v-list-tile-action>
+              <v-list-tile-action v-html="item.icon" />
               <v-list-tile-content>
                 <v-list-tile-title v-text="$languages.get(`navigation.${item.code}`)"></v-list-tile-title>
               </v-list-tile-content>
             </v-list-tile>
             <template v-for="(children, ii) in item.children">
               <v-list-tile :key="ii" v-if="children.children.length<1" @click="MenuAction(children)">
-                <v-list-tile-title v-text="$languages.get(`navigation.${children.code}`)" />
                 <v-list-tile-action v-html="children.icon" />
+                <v-list-tile-content>
+                  <v-list-tile-title v-text="$languages.get(`navigation.${children.code}`)" />
+                </v-list-tile-content>
               </v-list-tile>
               <v-list-group v-else :key="ii" no-action sub-group>
                 <v-list-tile slot="activator">
@@ -187,6 +189,7 @@
             <i class="material-icons">close</i>
           </v-btn>
         </v-snackbar>
+        <!-- <v-breadcrumbs :items="items"></v-breadcrumbs> -->
         <router-view></router-view>
       </div>
     </v-content>

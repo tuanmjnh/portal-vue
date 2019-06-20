@@ -18,9 +18,9 @@ export default {
     }
   },
   getters: {
-    inRoles: state => roles => {
-      if (!state.user.roles) return false
-      return state.user.roles.indexOf(roles) < 0 ? false : true
+    inRoles: state => quyen => {
+      if (!state.user.quyen) return false
+      return state.user.quyen.indexOf(quyen) < 0 ? false : true
     },
   },
   mutations: {

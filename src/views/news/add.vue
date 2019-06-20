@@ -104,7 +104,7 @@
                   </v-flex>
                   <v-flex xs12 sm6 md6>
                     <upload-files :http="http" :autoName="true" :buttonUse="false"
-                      :multiple="false" extension="*" :files.sync="attach_upload.files"
+                      :multiple="true" extension="*" :files.sync="attach_upload.files"
                       :loading.sync="attach_upload.loading" :buttonText="$languages.get('global.upload_drag')"
                       :basePath="attach_upload.basePath"></upload-files>
                   </v-flex>
