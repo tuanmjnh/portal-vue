@@ -12,28 +12,27 @@
                 single-line hide-details></v-text-field>
             </v-flex>
             <v-flex xs12 sm12 md12>
-              <v-select :items="nhom_dich_vu" v-model="pagination.group_id"
-                :hide-selected="true" item-text="title" item-value="id" label="loại dịch vụ"></v-select>
+              <v-select :items="nhom_dich_vu" v-model="pagination.group_id" :hide-selected="true" item-text="title"
+                item-value="id" label="loại dịch vụ"></v-select>
             </v-flex>
             <v-flex xs12 sm6 md6>
-              <v-menu v-model="start_at_menu" :close-on-content-click="false"
-                :nudge-right="40" lazy transition="scale-transition" offset-y full-width
-                min-width="290px">
+              <v-menu v-model="start_at_menu" :close-on-content-click="false" :nudge-right="40" lazy
+                transition="scale-transition" offset-y full-width min-width="290px">
                 <template v-slot:activator="{on}">
                   <v-text-field :value="pagination.start_at.formatDate('DD/MM/YYYY')"
-                    :label="$languages.get('global.start_at')" prepend-icon="event"
-                    readonly v-on="on" persistent-hint :hint="`${$languages.get('global.format')}: DD/MM/YYYY`"></v-text-field>
+                    :label="$languages.get('global.start_at')" prepend-icon="event" readonly v-on="on" persistent-hint
+                    :hint="`${$languages.get('global.format')}: DD/MM/YYYY`"></v-text-field>
                 </template>
                 <v-date-picker v-model="pagination.start_at" @input="menu2=false"></v-date-picker>
               </v-menu>
             </v-flex>
             <v-flex xs12 sm6 md6>
-              <v-menu v-model="end_at_menu" :close-on-content-click="false" :nudge-right="40"
-                lazy transition="scale-transition" offset-y full-width min-width="290px">
+              <v-menu v-model="end_at_menu" :close-on-content-click="false" :nudge-right="40" lazy
+                transition="scale-transition" offset-y full-width min-width="290px">
                 <template v-slot:activator="{on}">
                   <v-text-field :value="pagination.end_at.formatDate('DD/MM/YYYY')"
-                    :label="$languages.get('global.end_at')" prepend-icon="event"
-                    readonly v-on="on" persistent-hint :hint="`${$languages.get('global.format')}: DD/MM/YYYY`"></v-text-field>
+                    :label="$languages.get('global.end_at')" prepend-icon="event" readonly v-on="on" persistent-hint
+                    :hint="`${$languages.get('global.format')}: DD/MM/YYYY`"></v-text-field>
                 </template>
                 <v-date-picker v-model="pagination.end_at" @input="menu2=false"></v-date-picker>
               </v-menu>
@@ -83,10 +82,9 @@
           :items="[{title:`${$languages.get('global.export')} .csv`,type:'csv'}]" />
       </v-card-title>
       <v-data-table class="elevation-1" v-model="$store.state.contract_enterprise.selected"
-        select-all item-key="id" :headers="headers" :items="items" :rows-per-page-items="$store.state.$row_per_page"
-        :rows-per-page-text="$languages.get('global.rows_per_page')" :pagination.sync="pagination"
-        :search="pagination.search">
-        <!--:loading="loading" :pagination.sync="pagination" :total-items="totalItems" -->
+        select-all item-key="id" :headers="headers" :items="items" :rows-per-page-text="$languages.get('global.rows_per_page')"
+        :pagination.sync="pagination" :rows-per-page-items="[8, 25, 50, 100, 200, 500]"
+        :total-items="totalItems" :loading="$store.state.$loadingGet">
         <template slot="items" slot-scope="props">
           <tr>
             <td>
@@ -101,8 +99,8 @@
             <td>{{ props.item.ngay_tao|formatDate('DD/MM/YYYY') }}</td>
             <td class="justify-center layout px-0">
               <v-tooltip left>
-                <a slot="activator" :href="`${http.defaults.host}/${props.item.tep_dk}`"
-                  target="_blank" class="mx-0 v-btn v-btn--icon theme--info">
+                <a slot="activator" :href="`${http.defaults.host}/${props.item.tep_dk}`" target="_blank"
+                  class="mx-0 v-btn v-btn--icon theme--info">
                   <i class="material-icons">attachment</i>
                 </a>
                 <span>

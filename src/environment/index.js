@@ -1,8 +1,9 @@
 const env = {
   production: false,
-  // api: ['http://10.17.20.199:5000', 'api'],
-  api: ['http://localhost:8000', 'api'],
+  api: ['http://10.17.20.199:5000', 'api'],
+  // api: ['http://localhost:8000', 'api'],
   // api: ['http://localhost:5000', 'api'],
+  // api: ['http://10.17.20.222/vnpt', 'api'],
   upload: 'filemanager',
   baseUrl: [window.location.origin, '/'],
   publicPath: '/',

@@ -186,7 +186,8 @@
     "title": "Tên module",
     "setting": "Cài đặt",
     "category_kh": "Nhóm kế hoạch",
-    "items_kh": "Dữ liệu chung"
+    "items_kh": "Dữ liệu chung",
+    "doanhthu": "Doanh thu"
   },
   "navigation": {
     "category": "Danh mục",
@@ -227,7 +228,8 @@
     "user_role": "Phân quyền",
     "users": "Người dùng",
     "category_kh": "Nhóm kế hoạch",
-    "items_kh": "Dữ liệu chung"
+    "items_kh": "Dữ liệu chung",
+    "doanhthu": "Doanh thu"
   },
   "news": { "name": "Tên tin tức", "title": "Tiêu đề tin tức" },
   "nguoidung": {

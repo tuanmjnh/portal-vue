@@ -9,12 +9,12 @@
           <v-form v-model="valid_nguoi_gt" ref="form">
             <v-layout wrap>
               <v-flex xs12 sm12 md12>
-                <v-select :items="donvi" v-model="donvi_id_gt" :hide-selected="true"
-                  item-text="ten_dv" item-value="donvi_id" label="Đơn vị"></v-select>
+                <v-select :items="donvi" v-model="donvi_id_gt" :hide-selected="true" item-text="ten_dv"
+                  item-value="donvi_id" label="Đơn vị"></v-select>
               </v-flex>
               <v-flex xs12 sm12 md12>
-                <v-select :items="nguoidung" :hide-selected="true" @change="onChangeNguoiGT($event)"
-                  label="Nhân viên" :rules="[v=>!!v||$languages.get('error.required')]">
+                <v-select :items="nguoidung" :hide-selected="true" @change="onChangeNguoiGT($event)" label="Nhân viên"
+                  :rules="[v=>!!v||$languages.get('error.required')]">
                   <template v-slot:item="data">
                     {{ data.item.ten_nd }} - {{ data.item.ma_nd }}
                   </template>
@@ -38,8 +38,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="$store.state.contract_enterprise.dialog" max-width="1024px"
-      persistent>
+    <v-dialog v-model="$store.state.contract_enterprise.dialog" max-width="1024px" persistent>
       <v-card>
         <v-card-title class="headline grey lighten-2">
           {{ item.id ?
@@ -59,21 +58,24 @@
                 <v-container grid-list-md>
                   <v-layout wrap>
                     <v-flex xs12 sm6 md6>
-                      <v-text-field v-model.trim="item.ten_kh" label="Tên cơ quan" :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
+                      <v-text-field v-model.trim="item.ten_kh" label="Tên cơ quan"
+                        :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md6>
                       <v-text-field v-model.trim="item.nguoi_dd" label="Người đại diện"
                         :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm12 md12>
-                      <v-text-field v-model.trim="item.diachi_kh" label="Địa chỉ" :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
+                      <v-text-field v-model.trim="item.diachi_kh" label="Địa chỉ"
+                        :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm4 md4>
                       <v-text-field type="number" v-model.trim="item.sdt" label="Số điện thoại"
                         :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm4 md4>
-                      <v-text-field v-model.trim="item.stk" label="Số tài khoản" :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
+                      <v-text-field v-model.trim="item.stk" label="Số tài khoản"
+                        :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm4 md4>
                       <v-text-field v-model.trim="item.mst" label="Mã số thuế"></v-text-field>
@@ -85,13 +87,12 @@
                       <v-text-field v-model.trim="item.noi_cap" label="Nơi cấp"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm4 md4>
-                      <v-menu v-model="date_menu_ngay_cap" :close-on-content-click="false"
-                        :nudge-right="40" lazy transition="scale-transition" offset-y
-                        full-width min-width="290px">
+                      <v-menu v-model="date_menu_ngay_cap" :close-on-content-click="false" :nudge-right="40" lazy
+                        transition="scale-transition" offset-y full-width min-width="290px">
                         <template v-slot:activator="{on}">
                           <v-text-field :value="item.ngay_cap?item.ngay_cap.formatDate('DD/MM/YYYY'):''"
-                            label="Ngày cấp" prepend-icon="event" readonly v-on="on"
-                            persistent-hint hint="Định dạng: DD/MM/YYYY"></v-text-field>
+                            label="Ngày cấp" prepend-icon="event" readonly v-on="on" persistent-hint
+                            hint="Định dạng: DD/MM/YYYY"></v-text-field>
                         </template>
                         <v-date-picker v-model="item.ngay_cap" @input="date_menu_ngay_cap=false"></v-date-picker>
                       </v-menu>
@@ -103,9 +104,9 @@
                 <v-container grid-list-md>
                   <v-layout wrap>
                     <v-flex xs12 sm6 md6>
-                      <v-select :items="nhom_dich_vu" v-model="item.group_id"
-                        :hide-selected="true" item-text="title" item-value="id" label="loại dịch vụ"
-                        :rules="[v=>!!v||$languages.get('error.required_select')]"></v-select>
+                      <v-select :items="nhom_dich_vu" v-model="item.group_id" :hide-selected="true" item-text="title"
+                        item-value="id" label="loại dịch vụ" :rules="[v=>!!v||$languages.get('error.required_select')]">
+                      </v-select>
                     </v-flex>
                     <v-flex xs12 sm6 md6>
                       <v-text-field v-model.trim="item.ma_hd" label="Mã hợp đồng" class="text-color-initial"
@@ -124,25 +125,23 @@
                         :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm4 md4>
-                      <v-menu v-model="date_menu_ngay_bd" :close-on-content-click="false"
-                        :nudge-right="40" lazy transition="scale-transition" offset-y
-                        full-width min-width="290px">
+                      <v-menu v-model="date_menu_ngay_bd" :close-on-content-click="false" :nudge-right="40" lazy
+                        transition="scale-transition" offset-y full-width min-width="290px">
                         <template v-slot:activator="{on}">
                           <v-text-field :value="item.ngay_bd?item.ngay_bd.formatDate('DD/MM/YYYY'):''"
-                            label="Ngày bắt đầu hợp đồng" prepend-icon="event" readonly
-                            v-on="on" persistent-hint hint="Định dạng: DD/MM/YYYY"></v-text-field>
+                            label="Ngày bắt đầu hợp đồng" prepend-icon="event" readonly v-on="on" persistent-hint
+                            hint="Định dạng: DD/MM/YYYY"></v-text-field>
                         </template>
                         <v-date-picker v-model="item.ngay_bd" @input="date_menu_ngay_bd=false"></v-date-picker>
                       </v-menu>
                     </v-flex>
                     <v-flex xs12 sm4 md4>
-                      <v-menu v-model="date_menu_ngay_kt" :close-on-content-click="false"
-                        :nudge-right="40" lazy transition="scale-transition" offset-y
-                        full-width min-width="290px">
+                      <v-menu v-model="date_menu_ngay_kt" :close-on-content-click="false" :nudge-right="40" lazy
+                        transition="scale-transition" offset-y full-width min-width="290px">
                         <template v-slot:activator="{on}">
                           <v-text-field :value="item.ngay_kt?item.ngay_kt.formatDate('DD/MM/YYYY'):''"
-                            label="Ngày kết thúc hợp đồng" prepend-icon="event" readonly
-                            v-on="on" persistent-hint hint="Định dạng: DD/MM/YYYY"></v-text-field>
+                            label="Ngày kết thúc hợp đồng" prepend-icon="event" readonly v-on="on" persistent-hint
+                            hint="Định dạng: DD/MM/YYYY"></v-text-field>
                         </template>
                         <v-date-picker v-model="item.ngay_kt" @input="date_menu_ngay_kt=false"></v-date-picker>
                       </v-menu>
@@ -152,37 +151,36 @@
                         :rules="[v=>!!v||$languages.get('error.required'),rules.money]"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm4 md4>
-                      <v-text-field name="thue" :value="Math.round(this.item.tien * 0.1).format()"
-                        label="Thuế" :disabled="true" class="text-color-initial"></v-text-field>
+                      <v-text-field name="thue" :value="Math.round(this.item.tien * 0.1).format()" label="Thuế"
+                        :disabled="true" class="text-color-initial"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm4 md4>
-                      <v-text-field name="tongcong" :value="Math.round(this.item.tien * 1.1).format()"
-                        label="Tổng cộng" :disabled="true" class="text-color-initial"></v-text-field>
+                      <v-text-field name="tongcong" :value="Math.round(this.item.tien * 1.1).format()" label="Tổng cộng"
+                        :disabled="true" class="text-color-initial"></v-text-field>
                     </v-flex>
                     <v-flex xs12 sm6 md6 class="text-append-icon">
                       <v-text-field v-model="nguoi_gt" label="Người giới thiệu" :disabled="true"
-                        class="text-color-initial"></v-text-field>
+                        class="text-color-initial" :rules="[v=>!!v||$languages.get('error.required')]"></v-text-field>
                       <i class="icon material-icons pointer" @click="dialog_nguoi_gt=true">pageview</i>
                     </v-flex>
-                    <v-flex xs12 sm6 md6 class="text-append-icon" offset-xs0 offset-sm6
-                      offset-md6>
+                    <v-flex xs12 sm6 md6 class="text-append-icon" offset-xs0 offset-sm6 offset-md6>
                     </v-flex>
                     <v-flex xs12 sm12 md12 v-if="item.id">
-                      Hợp đồng: <a class="mx-0 v-btn v-btn--icon theme--info" :href="`${http.defaults.host}/${item.tep_dk}`"
-                        target="_blank"><i class="material-icons">attachment</i></a>
+                      Hợp đồng: <a class="mx-0 v-btn v-btn--icon theme--info"
+                        :href="`${http.defaults.host}/${item.tep_dk}`" target="_blank"><i
+                          class="material-icons">attachment</i></a>
                     </v-flex>
                     <template v-else>
                       <v-flex xs12 sm6 md6 v-if="item.ma_hd">
-                        <upload-files :files.sync="attach_upload.files" :http="http"
-                          :autoName="true" :buttonUse="false" :loading.sync="attach_upload.loading"
-                          :basePath="attach_upload.basePath" :multiple="false" :fileName="item.ma_hd.toString()"
-                          extension="application/pdf" buttonText="Ấn vào đây để chọn hợp đồng"></upload-files>
+                        <upload-files :files.sync="attach_upload.files" :http="http" :autoName="true" :buttonUse="false"
+                          :loading.sync="attach_upload.loading" :basePath="attach_upload.basePath" :multiple="false"
+                          :fileName="item.ma_hd.toString()" extension="application/pdf"
+                          buttonText="Ấn vào đây để chọn hợp đồng"></upload-files>
                         <!-- :fileName="item.ma_gd.replace(/\//g,'_')" -->
                       </v-flex>
                       <v-flex xs12 sm6 md6 v-if="item.ma_hd">
                         <display-files :files="attach_upload.files" :baseUrl="http.defaults.host"
-                          :preFixName="attach_upload.basePath" :isShowName="false"
-                          classes="w-x"></display-files>
+                          :preFixName="attach_upload.basePath" :isShowName="false" classes="w-x"></display-files>
                       </v-flex>
                     </template>
                   </v-layout>
@@ -207,8 +205,8 @@
         <v-divider></v-divider>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn v-if="!item.id&&attach_upload.files.length>0" color="primary" flat
-            @click.native="onSave" :disabled="!valid" :loading="$store.state.$loadingCommit">
+          <v-btn v-if="!item.id&&attach_upload.files.length>0" color="primary" flat @click.native="onSave"
+            :disabled="!valid" :loading="$store.state.$loadingCommit">
             {{$languages.get('global.update')}}
           </v-btn>
           <v-btn color="secondary" flat @click.native="$store.state.contract_enterprise.dialog=false"
@@ -267,6 +265,7 @@ export default {
       return this.$store.state.contract_enterprise.dialog
     },
     item() {
+      console.log(this.$store.state.auth.user)
       return this.$store.state.contract_enterprise.item
     },
     nhom_dich_vu() {

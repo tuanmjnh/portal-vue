@@ -34,7 +34,8 @@ import {
   VChip,
   VAvatar,
   VProgressCircular,
-  VProgressLinear
+  VProgressLinear,
+  VSubheader
 } from 'vuetify'
 Vue.use(Vuetify, {
   components: {
@@ -70,7 +71,8 @@ Vue.use(Vuetify, {
     VChip,
     VAvatar,
     VProgressCircular,
-    VProgressLinear
+    VProgressLinear,
+    VSubheader
   },
   theme: {
     primary: '#1976D2',

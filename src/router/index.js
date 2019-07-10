@@ -554,6 +554,16 @@ const routes = [
     ]
   },
   {
+    path: '/doanhthu',
+    name: 'doanhthu',
+    alias: '',
+    // redirect: { name: 'category-list' },
+    meta: { desc: 'doanhthu', auth: true, roles: ['doanhthu.select'] },
+    component: () => import('@/views/doanhthu/index'),
+    children: [
+    ]
+  },
+  {
     // not found handler
     path: '*',
     name: 'not-found',

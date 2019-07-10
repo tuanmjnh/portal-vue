@@ -88,14 +88,23 @@ export default {
       // Loading
       if (params.loading && !rootState.$loadingGet) rootState.$loadingGet = true
       // http
-      await vnptbkn().get(collection, { params: params }).then(function(res) {
+      return await vnptbkn().get(collection, { params: params }).then(function(res) {
         if (res.status === 200) {
+          if (res.data.msg === 'error_token') {
+            commit('SET_CATCH', { response: { status: 401 } }, { root: true })
+            return
+          }
           if (res.data.msg === 'danger') {
             commit('SET_MESSAGE', { text: rootGetters.languages('error.data'), color: res.data.msg }, { root: true })
             return
           }
-          if (res.data.items) {
-            commit('SET_ITEMS', res.data.items)
+          if (params.is_export) {
+            if (res.data.data.length < 1)
+              commit('SET_MESSAGE', { text: rootGetters.languages('error.no_data'), color: 'warning' }, { root: true })
+            return res.data.data
+          } else {
+            if (res.data.data) commit('SET_ITEMS', res.data.data)
+            return res.data
           }
         } else { commit('SET_CATCH', null, { root: true }) }
       }).catch((error) => { commit('SET_CATCH', error, { root: true }) })

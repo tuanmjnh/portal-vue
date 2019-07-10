@@ -189,7 +189,8 @@
     "title": "Module name",
     "setting": "Settings",
     "category_kh": "Plan category",
-    "items_kh": "Plan common data"
+    "items_kh": "Plan common data",
+    "doanhthu": "revenue"
   },
   "navigation": {
     "category": "Category",
@@ -230,7 +231,8 @@
     "user_role": "Decentralize",
     "users": "Users",
     "category_kh": "Plan category",
-    "items_kh": "Plan common data"
+    "items_kh": "Plan common data",
+    "doanhthu": "revenue"
   },
   "news": { "name": "News name", "title": "News title" },
   "nguoidung": {

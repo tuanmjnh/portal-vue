@@ -46,15 +46,20 @@ export default {
       await vnptbkn().post(collection, state.item).then(function(res) {
         // commit auth
         if (res.status === 200) {
-          storageAuth.signIn({
-            uid: res.data.nguoidung_id,
-            token: `Bearer ${res.data.token}`,
-            remember: state.item.remember,
-            // account: res.data.data.ma_nd,
-            // name: res.data.data.ten_nd
-          })
-          commit('SET_USER', res.data)
-          commit('SET_ISAUTH', true)
+          if (res.data.msg) {
+            res.color = 'danger'
+            res.text = rootGetters.languages('auth.msg_err_login')
+          } else {
+            storageAuth.signIn({
+              uid: res.data.nguoidung_id,
+              token: `Bearer ${res.data.token}`,
+              remember: state.item.remember,
+              // account: res.data.data.ma_nd,
+              // name: res.data.data.ten_nd
+            })
+            commit('SET_USER', res.data)
+            commit('SET_ISAUTH', true)
+          }
         } else if (res.status === 401) {
           if (res.data.msg == 'locked') {
             res.color = 'danger'
