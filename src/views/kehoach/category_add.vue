@@ -53,8 +53,9 @@
                       :rules="[v =>!!v||$languages.get('error.required')]"></v-text-field>
                   </v-flex>
                   <v-flex xs6 sm3 md3>
-                    <v-switch color="primary" :label="item.flag===1?$languages.get('global.show'):$languages.get('global.hide')"
-                      :true-value="1" :false-value="0" v-model.number="item.flag"></v-switch>
+                    <v-switch color="primary"
+                      :label="item.flag===1?$languages.get('global.show'):$languages.get('global.hide')" :true-value="1"
+                      :false-value="0" v-model.number="item.flag"></v-switch>
                   </v-flex>
                   <!-- <v-flex xs12 sm12 md12 v-if="item.id">
                     {{$languages.get('global.contract')}}: <a class="mx-0 v-btn v-btn--icon theme--info"
@@ -66,9 +67,9 @@
                       prepend-icon="attachment"></v-text-field>
                   </v-flex> -->
                   <v-flex xs1 sm1 md1 v-if="item.title">
-                    <upload-files :files.sync="attach_upload.files" :http="http"
-                      :fileName="item.title.convertToAscii()" :autoName="false"
-                      :buttonUse="true" :loading.sync="attach_upload.loading" :buttonText="item.id?$languages.get('global.upload_btn'):$languages.get('global.upload_drag')"
+                    <upload-files :files.sync="attach_upload.files" :http="http" :fileName="item.title.convertToAscii()"
+                      :autoName="false" :buttonUse="true" :loading.sync="attach_upload.loading"
+                      :buttonText="item.id?$languages.get('global.upload_btn'):$languages.get('global.upload_drag')"
                       :basePath="attach_upload.basePath" :multiple="false"></upload-files>
                   </v-flex>
                   <v-flex xs12 sm6 md6 v-if="item.attach">
@@ -89,7 +90,8 @@
               <v-tab-item>
                 <v-layout wrap class="pt-2">
                   <v-flex xs12 sm12 md12>
-                    <v-textarea v-model.trim="item.descs" auto-grow box :placeholder="$languages.get('global.note')"></v-textarea>
+                    <v-textarea v-model.trim="item.descs" auto-grow box :placeholder="$languages.get('global.note')">
+                    </v-textarea>
                   </v-flex>
                 </v-layout>
               </v-tab-item>
@@ -152,6 +154,7 @@ export default {
       if (this.valid) {
         this.item.app_key = 'kehoach'
         this.item.dependent = ',501,'
+        this.item.url = this.item.title.convertToAscii()
         if (this.item.id) this.$store.dispatch('category/update')
         else this.$store.dispatch('category/insert').then(() => { this.reset() })
       }

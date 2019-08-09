@@ -12,16 +12,26 @@
                 single-line hide-details></v-text-field>
             </v-flex>
             <v-flex xs12 sm12 md12 v-if="$store.getters['auth/inRoles']('donvi.select')">
-              <v-select :items="donvi" v-model="pagination.donvi_id" item-text="ten_dv"
-                item-value="donvi_id" :label="$languages.get('global.local')"></v-select>
-            </v-flex>
-            <v-flex xs12 sm12 md12 v-if="$store.getters['auth/inRoles']('kehoach.update')">
-              <v-select :items="pagination_nguoidung" v-model="pagination.ma_nd"
-                item-text="ten_nd_dv" item-value="ma_nd" label="Thuê bao theo nhân viên"></v-select>
+              <v-select :items="donvi" v-model="pagination.donvi_id" item-text="ten_dv" item-value="donvi_id"
+                :label="$languages.get('global.local')"></v-select>
             </v-flex>
             <v-flex xs12 sm12 md12>
-              <v-select :items="nhom_kh" v-model="pagination.nhomkh_id" item-text="title"
-                item-value="id" label="Nhóm kế hoạch"></v-select>
+              <v-select :items="nhom_kh" v-model="pagination.nhomkh_id" item-text="title" item-value="id"
+                label="Nhóm kế hoạch"></v-select>
+            </v-flex>
+            <v-flex xs12 sm12 md12 v-if="$store.getters['auth/inRoles']('kehoach.update')">
+              <v-select :items="pagination_nguoidung" v-model="pagination.ma_nd" item-text="ten_nd_dv"
+                item-value="ma_nd" label="Thuê bao theo nhân viên"></v-select>
+            </v-flex>
+            <v-flex xs12 sm12 md12>
+              <v-menu v-model="date_picker_th.menu" :nudge-right="40" lazy transition="scale-transition" offset-y
+                full-width min-width="290px" :close-on-content-click="false">
+                <template v-slot:activator="{on}">
+                  <v-text-field :value="datePickerFormat(date_picker_th.date)" label="Tháng thực hiện"
+                    append-icon="event" readonly v-on="on" persistent-hint hint="Định dạng: MM/YYYY"></v-text-field>
+                </template>
+                <v-date-picker v-model="date_picker_th.date" @input="date_picker_th.menu=false"></v-date-picker>
+              </v-menu>
             </v-flex>
             <v-flex xs12 sm12 md12>
               <v-select :items="flag" v-model="pagination.flag" label="Trạng thái thực hiện"></v-select>
@@ -31,9 +41,9 @@
         <v-divider></v-divider>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <!-- <v-btn color="primary" flat @click.native="onSave">
-                {{$languages.get('global.accept')}}
-              </v-btn> -->
+          <v-btn color="primary" flat @click.native="onFilter">
+            {{$languages.get('global.accept')}}
+          </v-btn>
           <v-btn color="primary" flat @click.native="dialog_filter=false">
             {{$languages.get('global.back')}}
           </v-btn>
@@ -53,40 +63,40 @@
               <v-container fluid grid-list-md>
                 <v-layout wrap>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field :value="getNhomKHDetails($store.state.kehoach.item.nhom_kh)"
-                      label="Nhóm kế hoạch" :disabled="true" class="text-color-initial"></v-text-field>
-                  </v-flex>
-                  <v-flex xs12 sm6 md6>
-                    <v-text-field :value="$store.state.kehoach.item.ma_tb" label="Mã Thuê bao"
+                    <v-text-field :value="getNhomKHDetails($store.state.kehoach.item.nhom_kh)" label="Nhóm kế hoạch"
                       :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field :value="$store.state.kehoach.item.ten_tb" label="Tên thuê bao"
-                      :disabled="true" class="text-color-initial"></v-text-field>
+                    <v-text-field :value="$store.state.kehoach.item.ma_tb" label="Mã Thuê bao" :disabled="true"
+                      class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field :value="$store.state.kehoach.item.diachi_tb" label="Địa chỉ thuê bao"
-                      :disabled="true" class="text-color-initial"></v-text-field>
+                    <v-text-field :value="$store.state.kehoach.item.ten_tb" label="Tên thuê bao" :disabled="true"
+                      class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field :value="$store.state.kehoach.item.so_dt" label="Số điện thoại"
-                      :disabled="true" class="text-color-initial"></v-text-field>
+                    <v-text-field :value="$store.state.kehoach.item.diachi_tb" label="Địa chỉ thuê bao" :disabled="true"
+                      class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field :value="$store.state.kehoach.item.ma_nd" label="Nhân viên thực hiện"
-                      :disabled="true" class="text-color-initial"></v-text-field>
+                    <v-text-field :value="$store.state.kehoach.item.so_dt" label="Số điện thoại" :disabled="true"
+                      class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field :value="$store.state.kehoach.item.nguoi_nhap" label="Người nhập"
-                      :disabled="true" class="text-color-initial"></v-text-field>
+                    <v-text-field :value="$store.state.kehoach.item.ma_nd" label="Nhân viên thực hiện" :disabled="true"
+                      class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field :value="getFormatDate($store.state.kehoach.item.ngay_nhap)"
-                      label="Ngày nhập" :disabled="true" class="text-color-initial"></v-text-field>
+                    <v-text-field :value="$store.state.kehoach.item.nguoi_nhap" label="Người nhập" :disabled="true"
+                      class="text-color-initial"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field :value="getFormatDate($store.state.kehoach.item.ngay_nhap)" label="Ngày nhập"
+                      :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm12 md12>
-                    <v-textarea :value="$store.state.kehoach.item.ghichu" label="Ghi chú thuê bao"
-                      :disabled="true" class="text-color-initial" :rows="2"></v-textarea>
+                    <v-textarea :value="$store.state.kehoach.item.ghichu" label="Ghi chú thuê bao" :disabled="true"
+                      class="text-color-initial" :rows="2"></v-textarea>
                   </v-flex>
                   <!-- <v-flex xs12 sm6 md6>
                 <v-text-field :value="$store.state.kehoach.item.ip_nhap" label="Nhân viên thực hiện"
@@ -104,28 +114,28 @@
                 </v-layout>
                 <v-layout wrap v-else>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field :value="getFormatDate($store.state.kehoach.item.ngay_th)"
-                      label="Ngày thực hiện" :disabled="true" class="text-color-initial"></v-text-field>
-                  </v-flex>
-                  <v-flex xs12 sm6 md6>
-                    <v-text-field :value="getKetQua($store.state.kehoach.item.ket_qua).label"
-                      label="Kết quả" :disabled="true" class="text-color-initial"></v-text-field>
-                  </v-flex>
-                  <v-flex xs12 sm6 md6>
-                    <v-text-field :value="$store.state.kehoach.item.goicuoc" label="Gói cước"
+                    <v-text-field :value="getFormatDate($store.state.kehoach.item.ngay_th)" label="Ngày thực hiện"
                       :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field :value="$store.state.kehoach.item.lydo" label="Lý do"
+                    <v-text-field :value="getKetQua($store.state.kehoach.item.ket_qua).label" label="Kết quả"
                       :disabled="true" class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm6 md6>
-                    <v-text-field :value="$store.state.kehoach.item.de_xuat" label="Đề xuất"
-                      :disabled="true" class="text-color-initial"></v-text-field>
+                    <v-text-field :value="$store.state.kehoach.item.goicuoc" label="Gói cước" :disabled="true"
+                      class="text-color-initial"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field :value="$store.state.kehoach.item.lydo" label="Lý do" :disabled="true"
+                      class="text-color-initial"></v-text-field>
+                  </v-flex>
+                  <v-flex xs12 sm6 md6>
+                    <v-text-field :value="$store.state.kehoach.item.de_xuat" label="Đề xuất" :disabled="true"
+                      class="text-color-initial"></v-text-field>
                   </v-flex>
                   <v-flex xs12 sm12 md12>
-                    <v-textarea :value="$store.state.kehoach.item.ghichu_th" label="Ghi chú thực hiện"
-                      :disabled="true" class="text-color-initial" :rows="2"></v-textarea>
+                    <v-textarea :value="$store.state.kehoach.item.ghichu_th" label="Ghi chú thực hiện" :disabled="true"
+                      class="text-color-initial" :rows="2"></v-textarea>
                   </v-flex>
                 </v-layout>
               </v-container>
@@ -165,8 +175,8 @@
               <v-flex xs12 sm12 md12>
                 Tệp dữ liệu mẫu:
                 <v-tooltip bottom>
-                  <a :href="`${http.defaults.host}/Uploads/KeHoach/template/template.csv`"
-                    slot="activator" class="mx-0 theme--info" target="_blank">template</a>
+                  <a :href="`${http.defaults.host}/Uploads/KeHoach/template/template.csv`" slot="activator"
+                    class="mx-0 theme--info" target="_blank">template</a>
                   <!-- <i class="material-icons">attachment</i> -->
                   <span>Tệp dữ liệu mẫu</span>
                 </v-tooltip>
@@ -187,8 +197,8 @@
               </v-flex>
               <v-flex xs12 sm6 md6 v-if="params_import.error.length>0">
                 Tệp dữ liệu lỗi:
-                <export-data :getData="getDataErrorExport" filename="loi_capnhat_nhanvien"
-                  :suffixFileName="true" :tooltip="$languages.get('global.export')" color="danger"
+                <export-data :getData="getDataErrorExport" filename="loi_capnhat_nhanvien" :suffixFileName="true"
+                  :tooltip="$languages.get('global.export')" color="danger"
                   :items="[{title:$store.getters.languages(['global.export',' ',' .csv']),type:'csv'}]" />
               </v-flex>
             </v-layout>
@@ -209,8 +219,8 @@
               </p>
             </v-flex>
             <v-flex xs12 sm12 md12>
-              <upload-files :http="http" :autoName="false" :buttonUse="false" :multiple="false"
-                extension=".csv" :files.sync="attach_upload.files" :loading.sync="attach_upload.loading"
+              <upload-files :http="http" :autoName="false" :buttonUse="false" :multiple="false" extension=".csv"
+                :files.sync="attach_upload.files" :loading.sync="attach_upload.loading"
                 :buttonText="$languages.get('global.upload_drag')" :basePath="attach_upload.basePath"></upload-files>
             </v-flex>
           </v-card-text>
@@ -244,23 +254,24 @@
                   <span class="subheading primary--text">Chọn kết quả: </span>
                 </v-flex>
                 <v-flex xs12 sm12 md12>
-                  <v-radio-group v-model="params_thuchien.ket_qua" :column="false" :rules="[v=>!!v||$languages.get('error.required_select')]">
-                    <v-radio :key="index" v-for="(item,index) in ket_qua" :label="item.label"
-                      :color="item.color" :value="item.value"></v-radio>
+                  <v-radio-group v-model="params_thuchien.ket_qua" :column="false"
+                    :rules="[v=>!!v||$languages.get('error.required_select')]">
+                    <v-radio :key="index" v-for="(item,index) in ket_qua" :label="item.label" :color="item.color"
+                      :value="item.value"></v-radio>
                   </v-radio-group>
                 </v-flex>
               </v-layout>
               <v-divider></v-divider>
               <v-layout>
                 <v-flex xs12 sm12 md12 v-if="kehoach_extra.goicuoc&&kehoach_extra.goicuoc.length>0">
-                  <v-select :items="kehoach_extra.goicuoc" v-model="params_thuchien.goicuoc"
-                    item-text="title" :rules="[v=>!!v||$languages.get('error.required_select')]"
-                    item-value="id" label="Gói cước" hint="Chọn một gói cước"
-                    persistent-hint></v-select>
+                  <v-select :items="kehoach_extra.goicuoc" v-model="params_thuchien.goicuoc" item-text="title"
+                    :rules="[v=>!!v||$languages.get('error.required_select')]" item-value="id" label="Gói cước"
+                    hint="Chọn một gói cước" persistent-hint></v-select>
                 </v-flex>
                 <v-flex xs12 sm12 md12 v-else>
-                  <v-text-field v-model.trim="params_thuchien.goicuoc" :rules="[v=>!!v||$languages.get('error.required')]"
-                    :label="'Gói cước'" hint="Nhập gói cước gói cước" persistent-hint></v-text-field>
+                  <v-text-field v-model.trim="params_thuchien.goicuoc"
+                    :rules="[v=>!!v||$languages.get('error.required')]" :label="'Gói cước'"
+                    hint="Nhập gói cước gói cước" persistent-hint></v-text-field>
                 </v-flex>
               </v-layout>
               <v-divider v-if="params_thuchien.ket_qua===2"></v-divider>
@@ -269,15 +280,16 @@
                   <span class="subheading primary--text">Lý do: </span>
                 </v-flex> -->
                 <v-flex xs12 sm12 md12 class="mb-3">
-                  <v-select :items="kehoach_extra.lydo" v-model="params_thuchien.lydo"
-                    item-text="title" :rules="[v=>!!v||$languages.get('error.required_select')]"
-                    item-value="id" label="Lý do" hint="Chọn một lý do" persistent-hint></v-select>
+                  <v-select :items="kehoach_extra.lydo" v-model="params_thuchien.lydo" item-text="title"
+                    :rules="[v=>!!v||$languages.get('error.required_select')]" item-value="id" label="Lý do"
+                    hint="Chọn một lý do" persistent-hint></v-select>
                 </v-flex>
               </v-layout>
               <v-divider v-if="params_thuchien.ket_qua===2"></v-divider>
               <v-layout wrap v-if="params_thuchien.ket_qua===2">
                 <v-flex xs12 sm12 md12>
-                  <v-textarea v-model="params_thuchien.de_xuat" color="info" :rules="[v=>!!v||$languages.get('error.required_select')]">
+                  <v-textarea v-model="params_thuchien.de_xuat" color="info"
+                    :rules="[v=>!!v||$languages.get('error.required_select')]">
                     <template v-slot:label>
                       <div>
                         Nhập Đề xuất
@@ -322,9 +334,10 @@
               <span class="title">Giao thuê bao cho nhân viên</span>
             </v-flex>
             <v-flex xs12 sm5 md5>
-              <v-select :items="nguoidung" v-model="selected_nd" item-value="ma_nd"
-                item-text="ten_nd_dv" :hide-selected="true" label="Nhân viên" :rules="[v=>v&&v.length>0||$languages.get('error.required_select')]"
-                hint="Chọn một nhân viên" persistent-hint></v-select>
+              <v-select :items="nguoidung" v-model="selected_nd" item-value="ma_nd" item-text="ten_nd_dv"
+                :hide-selected="true" label="Nhân viên"
+                :rules="[v=>v&&v.length>0||$languages.get('error.required_select')]" hint="Chọn một nhân viên"
+                persistent-hint></v-select>
             </v-flex>
             <v-spacer></v-spacer>
             <!-- <v-tooltip left>
@@ -358,13 +371,14 @@
           <span>Giao thuê bao theo tệp</span>
         </v-tooltip>
         <export-data :getData="getDataExport" filename="kehoach_thuebao" :suffixFileName="true"
-          :tooltip="$languages.get('global.export')" color="success" :items="[{title:$store.getters.languages(['global.export',' ',' .csv']),type:'csv'}]" />
+          :tooltip="$languages.get('global.export')" color="success"
+          :items="[{title:$store.getters.languages(['global.export',' ',' .csv']),type:'csv'}]" />
       </v-card-title>
-      <v-data-table class="elevation-1" v-model="selected_tb" select-all item-key="id"
-        :headers="headers" :items="items" :rows-per-page-items="[10, 25, 50, 100, 200, 500]"
-        :rows-per-page-text="$languages.get('global.rows_per_page')" :pagination.sync="pagination"
-        :no-data-text="$languages.get('global.no_data_text')" :no-results-text="$languages.get('global.no_results_text')"
-        :loading="$store.state.$loadingGet" :total-items="totalItems">
+      <v-data-table class="elevation-1" v-model="selected_tb" select-all item-key="id" :headers="headers" :items="items"
+        :rows-per-page-items="[10, 25, 50, 100, 200, 500]" :rows-per-page-text="$languages.get('global.rows_per_page')"
+        :pagination.sync="pagination" :no-data-text="$languages.get('global.no_data_text')"
+        :no-results-text="$languages.get('global.no_results_text')" :loading="$store.state.$loadingGet"
+        :total-items="totalItems">
         <template slot="items" slot-scope="props">
           <tr>
             <td>
@@ -382,7 +396,7 @@
                 </v-btn>
                 <span>Chi tiết</span>
               </v-tooltip>
-              <v-tooltip bottom v-if="pagination.flag===1">
+              <v-tooltip bottom v-if="pagination.flag===1 && pagination.thang_th >= currentNow">
                 <v-btn flat icon slot="activator" color="primary" class="mx-0" @click="onEdit(props.item)">
                   <v-icon>input</v-icon>
                 </v-btn>
@@ -390,8 +404,7 @@
               </v-tooltip>
               <template v-else>
                 <v-tooltip bottom>
-                  <v-btn flat icon slot="activator" :color="props.item.ket_qua_color"
-                    class="mx-0">
+                  <v-btn flat icon slot="activator" :color="props.item.ket_qua_color" class="mx-0">
                     <v-icon>{{props.item.ket_qua_icon}}</v-icon>
                   </v-btn>
                   <span>{{props.item.ket_qua_title}}</span>
@@ -445,7 +458,8 @@ export default {
       donvi_id: 5588,
       nhomkh_id: 702,
       ma_nd: '0',
-      ket_qua: ''
+      ket_qua: '',
+      thang_th: 0,
     },
     headers: [
       { text: 'Mã TB', value: 'ma_tb', align: 'left' },
@@ -501,7 +515,13 @@ export default {
         icon: 'cancel',
         label: 'Không thành công',
       }
-    ]
+    ],
+    date_picker_th: {
+      menu: false,
+      format: 'MM/YYYY',
+      date: new Date().toISOString().substr(0, 10),
+    },
+    currentNow: parseInt(new Date().formatDate('YYYYMM'))
   }),
   mounted() {
     this.headers.forEach(e => { e.text = this.$store.getters.languages(e.text) })
@@ -517,7 +537,7 @@ export default {
           e.ket_qua_icon = x.icon
         }
         else {
-          e.ket_qua_title = 'Không xác định'
+          e.ket_qua_title = 'Quá hạn'
           e.ket_qua_color = 'danger'
           e.ket_qua_icon = 'sync_problem'
         }
@@ -566,14 +586,14 @@ export default {
     }
   },
   watch: {
-    pagination: {
-      handler(val) {
-        this.$store.dispatch('kehoach/select_tb', this.pagination).then((x) => {
-          if (x && x.total) this.totalItems = x.total
-        })
-      },
-      deep: true
-    },
+    // pagination: {
+    //   handler(val) {
+    //     this.$store.dispatch('kehoach/select_tb', this.pagination).then((x) => {
+    //       if (x && x.total) this.totalItems = x.total
+    //     })
+    //   },
+    //   deep: true
+    // },
     attach_upload: {
       handler(val) {
         if (val.files.length > 0) {
@@ -609,6 +629,13 @@ export default {
     }
   },
   methods: {
+    onFilter() {
+      this.dialog_filter = false
+      this.pagination.thang_th = parseInt(this.date_picker_th.date.formatDate('YYYYMM'))
+      this.$store.dispatch('kehoach/select_tb', this.pagination).then((x) => {
+        if (x && x.total) this.totalItems = x.total
+      })
+    },
     onEdit(item) {
       // this.$store.commit('kehoach/SET_ITEM', item)
       this.params_thuchien.nhomkh_id = item.nhom_kh
@@ -699,6 +726,9 @@ export default {
       this.params_import.success = 0
       this.params_import.error = []
       this.$refs.valid_import.resetValidation()
+    },
+    datePickerFormat(date) {
+      return date.formatDate('MM/YYYY')
     }
   }
 }

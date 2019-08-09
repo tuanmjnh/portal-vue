@@ -63,6 +63,13 @@ String.prototype.formatDate = function(format = 'DD/MM/YYYY hh:mm') {
   else
     return moment(this).format(format)
 }
+Date.prototype.formatDate = function(format = 'DD/MM/YYYY hh:mm') {
+  if (!this) return this
+  if (typeof val === 'object' && this.constructor.name === 'Timestamp')
+    return moment(this).format(format)
+  else
+    return moment(this).format(format)
+}
 export function FilesToString(files, chars = ',') {
   let rs = ''
   if (!files) return rs

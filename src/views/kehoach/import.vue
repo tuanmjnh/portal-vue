@@ -14,46 +14,54 @@
               thuê bao
             </v-flex>
             <v-flex xs6 sm6 md6 v-if="params.error.length>0">
-              <export-data :getData="getErrorExport" tooltip="Tải danh sách lỗi" color="error"
-                filename="import_error" :items="[{title:`${$languages.get('global.export')} .csv`,type:'csv'}]" />
+              <export-data :getData="getErrorExport" tooltip="Tải danh sách lỗi" color="error" filename="import_error"
+                :items="[{title:`${$languages.get('global.export')} .csv`,type:'csv'}]" />
             </v-flex>
           </v-layout>
           <v-layout wrap>
             <v-flex xs12 sm6 md6>
               <v-radio-group v-model="params.nhomkh_id" column @click="getNhomKHAttach()"
                 :rules="[v=>!!v||$languages.get('error.required_select')]">
-                <v-radio :key="index" v-for="(item,index) in nhom_kh" :label="item.title"
-                  :value="item.id"></v-radio>
+                <v-radio :key="index" v-for="(item,index) in nhom_kh" :label="item.title" :value="item.id"></v-radio>
               </v-radio-group>
             </v-flex>
             <v-flex xs12 sm6 md6>
               <!-- class="text-sm-right" -->
               <v-layout wrap>
                 <v-flex xs12 sm12 md12>
-                  <v-select :items="donvi" v-model="params.donvi_id" :hide-selected="true"
-                    item-text="ten_dv" item-value="donvi_id" :label="$languages.get('global.local')"
+                  <v-select :items="donvi" v-model="params.donvi_id" :hide-selected="true" item-text="ten_dv"
+                    item-value="donvi_id" :label="$languages.get('global.local')"
                     :rules="[v=>!!v||$languages.get('error.required_select')]"></v-select>
                 </v-flex>
                 <v-flex xs12 sm6 md6>
-                  <v-menu v-model="date_picker.menu" :nudge-right="40" lazy transition="scale-transition"
-                    offset-y full-width min-width="290px">
+                  <v-menu v-model="date_picker_start.menu" :nudge-right="40" lazy transition="scale-transition" offset-y
+                    full-width min-width="290px" :close-on-content-click="false">
                     <template v-slot:activator="{on}">
-                      <v-text-field :value="datePickerFormat()" label="Tháng bắt đầu"
-                        prepend-icon="event" :disabled="true" readonly v-on="on"
-                        persistent-hint hint="Định dạng: MM/YYYY"></v-text-field>
+                      <v-text-field :value="datePickerFormat(date_picker_start.date)" label="Tháng bắt đầu" prepend-icon="event" readonly
+                        v-on="on" persistent-hint hint="Định dạng: MM/YYYY"></v-text-field>
                     </template>
-                    <v-date-picker v-model="date_picker.date" @input="menu2=false"></v-date-picker>
+                    <v-date-picker v-model="date_picker_start.date" @input="date_picker_start.menu=false"></v-date-picker>
                   </v-menu>
                 </v-flex>
                 <v-flex xs12 sm6 md6 class="pb-3">
-                  <v-text-field :value="datePickerFormat()" label="Tháng kết thúc"
-                    prepend-icon="event" :disabled="true" readonly persistent-hint hint="Định dạng: MM/YYYY"></v-text-field>
+                  <v-menu v-model="date_picker_end.menu" :nudge-right="40" lazy transition="scale-transition" offset-y
+                    full-width min-width="290px" :close-on-content-click="false">
+                    <template v-slot:activator="{on}">
+                      <v-text-field :value="datePickerFormat(date_picker_end.date)" label="háng kết thúc" prepend-icon="event" readonly
+                        v-on="on" persistent-hint hint="Định dạng: MM/YYYY"></v-text-field>
+                    </template>
+                    <v-date-picker v-model="date_picker_end.date" @input="date_picker_end.menu=false"></v-date-picker>
+                  </v-menu>
                 </v-flex>
+                <!-- <v-flex xs12 sm6 md6 class="pb-3">
+                  <v-text-field :value="datePickerFormat()" label="Tháng kết thúc"
+                    prepend-icon="event" readonly persistent-hint hint="Định dạng: MM/YYYY"></v-text-field>
+                </v-flex> -->
                 <v-flex xs12 sm12 md12 v-if="params.nhomkh_attach">
                   Tệp dữ liệu mẫu:
                   <v-tooltip bottom>
-                    <a :href="`${http.defaults.host}/${params.nhomkh_attach}`" slot="activator"
-                      class="mx-0 theme--info" target="_blank">template</a>
+                    <a :href="`${http.defaults.host}/${params.nhomkh_attach}`" slot="activator" class="mx-0 theme--info"
+                      target="_blank">template</a>
                     <!-- <i class="material-icons">attachment</i> -->
                     <span>{{params.nhomkh_attach.split('/').pop()}}</span>
                   </v-tooltip>
@@ -76,8 +84,8 @@
               </p>
             </v-flex>
             <v-flex xs12 sm6 md6 v-if="params.nhomkh_id>0">
-              <upload-files :http="http" :autoName="false" :buttonUse="false" :multiple="false"
-                extension=".csv" :files.sync="attach_upload.files" :loading.sync="attach_upload.loading"
+              <upload-files :http="http" :autoName="false" :buttonUse="false" :multiple="false" extension=".csv"
+                :files.sync="attach_upload.files" :loading.sync="attach_upload.loading"
                 :buttonText="$languages.get('global.upload_drag')" :basePath="attach_upload.basePath"></upload-files>
             </v-flex>
           </v-layout>
@@ -115,7 +123,12 @@ export default {
       basePath: 'Uploads/KeHoach',
       loading: false//true
     },
-    date_picker: {
+    date_picker_start: {
+      menu: false,
+      format: 'MM/YYYY',
+      date: new Date().toISOString().substr(0, 10),
+    },
+    date_picker_end: {
       menu: false,
       format: 'MM/YYYY',
       date: new Date().toISOString().substr(0, 10),
@@ -157,7 +170,8 @@ export default {
   methods: {
     onSave() {
       if (this.valid) {
-        this.params.thang_bd = this.date_picker.date.formatDate('YYYYMM')
+        this.params.thang_bd = this.date_picker_start.date.formatDate('YYYYMM')
+        this.params.thang_kt = this.date_picker_end.date.formatDate('YYYYMM')
         this.$store.dispatch('kehoach/import_tb', this.params).then((x) => {
           if (x) {
             this.params.success = x.success
@@ -172,8 +186,8 @@ export default {
         resolve(this.params.error)
       })
     },
-    datePickerFormat() {
-      return this.date_picker.date.formatDate('MM/YYYY')
+    datePickerFormat(date) {
+      return date.formatDate('MM/YYYY')
     },
     getNhomKHAttach() {
       var x = this.nhom_kh.find((x) => { return x.id === this.params.nhomkh_id })

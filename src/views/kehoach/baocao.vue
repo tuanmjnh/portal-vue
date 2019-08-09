@@ -8,16 +8,26 @@
         <v-card-text>
           <v-layout wrap>
             <v-flex xs12 sm12 md12 v-if="$store.getters['auth/inRoles']('donvi.select')">
-              <v-select :items="donvi" v-model="pagination.donvi_id" item-text="ten_dv"
-                item-value="donvi_id" :label="$languages.get('global.local')"></v-select>
+              <v-select :items="donvi" v-model="pagination.donvi_id" item-text="ten_dv" item-value="donvi_id"
+                :label="$languages.get('global.local')"></v-select>
             </v-flex>
             <v-flex xs12 sm12 md12>
-              <v-select :items="nhom_kh" v-model="pagination.nhomkh_id" item-text="title"
-                item-value="id" label="Nhóm kế hoạch"></v-select>
+              <v-select :items="nhom_kh" v-model="pagination.nhomkh_id" item-text="title" item-value="id"
+                label="Nhóm kế hoạch"></v-select>
             </v-flex>
             <v-flex xs12 sm12 md12>
-              <v-select :items="pagination_nguoidung" v-model="pagination.ma_nd"
-                item-text="ten_nd_dv" item-value="ma_nd" label="Thuê bao theo nhân viên"></v-select>
+              <v-select :items="pagination_nguoidung" v-model="pagination.ma_nd" item-text="ten_nd_dv"
+                item-value="ma_nd" label="Thuê bao theo nhân viên"></v-select>
+            </v-flex>
+            <v-flex xs12 sm12 md12>
+              <v-menu v-model="date_picker_th.menu" :nudge-right="40" lazy transition="scale-transition" offset-y
+                full-width min-width="290px" :close-on-content-click="false">
+                <template v-slot:activator="{on}">
+                  <v-text-field :value="datePickerFormat(date_picker_th.date)" label="Tháng thực hiện"
+                    append-icon="event" readonly v-on="on" persistent-hint hint="Định dạng: MM/YYYY"></v-text-field>
+                </template>
+                <v-date-picker v-model="date_picker_th.date" @input="date_picker_th.menu=false"></v-date-picker>
+              </v-menu>
             </v-flex>
             <v-flex xs12 sm12 md12>
               <v-select :items="flag" v-model="pagination.flag" label="Trạng thái thực hiện"></v-select>
@@ -54,9 +64,10 @@
           :tooltip="$languages.get('global.export')" color="success" :items="[{title:$store.getters.languages(['global.export',' ',' .csv']),type:'csv'}]" /> -->
       </v-card-title>
       <v-card-text>
-        <v-data-table class="elevation-1" :headers="items.thead" :items="items.tbody"
-          hide-actions :rows-per-page-items="[500]" :loading="$store.state.$loadingGet"
-          :rows-per-page-text="$languages.get('global.rows_per_page')" :no-data-text="$languages.get('global.no_data_text')"
+        <v-data-table class="elevation-1" :headers="items.thead" :items="items.tbody" hide-actions
+          :rows-per-page-items="[500]" :loading="$store.state.$loadingGet"
+          :rows-per-page-text="$languages.get('global.rows_per_page')"
+          :no-data-text="$languages.get('global.no_data_text')"
           :no-results-text="$languages.get('global.no_results_text')">
           <template v-slot:items="props">
             <!-- <td>{{ props.item.ten_dv }}</td>
@@ -107,7 +118,8 @@ export default {
       donvi_id: 0,
       nhomkh_id: 0,
       ma_nd: '0',
-      ket_qua: 0
+      ket_qua: 0,
+      thang_th: 0
     },
     flag: [
       { value: 0, text: '-- Tất cả --' },
@@ -127,7 +139,12 @@ export default {
       { value: 'trang_thai', text: 'Trạng thái' },
       { value: 'ket_qua', text: 'Kết quả' },
       { value: 'soluong', text: 'Số lượng' }
-    ]
+    ],
+    date_picker_th: {
+      menu: false,
+      format: 'MM/YYYY',
+      date: new Date().toISOString().substr(0, 10),
+    }
   }),
   computed: {
     donvi() {
@@ -158,6 +175,7 @@ export default {
   },
   methods: {
     onSave() {
+      this.pagination.thang_th = this.date_picker_th.date.formatDate('YYYYMM')
       if (this.$store.getters['auth/inRoles']('donvi.select') && !this.pagination.donvi_id)
         this.pagination.ma_nd = '0'
       if (this.pagination.flag < 2) this.pagination.ket_qua = 0
@@ -171,8 +189,8 @@ export default {
             text: this.mapHeader.find((t) => t.value === x).text
           }))
           this.items.tbody = x
-          console.log(this.items)
         }
+        this.dialog_filter = false
       })
     },
     getDataExport() {
@@ -192,6 +210,9 @@ export default {
         { value: 'ket_qua', text: 'Kết quả' },
         { value: 'soluong', text: 'Số lượng' }
       ]
+    },
+    datePickerFormat(date) {
+      return date.formatDate('MM/YYYY')
     }
   }
 }
